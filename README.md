@@ -1,4 +1,4 @@
-# Analysis Code: Multi-Grid V20 Measurements, 23/9-2019 -> 6/10-2019
+# Multi-Grid V20 Measurements, 23/9-2019 -> 6/10-2019
 
 Application for analysis of Multi-Grid data taken at the HZB using the V20 instrument.
 The program consists of a GUI Interface which allows the user to cluster Mesytec VMMR-8/16 output and analyse the data using different tools, such as:
@@ -33,7 +33,7 @@ python main.py
 ## Notes
 
 The code requires the following files:
--mapping.xlsx
--window.ui
+- mapping.xlsx
+- window.ui
 
 These can be found under the 'Tables'- and 'Window'-folders in the repository, and the files can be manipulated according to the specific conditions of the measurement.
