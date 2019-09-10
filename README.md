@@ -7,7 +7,11 @@ The program consists of a GUI Interface which allows the user to cluster Mesytec
 - Coincidences (2D and 3D)
 - Time-of-Flight
 
-The program has a 'filtering'-feature which allows the user to gate the data on different parameters, such as PHS, ToF and position.
+The program has a 'filtering'-feature which allows the user to gate the data on different parameters, such as PHS, ToF and position. In addition to this, it conatains the relevant analysis features used at the measurement:
+
+- Efficiency at cold neutrons energies
+- Detector response at high instanteous flux
+- Elastic line shape in energy transfer spectra
 
 ## Requisties
 - Python3 (https://www.python.org/downloads/)
