@@ -529,7 +529,7 @@ Events</string>
      </item>
     </layout>
    </widget>
-   <widget class="QSpinBox" name="ILL_1">
+   <widget class="QSpinBox" name="ILL_bus_1">
     <property name="geometry">
      <rect>
       <x>5</x>
@@ -565,7 +565,7 @@ Events</string>
      <string>ILL buses:</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="ILL_2">
+   <widget class="QSpinBox" name="ILL_bus_2">
     <property name="geometry">
      <rect>
       <x>45</x>
@@ -581,7 +581,7 @@ Events</string>
      <number>-1</number>
     </property>
    </widget>
-   <widget class="QSpinBox" name="ILL_3">
+   <widget class="QSpinBox" name="ILL_bus_3">
     <property name="geometry">
      <rect>
       <x>85</x>
@@ -597,7 +597,7 @@ Events</string>
      <number>-1</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="energy_selection">
+   <widget class="QLineEdit" name="incident_energy">
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -607,7 +607,7 @@ Events</string>
      </rect>
     </property>
     <property name="text">
-     <string>0</string>
+     <string>-1</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -672,7 +672,7 @@ Events</string>
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="Cluster">
+   <widget class="QPushButton" name="cluster_button">
     <property name="geometry">
      <rect>
       <x>3</x>
@@ -686,7 +686,7 @@ Events</string>
 ('.zip')</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Save">
+   <widget class="QPushButton" name="save_button">
     <property name="geometry">
      <rect>
       <x>3</x>
@@ -700,7 +700,7 @@ Events</string>
 ('.zip'→'.h5')</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Load">
+   <widget class="QPushButton" name="load_button">
     <property name="geometry">
      <rect>
       <x>3</x>
@@ -769,7 +769,7 @@ Events</string>
      <string>          Filter          </string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="energy_selection_2">
+   <widget class="QLineEdit" name="import_percentage">
     <property name="geometry">
      <rect>
       <x>6</x>
@@ -881,7 +881,7 @@ Events</string>
      <string>          Plotting &amp; Analysis          </string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Multiplicity">
+   <widget class="QPushButton" name="multiplicity_button">
     <property name="geometry">
      <rect>
       <x>370</x>
@@ -894,7 +894,7 @@ Events</string>
      <string>Multiplicity</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Timestamp">
+   <widget class="QPushButton" name="timestamp_button">
     <property name="geometry">
      <rect>
       <x>370</x>
@@ -907,7 +907,7 @@ Events</string>
      <string>Timestamp</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="PHS_1D">
+   <widget class="QPushButton" name="PHS_1D_button">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -923,7 +923,7 @@ Events</string>
      <string>1D</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="PHS_2D">
+   <widget class="QPushButton" name="PHS_2D_button">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -936,7 +936,7 @@ Events</string>
      <string>2D</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Coincidences_3D">
+   <widget class="QPushButton" name="ce_3D_button">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -987,7 +987,7 @@ Events</string>
      <string>PHS</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Coincidences_2D">
+   <widget class="QPushButton" name="ce_2D_button">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -1000,7 +1000,7 @@ Events</string>
      <string>2D</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF">
+   <widget class="QPushButton" name="ToF_button">
     <property name="geometry">
      <rect>
       <x>370</x>
@@ -1013,7 +1013,7 @@ Events</string>
      <string>ToF</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="PHS_wires_vs_grids">
+   <widget class="QPushButton" name="PHS_wires_vs_grids_button">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -1026,7 +1026,7 @@ Events</string>
      <string>Wires vs Grids</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Coincidences_Front_Top_Side">
+   <widget class="QPushButton" name="ce_projections_button">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -1058,7 +1058,7 @@ Events</string>
      <string>Misc.</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_2">
+   <widget class="QPushButton" name="dE_button">
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -1071,7 +1071,7 @@ Events</string>
      <string>∆E</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_3">
+   <widget class="QPushButton" name="efficiency_button">
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -1084,7 +1084,7 @@ Events</string>
      <string>Efficiency</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_4">
+   <widget class="QPushButton" name="energy_resolution_button">
     <property name="geometry">
      <rect>
       <x>590</x>
@@ -1098,7 +1098,7 @@ Events</string>
 Resolution</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_5">
+   <widget class="QPushButton" name="count_rate_button">
     <property name="geometry">
      <rect>
       <x>590</x>
@@ -1111,7 +1111,7 @@ Resolution</string>
      <string>Count Rate</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_6">
+   <widget class="QPushButton" name="lineshape_button">
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -1296,7 +1296,7 @@ Resolution</string>
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QCheckBox" name="ESS_PA">
+   <widget class="QCheckBox" name="ESS_CRB_filter">
     <property name="geometry">
      <rect>
       <x>848</x>
@@ -1312,7 +1312,7 @@ Resolution</string>
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="ESS_CLB">
+   <widget class="QCheckBox" name="ESS_PA_filter">
     <property name="geometry">
      <rect>
       <x>848</x>
@@ -1328,7 +1328,7 @@ Resolution</string>
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="ILL">
+   <widget class="QCheckBox" name="ILL_filter">
     <property name="geometry">
      <rect>
       <x>848</x>
@@ -1430,7 +1430,7 @@ Resolution</string>
      <string>ADC Threshold:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="energy_selection_3">
+   <widget class="QLineEdit" name="adc_threshold">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1456,7 +1456,7 @@ Resolution</string>
      <string>ADC Ch's</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="Files">
+   <widget class="QTextBrowser" name="information_window">
     <property name="geometry">
      <rect>
       <x>570</x>
