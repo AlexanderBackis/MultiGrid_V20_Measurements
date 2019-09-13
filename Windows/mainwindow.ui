@@ -597,7 +597,7 @@ Events</string>
      <number>-1</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="incident_energy">
+   <widget class="QLineEdit" name="Ei_value">
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -769,7 +769,7 @@ Events</string>
      <string>          Filter          </string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="import_percentage">
+   <widget class="QLineEdit" name="maximum_file_size_in_mb_value">
     <property name="geometry">
      <rect>
       <x>6</x>
@@ -779,7 +779,7 @@ Events</string>
      </rect>
     </property>
     <property name="text">
-     <string>100</string>
+     <string>3000</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -792,7 +792,7 @@ Events</string>
      </rect>
     </property>
     <property name="text">
-     <string>%</string>
+     <string>MB</string>
     </property>
    </widget>
    <widget class="Line" name="line_10">
@@ -858,7 +858,7 @@ Events</string>
      </font>
     </property>
     <property name="text">
-     <string>Percentage of file:</string>
+     <string>Maximum file size:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_23">
@@ -1430,7 +1430,7 @@ Resolution</string>
      <string>ADC Threshold:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="adc_threshold">
+   <widget class="QLineEdit" name="adc_threshold_value">
     <property name="geometry">
      <rect>
       <x>10</x>

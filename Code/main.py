@@ -1,10 +1,20 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" main.py: Module containing the GUI used for data analysis.
+"""
+
+#Standard library
+import os
+import sys
+#QT
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5 import uic
-import os
-import sys
+#Data Analysis
 import pandas as pd
+#Local sources
+from FileHandling.Import import import_data, unzip_data
 
 # =============================================================================
 # Windows
@@ -19,11 +29,10 @@ class MainWindow(QMainWindow):
         self.app = app
         self.measurement_time = 0
         self.data_sets = []
-        self.ILL_buses = []
-        self.measurement_time = 0
+        self.ILL_buses = [-1, -1, -1]
         self.Ei = -1
-        self.import_percentage = []
-        self.ADC_threshold = 0
+        self.maximum_file_size_in_mb = 3000
+        self.adc_threshold = 0
         self.fill_information_window()
         self.show()
         self.refresh_window()
@@ -33,7 +42,20 @@ class MainWindow(QMainWindow):
     # =========================================================================
 
     def cluster_action(self):
-        pass
+        zip_paths = QFileDialog.getOpenFileNames(self, "Select Directory", "../Data")[0]
+        self.set_clustering_parameters()
+        # Import
+        data = ()
+        for zip_path in zip_paths:
+            file_path = unzip_data(zip_path)
+            data += import_data(file_path, self.maximum_file_size_in_mb)
+            os.remove(file_path)
+        # Cluster
+
+
+        # Update window
+        self.fill_information_window()
+        self.refresh_window()
 
 
     # =========================================================================
@@ -70,7 +92,7 @@ class MainWindow(QMainWindow):
 
     def setup_buttons(self):
         # File handling
-        #self.cluster_button.clicked.connect(self.cluster_action)
+        self.cluster_button.clicked.connect(self.cluster_action)
         # Plotting
         #self.PHS_1D_button.clicked.connect(self.PHS_1D_action)
         #self.PHS_2D_button.clicked.connect(self.PHS_2D_action)
@@ -91,12 +113,18 @@ class MainWindow(QMainWindow):
 
     def fill_information_window(self):
         information_text = '<b>Measurement time:</b> %d [s]' % int(self.measurement_time)
-        information_text += '<br/><b>Incident energy:</b> %.4f [meV]' % self.Ei
-        information_text += "<br/><b>ADC Threshold:</b> %d [ADC Ch's]" % self.ADC_threshold
+        information_text += '<br/><b>Incident energy:</b> %.2f [meV]' % self.Ei
+        information_text += "<br/><b>ADC Threshold:</b> %d [ADC Ch's]" % self.adc_threshold
         information_text += '<br/><b>ILL buses:</b> ' + str(self.ILL_buses)
-        information_text += '<br/><b>Import percentages:</b> ' + str(self.import_percentage)
         information_text += '<br/><b>Data sets:</b> ' + str(self.data_sets)
         self.information_window.setText(information_text)
+
+    def set_clustering_parameters(self):
+        self.ILL_buses = [self.ILL_bus_1.value(), self.ILL_bus_2.value(), self.ILL_bus_3.value()]
+        self.Ei = float(self.Ei_value.text())
+        self.maximum_file_size_in_mb = float(self.maximum_file_size_in_mb_value.text())
+        self.adc_threshold = float(self.adc_threshold_value.text())
+
 
 
 # =============================================================================
