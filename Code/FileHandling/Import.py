@@ -83,7 +83,7 @@ def import_data(file_path, maximum_file_size_in_mb):
         match = re.search(b'}\n}\n[ ]*', content)
         start = match.end()
         content = content[start:]
-        # Split into groups of 4 bytes
+        # Split first piece of data into groups of 4 bytes
         data = struct.unpack('I' * (len(content)//4), content)
         # Repeat for the rest of data
         moreData = True

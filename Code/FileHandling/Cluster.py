@@ -236,11 +236,6 @@ def cluster_data(data, adc_threshold=0, ILL_buses=[]):
                 else:
                     coincident_events['d'][index-i] = -1
 
-
-
-            #print('Time: %d' % Time)
-            #print('ToF: %d' % ToF)
-            #print()
             #Reset temporary variables
             nbrCoincidentEvents = 0
             nbrEvents = 0
