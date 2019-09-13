@@ -10,6 +10,38 @@ CreateMapping.py: Creates the channel->coordinate mapping using Isaaks CAD
                   ordering, because buses are flipped and wire rows are flipped.
 """
 
+
+# =============================================================================
+#                        FULL MAPPING, ALL DETECTORS
+# =============================================================================
+
+def create_full_mapping():
+    # Import measurement of corners
+    ill_corners, ess_crb_corners, ess_pa_corners = get_detector_corners()
+    # Calculate inclination of detectors in (x, z)-plane
+    theta_ill = calculate_theta(ill_corners['left']['x'],
+                                ill_corners['right']['x'],
+                                ill_corners['left']['z'],
+                                ill_corners['right']['z'])
+    theta_crb = calculate_theta(ess_crb_corners['left']['x'],
+                                ess_crb_corners['right']['x'],
+                                ess_crb_corners['left']['z'],
+                                ess_crb_corners['right']['z'])
+    theta_pa = calculate_theta(ess_pa_corners['left']['x'],
+                               ess_pa_corners['right']['x'],
+                               ess_pa_corners['left']['z'],
+                               ess_pa_corners['right']['z'])
+    # Calculate offset of detectors in (x, y, z)
+    offset_ill = ill_corners['right']
+    offset_crb = ess_crb_corners['right']
+    offset_pa = ess_pa_corners['right']
+    # Calculate mappings
+    ill_mapping = create_ill_channel_to_coordinate_map(theta_ill, offset_ill)
+    crb_mapping = create_ess_channel_to_coordinate_map(theta_crb, offset_crb)
+    pa_mapping = create_ess_channel_to_coordinate_map(theta_pa, offset_pa)
+    return [ill_mapping, crb_mapping, pa_mapping]
+
+
 # =============================================================================
 #                            ESS DETECTOR MAPPING
 # =============================================================================
@@ -123,28 +155,107 @@ def create_ill_channel_to_coordinate_map(theta, offset):
                                     flip_wire(WireChannel)] = {'x': x, 'y': y, 'z': z}
     return ill_ch_to_coord
 
-
 # =============================================================================
 #                            Helper Functions
 # =============================================================================
 
 def flip_bus(bus):
+    """
+    Flips the bus into correct position in detector, which is on the
+    mirrored side (detector surface projections).
+
+    Args:
+        bus (int): Bus
+
+    Returns:
+        mirrored_bus (int): Mirrored bus (on detector surface projection)
+    """
     flip_bus_dict = {0: 2, 1: 1, 2: 0}
-    return flip_bus_dict[bus]
+    mirrored_bus = flip_bus_dict[bus]
+    return mirrored_bus
 
 def flip_wire(wCh):
-        if 0 <= wCh <= 19:
-            wCh += 60
-        elif 20 <= wCh <= 39:
-            wCh += 20
-        elif 40 <= wCh <= 59:
-            wCh -= 20
-        elif 60 <= wCh <= 79:
-            wCh -= 60
-        return wCh
+    """
+    Flips the wire channel into correct location in bus, which is on the
+    mirrored side (detector surface projection).
+
+    Args:
+        wCh (int): Wire channel
+
+    Returns:
+        mirrored_wCh (int): Mirrored wire channel position (on detector
+                            surface projection)
+    """
+    if 0 <= wCh <= 19:
+        mirrored_wCh = wCh + 60
+    elif 20 <= wCh <= 39:
+        mirrored_wCh = wCh + 20
+    elif 40 <= wCh <= 59:
+        mirrored_wCh = wCh - 20
+    elif 60 <= wCh <= 79:
+        mirrored_wCh = wCh - 60
+    return mirrored_wCh
 
 def get_new_x(x, y, theta):
-    return np.cos(np.arctan(y/x)+theta)*np.sqrt(x ** 2 + y ** 2)
+    """
+    This works because we are working in Isaaks coordinate system, where
+    each consecutive voxel center is placed further out in the x-y plane.
+    We then check the angle for the non-rotated system (i.e. np.arctan(y/x)),
+    followed by a an addition to theta (corresponding to the rotation, which
+    is "up" from the x-axis, which makes it easy for us to add the angles).
+    The summation of these two angles are then used to translate the coordinate
+    into polar form and calculate the final position of the voxel.
+
+    Args:
+        x (float): x-position
+        y (float): y-position
+        theta (float): Detector inclination [Radians]
+
+    Returns:
+        new_x (float): New x in rotated geometry
+    """
+    new_x = np.cos(np.arctan(y/x)+theta)*np.sqrt(x ** 2 + y ** 2)
+    return new_x
 
 def get_new_y(x, y, theta):
-    return np.sin(np.arctan(y/x)+theta)*np.sqrt(x ** 2 + y ** 2)
+    """
+    This works because we are working in Isaaks coordinate system, where
+    each consecutive voxel center is placed further out in the x-y plane.
+    We then check the angle for the non-rotated system (i.e. np.arctan(y/x)),
+    followed by a an addition to theta (corresponding to the rotation, which
+    is "up" from the x-axis, which makes it easy for us to add the angles).
+    The summation of these two angles are then used to translate the coordinate
+    into polar form and calculate the final position of the voxel.
+
+    Args:
+        x (float): x-position
+        y (float): y-position
+        theta (float): Detector inclination [Radians]
+
+    Returns:
+        new_y (float): New y in rotated geometry
+    """
+    new_y = np.sin(np.arctan(y/x)+theta)*np.sqrt(x ** 2 + y ** 2)
+    return new_y
+
+def calculate_theta(x1, x2, z1, z2):
+    return np.arctan((z2-z1)/(x2-x1))
+
+def get_detector_corners():
+    def create_corner_dict(corners):
+        corners = {'left': {'x': corners[0],
+                            'y': corners[1],
+                            'z': corners[2]},
+                   'right': {'x': corners[3],
+                             'y': corners[4],
+                             'z': corners[5]}}
+        return corners
+    # Import data from measurement of corners
+    dirname = os.path.dirname(__file__)
+    file_path = os.path.join(dirname, '../../Tables/Detector_Corners.xlsx')
+    matrix = pd.read_excel(file_path).values
+    # Create dictionary containing information about corners
+    ill_corners = create_corner_dict(matrix[1][1:])
+    ess_crb_corners = create_corner_dict(matrix[2][1:])
+    ess_pa_corners = create_corner_dict(matrix[3][1:])
+    return ill_corners, ess_crb_corners, ess_pa_corners

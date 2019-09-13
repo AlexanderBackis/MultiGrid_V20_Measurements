@@ -50,7 +50,7 @@ ExTsShift     =   30
 #                               CLUSTER DATA
 # =============================================================================
 
-def cluster_data(data, adc_threshold=0, ILL_buses=[]):
+def cluster_data(data, detector_mappings, ILL_buses, adc_threshold=0):
     """ Clusters the imported data and stores it two data frames: one for
         individual events and one for coicident events (i.e. candidate neutron
         events).
@@ -96,25 +96,9 @@ def cluster_data(data, adc_threshold=0, ILL_buses=[]):
 
 
     """
-    offset_1 = {'x': -0.907574, 'y': -3.162949, 'z': 5.384863}
-    offset_2 = {'x': -1.246560, 'y': -3.161484, 'z': 5.317432}
-    offset_3 = {'x': -1.579114, 'y': -3.164503,  'z': 5.227986}
 
-    corners = {'ESS_2': {1: [-1.579114, -3.164503, 5.227986],
-                         2: [-1.252877, -3.162614, 5.314108]},
-               'ESS_1': {3: [-1.246560, -3.161484, 5.317432],
-                         4: [-0.916552, -3.160360, 5.384307]},
-               'ILL':   {5: [-0.907574, -3.162949, 5.384863],
-                         6: [-0.575025, -3.162578, 5.430037]}
-                }
 
-    ILL_C = corners['ILL']
-    ESS_1_C = corners['ESS_1']
-    ESS_2_C = corners['ESS_2']
 
-    theta_1 = np.arctan((ILL_C[6][2]-ILL_C[5][2])/(ILL_C[6][0]-ILL_C[5][0]))
-    theta_2 = np.arctan((ESS_1_C[4][2]-ESS_1_C[3][2])/(ESS_1_C[4][0]-ESS_1_C[3][0]))
-    theta_3 = np.arctan((ESS_2_C[2][2]-ESS_2_C[1][2])/(ESS_2_C[2][0]-ESS_2_C[1][0]))
 
     detector_1 = create_ill_channel_to_coordinate_map(theta_1, offset_1)
     detector_2 = create_ess_channel_to_coordinate_map(theta_2, offset_2)
@@ -269,3 +253,7 @@ def cluster_data(data, adc_threshold=0, ILL_buses=[]):
         triggers_df = pd.DataFrame(triggers[0:trigger_index-1])
 
     return coincident_events_df, events_df, triggers_df
+
+# =============================================================================
+#                               HELPER FUNCTIONS
+# =============================================================================
