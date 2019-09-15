@@ -53,8 +53,7 @@ class MainWindow(QMainWindow):
             data += import_data(file_path, self.maximum_file_size_in_mb)
             os.remove(file_path)
         # Cluster
-        detector_mappings = create_full_mapping()
-        clusters = cluster_data(data, detector_mappings, self.ILL_buses, self.adc_threshold)
+        clusters, events = cluster_data(data, self.ILL_buses, self.adc_threshold)
         # Update window
         self.fill_information_window()
         self.refresh_window()

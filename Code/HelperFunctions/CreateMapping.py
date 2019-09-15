@@ -16,6 +16,13 @@ CreateMapping.py: Creates the channel->coordinate mapping using Isaaks CAD
 # =============================================================================
 
 def create_full_mapping():
+    """
+    Creates a channel->coordinate mapping for all three detectors.
+
+    Returns:
+        detector_mappings (list): List containing the mappings for all three
+                                  detectors.
+    """
     # Import measurement of corners
     ill_corners, ess_crb_corners, ess_pa_corners = get_detector_corners()
     # Calculate inclination of detectors in (x, z)-plane
@@ -39,7 +46,8 @@ def create_full_mapping():
     ill_mapping = create_ill_channel_to_coordinate_map(theta_ill, offset_ill)
     crb_mapping = create_ess_channel_to_coordinate_map(theta_crb, offset_crb)
     pa_mapping = create_ess_channel_to_coordinate_map(theta_pa, offset_pa)
-    return [ill_mapping, crb_mapping, pa_mapping]
+    detector_mappings = [ill_mapping, crb_mapping, pa_mapping]
+    return detector_mappings
 
 
 # =============================================================================
@@ -239,9 +247,30 @@ def get_new_y(x, y, theta):
     return new_y
 
 def calculate_theta(x1, x2, z1, z2):
-    return np.arctan((z2-z1)/(x2-x1))
+    """
+    Calculates the angle in a triangle with sides the length of (x2-x1) and
+    (z2-z1).
+
+    Args:
+        x1 (float): First x-position
+        x2 (float): Second x-position
+        y1 (float): First y-position
+        y2 (float): Second y-position
+
+    Returns:
+        theta (float): Angle theta in triangle with sides (x2-x1) and (z2-z1).
+    """
+    theta = np.arctan((z2-z1)/(x2-x1))
+    return theta
 
 def get_detector_corners():
+    """
+    Imports the measured detector corners of the three detectors and saves them
+    in three dictionaries, which are stored in a list.
+
+    Returns:
+        theta (float): Angle theta in triangle with sides (x2-x1) and (z2-z1).
+    """
     def create_corner_dict(corners):
         corners = {'left': {'x': corners[0],
                             'y': corners[1],
