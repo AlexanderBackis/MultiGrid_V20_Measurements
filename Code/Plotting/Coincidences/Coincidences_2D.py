@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-PathsAndFolders.py: Helper functions for handling of paths and folders.
+Coincidences_2D.py: Helper functions for handling of paths and folders.
 """
 
 
 # =============================================================================
-# Coincidence Histogram (2D)
+#                          Coincidence Histogram (2D)
 # =============================================================================
 
 def Coincidences_2D_plot(ce, data_sets, module_order, window):
@@ -14,15 +14,13 @@ def Coincidences_2D_plot(ce, data_sets, module_order, window):
         h, *_ = plt.hist2d(ce.wCh, ce.gCh, bins=[80, 40],
                            range=[[-0.5, 79.5], [79.5, 119.5]],
                            vmin=vmin, vmax=vmax, norm=LogNorm(), cmap='jet')
-        xlabel = 'Wire [Channel number]'
-        ylabel = 'Grid [Channel number]'
-        fig = stylize(fig, xlabel, ylabel, title=sub_title, colorbar=True)
+        plt.xlabel('Wire [Channel number]')
+        plt.ylabel('Grid [Channel number]')
+        plt.title(sub_title)
         plt.colorbar()
         return fig, h
 
-    # Filter clusters
-    ce = filter_ce_clusters(window, ce)
-    # Declare parameters (added with condition if empty array)
+    # Calculate color limits
     if ce.shape[0] != 0:
         duration = window.measurement_time
         vmin = 1
@@ -31,7 +29,7 @@ def Coincidences_2D_plot(ce, data_sets, module_order, window):
         duration = 1
         vmin = 1
         vmax = 1
-    title = 'Coincident events (2D)\nData set(s): %s' % data_sets
+    plt.title('Coincident events (2D)')
     height = 12
     width = 14
     # Ensure only coincident events are plotted

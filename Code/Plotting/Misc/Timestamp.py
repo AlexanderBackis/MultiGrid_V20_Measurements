@@ -13,16 +13,17 @@ import numpy as np
 
 
 def timestamp_plot(df):
-    # Generate list of event numbers
-    event_number = np.arange(0, df.shape[0], 1)
+    # Filter so we only plot every 100:th element, so it is not so slow
+    df_temp = df[df.index % 100 == 0]
     # Prepare figure
     fig = plt.figure()
-    plt.title('Timestamp')
+    plt.title('Timestamp (every 100:th cluster)')
     plt.xlabel('Cluster [index]')
     plt.ylabel('Timestamp [TDC channels]')
     plt.grid(True, which='major', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
-    plt.scatter(event_number, df.Time, c=df.wM+df.gM, cmap='jet', zorder=5)
+    plt.scatter(df_temp.index, df_temp.Time, c=df_temp.wM+df_temp.gM,
+                cmap='jet', zorder=5)
     cbar = plt.colorbar()
     cbar.set_label('Multiplicity summation [wM + gM]')
     plt.tight_layout()

@@ -17,7 +17,8 @@ import pandas as pd
 from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
 from HelperFunctions.CreateMapping import create_full_mapping
-from HelperFunctions.Filtering import filter_clusters
+from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
+from HelperFunctions.Duration import get_duration
 # PHS
 from Plotting.PHS.PHS_1D import PHS_1D_plot
 from Plotting.PHS.PHS_2D import PHS_2D_plot
@@ -85,6 +86,7 @@ class MainWindow(QMainWindow):
                 self.ce.reset_index(drop=True, inplace=True)
                 self.e.reset_index(drop=True, inplace=True)
             # Update window
+            self.measurement_time = get_duration(self.ce)
             self.fill_information_window()
             self.refresh_window()
             print(self.ce)
@@ -207,39 +209,8 @@ def append_folder_and_files(folder, files):
     folder_vec = np.array(len(files)*[folder])
     return np.core.defchararray.add(folder_vec, files)
 
-def get_filter_parameters(window):
-    parameters = {'wM': [window.wM_min.value(),
-                         window.wM_max.value(),
-                         window.wM_filter.isChecked()],
-                  'gM': [window.gM_min.value(),
-                         window.gM_max.value(),
-                         window.gM_filter.isChecked()],
-                  'ceM': [window.ceM_min.value(),
-                          window.ceM_max.value(),
-                          window.ceM_filter.isChecked()],
-                  'wADC': [float(window.wADC_min.text()),
-                           float(window.wADC_max.text()),
-                           window.wADC_filter.isChecked()],
-                  'gADC': [float(window.gADC_min.text()),
-                           float(window.gADC_max.text()),
-                           window.gADC_filter.isChecked()],
-                  'ToF': [float(window.ToF_min.text()) / (62.5e-9 * 1e6),
-                          float(window.ToF_max.text()) / (62.5e-9 * 1e6),
-                          window.ToF_filter.isChecked()],
-                  'Time': [float(window.Time_min.text()),
-                           float(window.Time_max.text()),
-                           window.Time_filter.isChecked()],
-                  'Bus': [window.module_min.value(),
-                          window.module_max.value(),
-                          window.module_filter.isChecked()],
-                  'wire': [window.wire_min.value(),
-                           window.wire_max.value(),
-                           window.wire_filter.isChecked()],
-                  'gCh': [window.grid_min.value() + 80 - 1,
-                          window.grid_max.value() + 80 - 1,
-                          window.grid_filter.isChecked()]
-                  }
-    return parameters
+
+
 
 # =============================================================================
 # Start GUI
