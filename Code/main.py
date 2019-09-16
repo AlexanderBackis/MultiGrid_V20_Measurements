@@ -25,6 +25,7 @@ from Plotting.PHS.PHS_Wires_Vs_Grids import PHS_wires_vs_grids_plot
 # Misc
 from Plotting.Misc.Multiplicity import multiplicity_plot
 from Plotting.Misc.ToF import ToF_histogram
+from Plotting.Misc.Timestamp import timestamp_plot
 
 # =============================================================================
 # Windows
@@ -134,6 +135,13 @@ class MainWindow(QMainWindow):
             fig = ToF_histogram(ce_filtered, number_bins)
             fig.show()
 
+    def Timestamp_action(self):
+        if (self.data_sets != ''):
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            fig = timestamp_plot(ce_filtered)
+            fig.show()
+
     def Coincidences_2D_action(self):
         if self.data_sets != '':
             pass
@@ -160,6 +168,7 @@ class MainWindow(QMainWindow):
         # Misc
         self.multiplicity_button.clicked.connect(self.Multiplicity_action)
         self.ToF_button.clicked.connect(self.ToF_action)
+        self.timestamp_button.clicked.connect(self.Timestamp_action)
         # Coincidences
         #self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
         #self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)

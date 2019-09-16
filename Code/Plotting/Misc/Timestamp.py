@@ -4,24 +4,26 @@
 Timestamp.py: Helper functions for handling of paths and folders.
 """
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 # =============================================================================
 #                                   Timestamp
 # =============================================================================
 
 
-def Timestamp_plot(df, data_sets):
-    name = 'Timestamp\nData set(s): ' + str(data_sets)
-    fig = plt.figure()
+def timestamp_plot(df):
+    # Generate list of event numbers
     event_number = np.arange(0, df.shape[0], 1)
-    plt.title(name)
-    plt.xlabel('Event number')
+    # Prepare figure
+    fig = plt.figure()
+    plt.title('Timestamp')
+    plt.xlabel('Cluster [index]')
     plt.ylabel('Timestamp [TDC channels]')
     plt.grid(True, which='major', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
-    plt.plot(event_number, df.Time, color='black', label='All events')
-    glitches = df[(df.wM >= 80) & (df.gM >= 40)].Time
-    plt.plot(glitches.index.tolist(), glitches, 'rx',
-             label='Glitch events')
-    plt.legend()
+    plt.scatter(event_number, df.Time, c=df.wM+df.gM, cmap='jet', zorder=5)
+    cbar = plt.colorbar()
+    cbar.set_label('Multiplicity summation [wM + gM]')
     plt.tight_layout()
-    fig.show()
+    return fig
