@@ -147,6 +147,8 @@ def cluster_data(data, ILL_buses, adc_threshold):
                 maxADCg = 0
                 ce_count += 1
                 ce_index += 1
+                # Save Bus data for cluster
+                ce_dict['Bus'][ce_index] = Bus
         elif ((word & DataMask) == DataEvent) & isOpen:
             # Extract Channel and ADC
             Channel = ((word & ChannelMask) >> ChannelShift)
@@ -164,7 +166,7 @@ def cluster_data(data, ILL_buses, adc_threshold):
                     e_index += 1
                     e_count += 1
                     # Save cluster data
-                    ce_dict['Bus'][ce_index] = Bus
+                    ce_dict['Bus'][ce_index] = Bus ### REMOVE IF TRIGGER ON WIRE
                     ce_dict['wADC'][ce_index] += ADC
                     ce_dict['wM'][ce_index] += 1
                     # Use wire with largest collected charge as hit position
@@ -173,16 +175,15 @@ def cluster_data(data, ILL_buses, adc_threshold):
                 elif 80 <= Channel <= 119:
                     # Save event data and increase event index and event count
                     e_dict['Bus'][e_index] = Bus
-                    e_dict['Ch'][e_index] = Channel ^ 1
+                    e_dict['Ch'][e_index] = Channel
                     e_dict['ADC'][e_index] = ADC
                     e_index += 1
                     e_count += 1
                     # Save cluster data, and check if current channel collected most charge
-                    ce_dict['Bus'][ce_index] = Bus
                     ce_dict['gADC'][ce_index] += ADC
                     ce_dict['gM'][ce_index] += 1
                     # Use grid with largest collected charge as hit position
-                    if ADC > maxADCg: maxADCg, ce_dict['gCh'][ce_index] = ADC, Channel ^ 1
+                    if ADC > maxADCg: maxADCg, ce_dict['gCh'][ce_index] = ADC, Channel
                 else:
                     pass
         elif ((word & DataMask) == DataExTs) & isOpen:

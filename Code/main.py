@@ -21,6 +21,7 @@ from HelperFunctions.Filtering import filter_clusters
 # Plotting
 from Plotting.PHS.PHS_1D import PHS_1D_plot
 from Plotting.PHS.PHS_2D import PHS_2D_plot
+from Plotting.PHS.PHS_Wires_Vs_Grids import PHS_wires_vs_grids_plot
 
 # =============================================================================
 # Windows
@@ -104,6 +105,13 @@ class MainWindow(QMainWindow):
             fig = PHS_2D_plot(self.e)
             fig.show()
 
+    def PHS_wires_vs_grids_action(self):
+        if (self.data_sets != ''):
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            fig = PHS_wires_vs_grids_plot(ce_filtered)
+            fig.show()
+
     def ToF_action(self):
         if self.data_sets != '':
             pass
@@ -127,9 +135,10 @@ class MainWindow(QMainWindow):
     def setup_buttons(self):
         # File handling
         self.cluster_button.clicked.connect(self.cluster_action)
-        # Plotting
+        # PHS
         self.PHS_1D_button.clicked.connect(self.PHS_1D_action)
         self.PHS_2D_button.clicked.connect(self.PHS_2D_action)
+        self.PHS_wires_vs_grids_button.clicked.connect(self.PHS_wires_vs_grids_action)
         #self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
         #self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         #self.Coincidences_Projections.clicked.connect(self.Projections_action)

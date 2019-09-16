@@ -23,7 +23,6 @@ def PHS_2D_plot(events):
         plt.colorbar()
         return fig
     fig = plt.figure()
-    fig.suptitle('PHS (2D)')
     fig.set_figheight(12)
     fig.set_figwidth(14)
     vmin = 1
