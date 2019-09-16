@@ -3,20 +3,24 @@
 """ main.py: Module containing the GUI used for data analysis.
 """
 
-#Standard library
+# Standard library
 import os
 import sys
-#QT
+# QT
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5 import uic
-#Data Analysis
+# Data Analysis
 import pandas as pd
-#Local sources
+# Local sources
 from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
 from HelperFunctions.CreateMapping import create_full_mapping
+from HelperFunctions.Filtering import filter_clusters
+# Plotting
+from Plotting.PHS.PHS_1D import PHS_1D_plot
+from Plotting.PHS.PHS_2D import PHS_2D_plot
 
 # =============================================================================
 # Windows
@@ -30,7 +34,7 @@ class MainWindow(QMainWindow):
         self.ui = uic.loadUi(title_screen_path, self)
         self.app = app
         # Clustering attributes
-        self.data_sets = []
+        self.data_sets = ''
         self.ILL_buses = [-1, -1, -1]
         self.maximum_file_size_in_mb = 3000
         self.adc_threshold = 0
@@ -49,30 +53,37 @@ class MainWindow(QMainWindow):
 
     def cluster_action(self):
         zip_paths = QFileDialog.getOpenFileNames(self, "Select Directory", "../Data")[0]
-        self.set_clustering_parameters()
-        # Import
-        data = ()
-        for zip_path in zip_paths:
-            file_path = unzip_data(zip_path)
-            data += import_data(file_path, self.maximum_file_size_in_mb)
-            os.remove(file_path)
-        # Cluster
-        clusters, events = cluster_data(data, self.ILL_buses, self.adc_threshold)
-        # Write or append
-        if self.write.isChecked():
-            self.ce = clusters
-            self.e = events
-        else:
-            self.ce = self.ce.append(clusters)
-            self.e = self.e.append(events)
-            # Reset index
-            self.ce.reset_index(drop=True, inplace=True)
-            self.e.reset_index(drop=True, inplace=True)
-        # Update window
-        self.fill_information_window()
-        self.refresh_window()
-        print(self.ce)
-        print(self.e)
+        if len(zip_paths) > 0:
+            self.set_clustering_parameters()
+            # Import
+            data = ()
+            data_sets_temp = '<br/>'
+            for i, zip_path in enumerate(zip_paths):
+                file_name = zip_path.rsplit('/', 1)[-1]
+                data_sets_temp += file_name + '<br/>'
+                file_path = unzip_data(zip_path)
+                data += import_data(file_path, self.maximum_file_size_in_mb)
+                os.remove(file_path)
+                print('%d/%d' % (i+1, len(zip_paths)))
+            # Cluster
+            clusters, events = cluster_data(data, self.ILL_buses, self.adc_threshold)
+            # Write or append
+            if self.write.isChecked():
+                self.ce = clusters
+                self.e = events
+                self.data_sets = data_sets_temp
+            else:
+                self.ce = self.ce.append(clusters)
+                self.e = self.e.append(events)
+                self.data_sets += data_sets_temp
+                # Reset index
+                self.ce.reset_index(drop=True, inplace=True)
+                self.e.reset_index(drop=True, inplace=True)
+            # Update window
+            self.fill_information_window()
+            self.refresh_window()
+            print(self.ce)
+            print(self.e)
 
 
     # =========================================================================
@@ -81,11 +92,17 @@ class MainWindow(QMainWindow):
 
     def PHS_1D_action(self):
         if self.data_sets != '':
-            pass
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            number_bins = int(self.phsBins.text())
+            fig = PHS_1D_plot(self.e, ce_filtered, number_bins)
+            fig.show()
+
 
     def PHS_2D_action(self):
         if self.data_sets != '':
-            pass
+            fig = PHS_2D_plot(self.e)
+            fig.show()
 
     def ToF_action(self):
         if self.data_sets != '':
@@ -111,8 +128,8 @@ class MainWindow(QMainWindow):
         # File handling
         self.cluster_button.clicked.connect(self.cluster_action)
         # Plotting
-        #self.PHS_1D_button.clicked.connect(self.PHS_1D_action)
-        #self.PHS_2D_button.clicked.connect(self.PHS_2D_action)
+        self.PHS_1D_button.clicked.connect(self.PHS_1D_action)
+        self.PHS_2D_button.clicked.connect(self.PHS_2D_action)
         #self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
         #self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         #self.Coincidences_Projections.clicked.connect(self.Projections_action)
@@ -133,7 +150,7 @@ class MainWindow(QMainWindow):
         information_text += '<br/><b>Incident energy:</b> %.2f [meV]' % self.Ei
         information_text += "<br/><b>ADC Threshold:</b> %d [ADC Ch's]" % self.adc_threshold
         information_text += '<br/><b>ILL buses:</b> ' + str(self.ILL_buses)
-        information_text += '<br/><b>Data sets:</b> ' + str(self.data_sets)
+        information_text += '<br/><b>Data sets:</b> ' + self.data_sets
         self.information_window.setText(information_text)
 
     def set_clustering_parameters(self):
@@ -151,6 +168,40 @@ class MainWindow(QMainWindow):
 def append_folder_and_files(folder, files):
     folder_vec = np.array(len(files)*[folder])
     return np.core.defchararray.add(folder_vec, files)
+
+def get_filter_parameters(window):
+    parameters = {'wM': [window.wM_min.value(),
+                         window.wM_max.value(),
+                         window.wM_filter.isChecked()],
+                  'gM': [window.gM_min.value(),
+                         window.gM_max.value(),
+                         window.gM_filter.isChecked()],
+                  'ceM': [window.ceM_min.value(),
+                          window.ceM_max.value(),
+                          window.ceM_filter.isChecked()],
+                  'wADC': [float(window.wADC_min.text()),
+                           float(window.wADC_max.text()),
+                           window.wADC_filter.isChecked()],
+                  'gADC': [float(window.gADC_min.text()),
+                           float(window.gADC_max.text()),
+                           window.gADC_filter.isChecked()],
+                  'ToF': [float(window.ToF_min.text()) / (62.5e-9 * 1e6),
+                          float(window.ToF_max.text()) / (62.5e-9 * 1e6),
+                          window.ToF_filter.isChecked()],
+                  'Time': [float(window.Time_min.text()),
+                           float(window.Time_max.text()),
+                           window.Time_filter.isChecked()],
+                  'Bus': [window.module_min.value(),
+                          window.module_max.value(),
+                          window.module_filter.isChecked()],
+                  'wire': [window.wire_min.value(),
+                           window.wire_max.value(),
+                           window.wire_filter.isChecked()],
+                  'gCh': [window.grid_min.value() + 80 - 1,
+                          window.grid_max.value() + 80 - 1,
+                          window.grid_filter.isChecked()]
+                  }
+    return parameters
 
 # =============================================================================
 # Start GUI

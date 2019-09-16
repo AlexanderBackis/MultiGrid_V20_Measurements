@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1008</width>
-    <height>657</height>
+    <height>654</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>150</x>
       <y>450</y>
       <width>751</width>
       <height>161</height>
@@ -50,363 +50,53 @@
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
-     <item row="6" column="3">
-      <widget class="QCheckBox" name="ceM_filter">
+     <item row="3" column="4">
+      <widget class="QLineEdit" name="wADC_min">
        <property name="text">
-        <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>500</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="8">
-      <widget class="QCheckBox" name="module_filter">
+     <item row="3" column="6">
+      <widget class="QLineEdit" name="ToF_min">
        <property name="text">
-        <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>0</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="7">
-      <widget class="QCheckBox" name="Time_filter">
+     <item row="5" column="5">
+      <widget class="QLineEdit" name="gADC_max">
        <property name="text">
-        <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>12288</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="4">
-      <widget class="QCheckBox" name="wADC_filter">
+     <item row="5" column="4">
+      <widget class="QLineEdit" name="wADC_max">
        <property name="text">
-        <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="7">
-      <widget class="QLabel" name="label_35">
-       <property name="text">
-        <string>   Timestamp
-[TDC channels]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="2">
-      <widget class="QCheckBox" name="gM_filter">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="3">
-      <widget class="QSpinBox" name="ceM_max">
-       <property name="maximum">
-        <number>140</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="3">
-      <widget class="QSpinBox" name="ceM_min">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="maximum">
-        <number>140</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QSpinBox" name="gM_max">
-       <property name="maximum">
-        <number>140</number>
-       </property>
-       <property name="value">
-        <number>5</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QLabel" name="label_48">
-       <property name="text">
-        <string>Grids</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QSpinBox" name="gM_min">
-       <property name="maximum">
-        <number>140</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QLabel" name="label_14">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Coincident
-Events</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="5">
-      <widget class="QLabel" name="label_18">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string> Grids</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="10">
-      <widget class="QSpinBox" name="grid_max">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>40</number>
-       </property>
-       <property name="value">
-        <number>40</number>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QSpinBox" name="wM_max">
-       <property name="maximum">
-        <number>140</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QLabel" name="label_17">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string> Wires</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="9">
-      <widget class="QSpinBox" name="wire_min">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>20</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="9" colspan="2">
-      <widget class="QLabel" name="label_20">
-       <property name="text">
-        <string>Coordinates</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" colspan="3">
-      <widget class="QLabel" name="label_6">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>               Multiplicity</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QSpinBox" name="wM_min">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="maximum">
-        <number>140</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="10">
-      <widget class="QSpinBox" name="grid_min">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>80</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4" colspan="2">
-      <widget class="QLabel" name="label_10">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Charge [ADC channels]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="8">
-      <widget class="QSpinBox" name="module_max">
-       <property name="maximum">
-        <number>8</number>
-       </property>
-       <property name="value">
-        <number>8</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="label_13">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string> Wires</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="10">
-      <widget class="QLabel" name="label_22">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Grids</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="8">
-      <widget class="QSpinBox" name="module_min">
-       <property name="maximum">
-        <number>8</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_15">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>       Min</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_16">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>      Max</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="9">
-      <widget class="QLabel" name="label_21">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Wires</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="9">
-      <widget class="QSpinBox" name="wire_max">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>20</number>
-       </property>
-       <property name="value">
-        <number>20</number>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="7">
-      <widget class="QLineEdit" name="Time_max">
-       <property name="text">
-        <string>1e15</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="10">
-      <widget class="QCheckBox" name="grid_filter">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>12288</string>
        </property>
       </widget>
      </item>
      <item row="6" column="9">
       <widget class="QCheckBox" name="wire_filter">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="5">
+      <widget class="QLineEdit" name="gADC_min">
+       <property name="text">
+        <string>400</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QCheckBox" name="gM_filter">
        <property name="text">
         <string/>
        </property>
@@ -425,10 +115,43 @@ Events</string>
        </property>
       </widget>
      </item>
+     <item row="6" column="5">
+      <widget class="QCheckBox" name="gADC_filter">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_15">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>       Min</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="8">
       <widget class="QLabel" name="label_11">
        <property name="text">
         <string>Module</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QSpinBox" name="gM_max">
+       <property name="maximum">
+        <number>140</number>
+       </property>
+       <property name="value">
+        <number>5</number>
        </property>
       </widget>
      </item>
@@ -442,23 +165,26 @@ Events</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_36">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
+     <item row="6" column="7">
+      <widget class="QCheckBox" name="Time_filter">
        <property name="text">
-        <string>   Active</string>
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
-     <item row="3" column="7">
-      <widget class="QLineEdit" name="Time_min">
-       <property name="text">
-        <string>0</string>
+     <item row="3" column="9">
+      <widget class="QSpinBox" name="wire_min">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>20</number>
+       </property>
+       <property name="value">
+        <number>1</number>
        </property>
       </widget>
      </item>
@@ -475,8 +201,107 @@ Events</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="5">
-      <widget class="QCheckBox" name="gADC_filter">
+     <item row="1" column="10">
+      <widget class="QLabel" name="label_22">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Grids</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="label_13">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string> Wires</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="8">
+      <widget class="QSpinBox" name="module_max">
+       <property name="maximum">
+        <number>8</number>
+       </property>
+       <property name="value">
+        <number>8</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_48">
+       <property name="text">
+        <string>Grids</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QSpinBox" name="wM_max">
+       <property name="maximum">
+        <number>140</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="wM_min">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="maximum">
+        <number>140</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="9">
+      <widget class="QLabel" name="label_21">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Wires</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="QSpinBox" name="ceM_min">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="maximum">
+        <number>140</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="9" colspan="2">
+      <widget class="QLabel" name="label_20">
+       <property name="text">
+        <string>Coordinates</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="10">
+      <widget class="QCheckBox" name="grid_filter">
        <property name="text">
         <string/>
        </property>
@@ -485,38 +310,213 @@ Events</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="4">
-      <widget class="QLineEdit" name="wADC_min">
+     <item row="1" column="3">
+      <widget class="QLabel" name="label_14">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="text">
-        <string>500</string>
+        <string>Coincident
+Events</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="4">
-      <widget class="QLineEdit" name="wADC_max">
+     <item row="0" column="4" colspan="2">
+      <widget class="QLabel" name="label_10">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="text">
-        <string>12288</string>
+        <string>Charge [ADC channels]</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="5">
-      <widget class="QLineEdit" name="gADC_min">
+     <item row="1" column="4">
+      <widget class="QLabel" name="label_17">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="text">
-        <string>400</string>
+        <string> Wires</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="5">
-      <widget class="QLineEdit" name="gADC_max">
+     <item row="0" column="1" colspan="3">
+      <widget class="QLabel" name="label_6">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="text">
-        <string>12288</string>
+        <string>               Multiplicity</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="6">
-      <widget class="QLineEdit" name="ToF_min">
+     <item row="1" column="5">
+      <widget class="QLabel" name="label_18">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string> Grids</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="7">
+      <widget class="QLineEdit" name="Time_min">
        <property name="text">
         <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="8">
+      <widget class="QCheckBox" name="module_filter">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="9">
+      <widget class="QSpinBox" name="wire_max">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>20</number>
+       </property>
+       <property name="value">
+        <number>20</number>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="3">
+      <widget class="QCheckBox" name="ceM_filter">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_16">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>      Max</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="4">
+      <widget class="QCheckBox" name="wADC_filter">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QSpinBox" name="gM_min">
+       <property name="maximum">
+        <number>140</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="8">
+      <widget class="QSpinBox" name="module_min">
+       <property name="maximum">
+        <number>8</number>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_36">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>   Active</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="7">
+      <widget class="QLineEdit" name="Time_max">
+       <property name="text">
+        <string>1e15</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="7">
+      <widget class="QLabel" name="label_35">
+       <property name="text">
+        <string>   Timestamp
+[TDC channels]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="QSpinBox" name="ceM_max">
+       <property name="maximum">
+        <number>140</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="10">
+      <widget class="QSpinBox" name="grid_max">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>40</number>
+       </property>
+       <property name="value">
+        <number>40</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="10">
+      <widget class="QSpinBox" name="grid_min">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>80</number>
+       </property>
+       <property name="value">
+        <number>1</number>
        </property>
       </widget>
      </item>
@@ -752,7 +752,7 @@ Events</string>
    <widget class="QLabel" name="label_19">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>510</x>
       <y>440</y>
       <width>161</width>
       <height>16</height>
@@ -1526,6 +1526,68 @@ Resolution</string>
     </property>
     <property name="text">
      <string>Measurements at the HZB using the V20 instrument, 23/9-2019 -&gt; 6/10-2019</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>931</x>
+      <y>508</y>
+      <width>87</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clusters</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_2">
+    <property name="geometry">
+     <rect>
+      <x>931</x>
+      <y>528</y>
+      <width>87</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Events</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="File_text_8">
+    <property name="geometry">
+     <rect>
+      <x>931</x>
+      <y>490</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>50</weight>
+      <italic>true</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Filter on:</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>910</x>
+      <y>436</y>
+      <width>16</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
     </property>
    </widget>
   </widget>
