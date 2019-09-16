@@ -17,6 +17,7 @@ import numpy as np
 # Local sources
 from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
+# Helper functions
 from HelperFunctions.CreateMapping import create_full_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
 # PHS
@@ -25,6 +26,7 @@ from Plotting.PHS.PHS_2D import PHS_2D_plot
 from Plotting.PHS.PHS_Wires_Vs_Grids import PHS_wires_vs_grids_plot
 # Coincidences
 from Plotting.Coincidences.Coincidences_2D import coincidences_2D_plot
+from Plotting.Coincidences.Coincidences_3D import coincidences_3D_plot
 # Misc
 from Plotting.Misc.Multiplicity import multiplicity_plot
 from Plotting.Misc.ToF import ToF_histogram
@@ -141,7 +143,9 @@ class MainWindow(QMainWindow):
 
     def Coincidences_3D_action(self):
         if self.data_sets != '':
-            pass
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            coincidences_3D_plot(ce_filtered)
 
     def Coincidences_Projections_action(self):
         if self.data_sets != '':
@@ -188,7 +192,7 @@ class MainWindow(QMainWindow):
         self.timestamp_button.clicked.connect(self.Timestamp_action)
         # Coincidences
         self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
-        #self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
+        self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         #self.Coincidences_Projections.clicked.connect(self.Projections_action)
 
     def refresh_window(self):

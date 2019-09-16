@@ -10,6 +10,9 @@ CreateMapping.py: Creates the channel->coordinate mapping using Isaaks CAD
                   ordering, because buses are flipped and wire rows are flipped.
 """
 
+import os
+import numpy as np
+import pandas as pd
 
 # =============================================================================
 #                        FULL MAPPING, ALL DETECTORS
@@ -71,7 +74,7 @@ def create_ess_channel_to_coordinate_map(theta, offset):
     dirname = os.path.dirname(__file__)
     file_path = os.path.join(dirname, '../../Tables/Mapping_MG_SEQ_ESS.xlsx')
     matrix = pd.read_excel(file_path).values
-    coordinates = matrix[1:801]
+    coordinates = matrix[2:802]
     # Create empty dictionary to store mapping
     ess_ch_to_coord = np.empty((3, 120, 80), dtype='object')
     coordinate = {'x': -1, 'y': -1, 'z': -1}

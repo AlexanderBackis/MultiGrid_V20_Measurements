@@ -21,7 +21,8 @@ def coincidences_2D_plot(ce, measurement_time):
         plt.title(sub_title)
         plt.colorbar()
         return fig, h
-
+    # Perform initial filter
+    ce = ce[(ce.wCh != -1) & (ce.gCh != -1)]
     # Calculate color limits
     if ce.shape[0] != 0:
         duration = measurement_time
