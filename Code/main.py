@@ -13,16 +13,18 @@ from PyQt5.QtGui import *
 from PyQt5 import uic
 # Data Analysis
 import pandas as pd
+import numpy as np
 # Local sources
 from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
 from HelperFunctions.CreateMapping import create_full_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
-from HelperFunctions.Duration import get_duration
 # PHS
 from Plotting.PHS.PHS_1D import PHS_1D_plot
 from Plotting.PHS.PHS_2D import PHS_2D_plot
 from Plotting.PHS.PHS_Wires_Vs_Grids import PHS_wires_vs_grids_plot
+# Coincidences
+from Plotting.Coincidences.Coincidences_2D import coincidences_2D_plot
 # Misc
 from Plotting.Misc.Multiplicity import multiplicity_plot
 from Plotting.Misc.ToF import ToF_histogram
@@ -120,6 +122,31 @@ class MainWindow(QMainWindow):
             fig = PHS_wires_vs_grids_plot(ce_filtered)
             fig.show()
 
+    # ==== Coincidences ==== #
+
+    def Coincidences_2D_action(self):
+        if self.data_sets != '':
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            fig, histograms = coincidences_2D_plot(ce_filtered, self.measurement_time)
+            # Export histograms to text
+            dir_name = os.path.dirname(__file__)
+            output_path = os.path.join(dir_name, '../Output/')
+            for bus, histogram in enumerate(histograms):
+                path = output_path + '2D_Coincidences_Bus_%d.txt' % bus
+                np.savetxt(path, histogram, fmt="%d", delimiter=",")
+            # Plot figure
+            fig.show()
+
+
+    def Coincidences_3D_action(self):
+        if self.data_sets != '':
+            pass
+
+    def Coincidences_Projections_action(self):
+        if self.data_sets != '':
+            pass
+
     # ==== Misc ==== #
 
     def Multiplicity_action(self):
@@ -144,18 +171,6 @@ class MainWindow(QMainWindow):
             fig = timestamp_plot(ce_filtered)
             fig.show()
 
-    def Coincidences_2D_action(self):
-        if self.data_sets != '':
-            pass
-
-    def Coincidences_3D_action(self):
-        if self.data_sets != '':
-            pass
-
-    def Coincidences_Projections_action(self):
-        if self.data_sets != '':
-            pass
-
     # ========================================================================
     # Helper Functions
     # ========================================================================
@@ -172,7 +187,7 @@ class MainWindow(QMainWindow):
         self.ToF_button.clicked.connect(self.ToF_action)
         self.timestamp_button.clicked.connect(self.Timestamp_action)
         # Coincidences
-        #self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
+        self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
         #self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         #self.Coincidences_Projections.clicked.connect(self.Projections_action)
 
@@ -209,7 +224,13 @@ def append_folder_and_files(folder, files):
     folder_vec = np.array(len(files)*[folder])
     return np.core.defchararray.add(folder_vec, files)
 
-
+def get_duration(df):
+    times = df.Time.values
+    diff = np.diff(times)
+    resets = np.where(diff < 0)
+    duration_in_TDC_channels = sum(times[resets]) + times[-1]
+    duration_in_seconds = duration_in_TDC_channels * 62.5e-9
+    return duration_in_seconds
 
 
 # =============================================================================

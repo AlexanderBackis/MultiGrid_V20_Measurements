@@ -987,7 +987,7 @@ Events</string>
      <string>PHS</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ce_2D_button">
+   <widget class="QPushButton" name="Coincidences_2D_button">
     <property name="geometry">
      <rect>
       <x>260</x>
