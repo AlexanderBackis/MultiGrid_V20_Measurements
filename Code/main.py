@@ -29,12 +29,16 @@ class MainWindow(QMainWindow):
         title_screen_path = os.path.join(dir_name, '../Windows/mainwindow.ui')
         self.ui = uic.loadUi(title_screen_path, self)
         self.app = app
-        self.measurement_time = 0
+        # Clustering attributes
         self.data_sets = []
         self.ILL_buses = [-1, -1, -1]
-        self.Ei = -1
         self.maximum_file_size_in_mb = 3000
         self.adc_threshold = 0
+        # Cluster properties
+        self.measurement_time = 0
+        self.Ei = -1
+        self.ce = pd.DataFrame()
+        self.e = pd.DataFrame()
         self.fill_information_window()
         self.show()
         self.refresh_window()
@@ -54,9 +58,21 @@ class MainWindow(QMainWindow):
             os.remove(file_path)
         # Cluster
         clusters, events = cluster_data(data, self.ILL_buses, self.adc_threshold)
+        # Write or append
+        if self.write.isChecked():
+            self.ce = clusters
+            self.e = events
+        else:
+            self.ce = self.ce.append(clusters)
+            self.e = self.e.append(events)
+            # Reset index
+            self.ce.reset_index(drop=True, inplace=True)
+            self.e.reset_index(drop=True, inplace=True)
         # Update window
         self.fill_information_window()
         self.refresh_window()
+        print(self.ce)
+        print(self.e)
 
 
     # =========================================================================

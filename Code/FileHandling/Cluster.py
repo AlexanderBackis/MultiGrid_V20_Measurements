@@ -97,8 +97,8 @@ def cluster_data(data, ILL_buses, adc_threshold):
                'ToF': (-1) * np.ones([size], dtype=int),
                'wCh': (-1) * np.ones([size], dtype=int),
                'gCh': (-1) * np.ones([size], dtype=int),
-               'wADC': (-1) * np.ones([size], dtype=int),
-               'gADC': (-1) * np.ones([size], dtype=int),
+               'wADC': np.zeros([size], dtype=int),
+               'gADC': np.zeros([size], dtype=int),
                'wM': np.zeros([size], dtype=int),
                'gM': np.zeros([size], dtype=int),
                'ceM': (-1) * np.ones([size], dtype=int)}
@@ -107,18 +107,18 @@ def cluster_data(data, ILL_buses, adc_threshold):
               'Time': (-1) * np.ones([size], dtype=int),
               'ToF': (-1) * np.ones([size], dtype=int),
               'Ch': (-1) * np.ones([size], dtype=int),
-              'ADC': (-1) * np.ones([size], dtype=int),
+              'ADC': np.zeros([size], dtype=int),
               'wM': np.zeros([size], dtype=int),
               'gM': np.zeros([size], dtype=int),
               'ceM': (-1) * np.ones([size], dtype=int)}
     # Declare temporary boolean variables, related to words
-    isOpen, isTrigger, isExTs = False, False, False
+    isOpen, isTrigger, isData, isExTs = False, False, False, False
     # Declare temporary variables, related to events
     previousBus, Bus = -1, -1
     maxADCw, maxADCg = 0, 0
     e_count, ce_count = 0, 0
     # Declare variables that track time and index for events and clusters
-    Time, e_index, ce_index = 0, 0, -1
+    Time, TriggerTime, e_index, ce_index = 0, 0, 0, -1
     e_index_temp = e_index
     # Iterate through data
     for i, word in enumerate(data):
@@ -126,9 +126,12 @@ def cluster_data(data, ILL_buses, adc_threshold):
         if (word & TypeMask) == Header:
             isOpen = True
             isTrigger = (word & TriggerMask) == Trigger
+            #print('---START OF EVENT---')
         elif ((word & DataMask) == DataBusStart) & isOpen:
             # Extract Bus
             Bus = (word & BusMask) >> BusShift
+            isData = True
+            #print('Bus: %d' % Bus)
             # If Bus != previous_Bus and ILL-exception, keep filling cluster,
             # else create new cluster
             if (previousBus in ILL_buses) and (Bus in ILL_buses):
@@ -148,13 +151,15 @@ def cluster_data(data, ILL_buses, adc_threshold):
             # Extract Channel and ADC
             Channel = ((word & ChannelMask) >> ChannelShift)
             ADC = (word & ADCMask)
+            #print('Channel: %d' % (Channel ^ 1))
+            #print('ADC: %d' % ADC)
             # Only save data if above ADC threshold
-            if ADC > ADC_threshold:
+            if ADC > adc_threshold:
                 # Wires have channels between 0->79
                 if 0 <= Channel <= 79:
                     # Save event data and increase event index and event count
                     e_dict['Bus'][e_index] = Bus
-                    e_dict['Ch'][e_index] = Channel
+                    e_dict['Ch'][e_index] = Channel ^ 1
                     e_dict['ADC'][e_index] = ADC
                     e_index += 1
                     e_count += 1
@@ -165,10 +170,10 @@ def cluster_data(data, ILL_buses, adc_threshold):
                     # Use wire with largest collected charge as hit position
                     if ADC > maxADCw: maxADCw, ce_dict['wCh'][ce_index] = ADC, Channel ^ 1
                 # Grids have channels between 80->119
-                elif 80 <= channel <= 119:
+                elif 80 <= Channel <= 119:
                     # Save event data and increase event index and event count
                     e_dict['Bus'][e_index] = Bus
-                    e_dict['Ch'][e_index] = Channel
+                    e_dict['Ch'][e_index] = Channel ^ 1
                     e_dict['ADC'][e_index] = ADC
                     e_index += 1
                     e_count += 1
@@ -187,39 +192,46 @@ def cluster_data(data, ILL_buses, adc_threshold):
             # Extract time_timestamp and add extended timestamp, if ExTs is used
             time_stamp = (word & TimeStampMask)
             Time = (extended_time_stamp | time_stamp) if isExTs else time_stamp
+            #print('Time: %d' % Time)
+            #print('Extended time_stamp: %d' % extended_time_stamp)
             # Update Triggertime, if this was a trigger event
             if isTrigger: TriggerTime = Time
-            # Calculate ToF
-            ToF = Time - TriggerTime
+            #print('ToF: %d' % ToF)
             # Assign timestamp to clusters and events
-            ce_dict['Time'][ce_index-ce_count:ce_index+1] = Time
-            e_dict['Time'][e_index-e_count:e_index+1] = Time
-            # Assign ToF to clusters and events
-            ce_dict['ToF'][ce_index-ce_count:ce_index+1] = ToF
-            e_dict['ToF'][e_index-e_count:e_index+1] = ToF
-            # Assign multiplicity to events and clusters
-            ce_dict['ceM'][ce_index-ce_count:ce_index+1] = ce_count
-            e_dict['ceM'][e_index-e_count:e_index+1] = ce_count
-            e_dict['wM'][e_index_temp:e_index+1] = ce_dict['wM'][ce_index]
-            e_dict['gM'][e_index_temp:e_index+1] = ce_dict['gM'][ce_index]
+            if isData:
+                # Calculate ToF
+                ToF = Time - TriggerTime
+                ce_dict['Time'][ce_index-(ce_count-1):ce_index+1] = Time
+                e_dict['Time'][e_index-e_count:e_index+1] = Time
+                # Assign ToF to clusters and events
+                ce_dict['ToF'][ce_index-(ce_count-1):ce_index+1] = ToF
+                e_dict['ToF'][e_index-e_count:e_index+1] = ToF
+                # Assign multiplicity to events and clusters
+                ce_dict['ceM'][ce_index-(ce_count-1):ce_index+1] = ce_count
+                e_dict['ceM'][e_index-e_count:e_index+1] = ce_count
+                e_dict['wM'][e_index_temp:e_index+1] = ce_dict['wM'][ce_index]
+                e_dict['gM'][e_index_temp:e_index+1] = ce_dict['gM'][ce_index]
+                # Reset temporary variables, related to data in events
+                previousBus, Bus = -1, -1
+                maxADCw, maxADCg = 0, 0
+                e_count, ce_count = 0, 0
+                e_index_temp = e_index
             # Reset temporary boolean variables, related to word-headers
-            isOpen, isTrigger = False, False
-            # Reset temporary variables, related to data in events
-            previousBus, Bus = -1, -1
-            maxADCw, maxADCg = 0, 0
-            e_count, ce_count = 0, 0
-            e_index_temp = e_index
+            isOpen, isTrigger, isData = False, False, False
+            #print('---END OF EVENT 1---')
+            #print()
+
         # Print progress of clustering process
-        if count % 1000000 == 1:
-            percentage_finished = int(round((count/len(data))*100))
-            print('Percentage: %d %' % percentage_finished)
+        if i % 1000000 == 1:
+            percentage_finished = int(round((i/len(data))*100))
+            print('Percentage: %d' % percentage_finished)
 
     # Remove empty elements in clusters and save in DataFrame for easier analysis
     for key in ce_dict:
-        ce_dict[key] = ce_dict[key][0:ce_index+1]
+        ce_dict[key] = ce_dict[key][0:ce_index]
     ce_df = pd.DataFrame(ce_dict)
     # Remove empty elements in events and save in DataFrame for easier analysis
-    for key in ce_dict:
-        e_dict[key] = e_dict[key][0:e_index+1]
+    for key in e_dict:
+        e_dict[key] = e_dict[key][0:e_index]
     e_df = pd.DataFrame(e_dict)
     return ce_df, e_df
