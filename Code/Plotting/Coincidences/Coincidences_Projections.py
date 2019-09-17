@@ -39,7 +39,6 @@ def coincidences_projections_plot(df):
     plt.xlabel('Row')
     plt.ylabel('Grid')
     plt.colorbar()
-    #h_front = plot_2D_Front(df, vmin, vmax)
     # Plot top view
     plt.subplot(1, 3, 2)
     h_top, *_ = plt.hist2d((wires + (80*buses)) // 20, wires % 20, bins=[36, 20],
@@ -49,7 +48,6 @@ def coincidences_projections_plot(df):
     plt.xlabel('Row')
     plt.ylabel('Layer')
     plt.colorbar()
-    #h_top = plot_2D_Top(df, vmin, vmax)
     # Plot side view
     plt.subplot(1, 3, 3)
     h_side, *_ = plt.hist2d(wires % 20, grids, bins=[20, 40],
@@ -59,8 +57,7 @@ def coincidences_projections_plot(df):
     plt.xlabel('Layer')
     plt.ylabel('Grid')
     plt.colorbar()
-    #h_side = plot_2D_Side(df, vmin, vmax)
+    # Collect all histograms and tighted layout
     plt.tight_layout()
-    # Collect all histograms
     histograms = [h_front, h_top, h_side]
     return fig, histograms
