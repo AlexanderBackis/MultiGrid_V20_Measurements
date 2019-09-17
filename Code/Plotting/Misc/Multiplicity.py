@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Multiplicity.py: Helper functions for handling of paths and folders.
+Multiplicity.py: Histograms multiplicity of wires versus grids in the
+                 clustered neutron events.
 """
 
 import matplotlib.pyplot as plt
@@ -12,6 +13,18 @@ from matplotlib.colors import LogNorm
 # =============================================================================
 
 def multiplicity_plot(df):
+    """
+    Histograms multiplicity of wires versus grids in the clustered neutron
+    events.
+
+    Args:
+        df (DataFrame): Clustered events
+
+    Returns:
+        fig (Figure): Figure containing nine 2D coincidences histograms, one
+                      for each bus.
+
+    """
     def plot_multiplicity_bus(df, bus, vmin, vmax):
         # Plot data
         plt.hist2d(df.wM, df.gM, bins=[80, 40], range=[[0, 80], [0, 40]],
