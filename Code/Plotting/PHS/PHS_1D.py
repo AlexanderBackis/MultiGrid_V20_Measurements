@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-PHS_1D.py: Helper functions for handling of paths and folders.
+PHS_1D.py: Module which plots the PHS spectra for wires and grids separatly.
+           Plots PHS from indivdual events and summation from clusters overlaid.
 """
 
 import matplotlib.pyplot as plt
@@ -14,6 +15,20 @@ import os
 
 
 def PHS_1D_plot(events, clusters, number_bins):
+    """
+    Histograms the ADC-values from wires and grids individually, and overlays
+    the results from indiviual events and clustered events. For the clustered
+    events, each data point is a summation of the ADC values contained in that
+    cluster, i.e. the summed ADC is being histogrammed.
+
+    Args:
+        events (DataFrame): Individual events
+        clusters (DataFrame): Clustered events
+        number_bins (int): Number of bins to use in the histogram
+
+    Returns:
+        fig (Figure): Figure containing 1D PHS plot
+    """
     fig = plt.figure()
     titles = ['Wires', 'Grids']
     limits = [[0, 79], [80, 119]]

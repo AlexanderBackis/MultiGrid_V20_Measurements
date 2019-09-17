@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-PHS_Wires_Vs_Grids.py: Helper functions for handling of paths and folders.
+PHS_Wires_Vs_Grids.py: Histograms ADC charge from wires vs grids, one for each
+                       bus, showing the relationship between charge collected by
+                       wires and charge collected by grids. In the ideal case
+                       there should be linear relationship between these
+                       two quantities.
 """
 
 import matplotlib.pyplot as plt
@@ -13,6 +17,19 @@ from matplotlib.colors import LogNorm
 
 
 def PHS_wires_vs_grids_plot(ce):
+    """
+    Histograms ADC charge from wires vs grids, one for each bus, showing the
+    relationship between charge collected by wires and charge collected by
+    grids. In the ideal case there should be linear relationship between these
+    two quantities.
+
+    Args:
+        ce (DataFrame): Clustered events
+
+    Returns:
+        fig (Figure): Figure containing nine 2D PHS plots, showing wire charge
+                      versus grid charge, one plot for each bus.
+    """
     def charge_scatter(fig, ce, sub_title, bus, vmin, vmax):
         plt.xlabel('Collected charge wires [ADC channels]')
         plt.ylabel('Collected charge grids [ADC channels]')
@@ -23,6 +40,7 @@ def PHS_wires_vs_grids_plot(ce):
                    vmin=vmin, vmax=vmax, cmap='jet')
         plt.colorbar()
         return fig
+    
     # Plot data
     fig = plt.figure()
     fig.set_figheight(12)
