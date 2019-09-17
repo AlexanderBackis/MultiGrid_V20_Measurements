@@ -27,6 +27,7 @@ from Plotting.PHS.PHS_Wires_Vs_Grids import PHS_wires_vs_grids_plot
 # Coincidences
 from Plotting.Coincidences.Coincidences_2D import coincidences_2D_plot
 from Plotting.Coincidences.Coincidences_3D import coincidences_3D_plot
+from Plotting.Coincidences.Coincidences_Projections import coincidences_projections_plot
 # Misc
 from Plotting.Misc.Multiplicity import multiplicity_plot
 from Plotting.Misc.ToF import ToF_histogram
@@ -50,10 +51,14 @@ class MainWindow(QMainWindow):
         self.adc_threshold = 0
         # Cluster properties
         self.measurement_time = 0
-        self.Ei = -1
         self.ce = pd.DataFrame()
         self.e = pd.DataFrame()
-        self.fill_information_window()
+        self.fill_MG_information_window()
+        # He3 attributes
+        self.He3_data_sets = ''
+        self.He3_measurement_time = 0
+        self.He3_counts = 0
+        self.fill_He3_information_window()
         self.show()
         self.refresh_window()
 
@@ -91,7 +96,7 @@ class MainWindow(QMainWindow):
                 self.e.reset_index(drop=True, inplace=True)
             # Update window
             self.measurement_time = get_duration(self.ce)
-            self.fill_information_window()
+            self.fill_MG_information_window()
             self.refresh_window()
             print(self.ce)
             print(self.e)
@@ -149,7 +154,18 @@ class MainWindow(QMainWindow):
 
     def Coincidences_Projections_action(self):
         if self.data_sets != '':
-            pass
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            fig, histograms = coincidences_projections_plot(ce_filtered)
+            # Export histograms to text
+            dir_name = os.path.dirname(__file__)
+            output_path = os.path.join(dir_name, '../Output/')
+            file_names = ['Front', 'Top', 'Side']
+            for file_name, histogram in zip(file_names, histograms):
+                path = output_path + '2D_Coincidences_Projections_%s.txt' % file_name
+                np.savetxt(path, histogram, fmt="%d", delimiter=",")
+            # Plot figure
+            fig.show()
 
     # ==== Misc ==== #
 
@@ -193,7 +209,7 @@ class MainWindow(QMainWindow):
         # Coincidences
         self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
         self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
-        #self.Coincidences_Projections.clicked.connect(self.Projections_action)
+        self.Coincidences_Projections_button.clicked.connect(self.Coincidences_Projections_action)
 
     def refresh_window(self):
         self.app.processEvents()
@@ -204,17 +220,21 @@ class MainWindow(QMainWindow):
         self.app.processEvents()
         self.app.processEvents()
 
-    def fill_information_window(self):
+    def fill_MG_information_window(self):
         information_text = '<b>Measurement time:</b> %d [s]' % int(self.measurement_time)
-        information_text += '<br/><b>Incident energy:</b> %.2f [meV]' % self.Ei
         information_text += "<br/><b>ADC Threshold:</b> %d [ADC Ch's]" % self.adc_threshold
         information_text += '<br/><b>ILL buses:</b> ' + str(self.ILL_buses)
         information_text += '<br/><b>Data sets:</b> ' + self.data_sets
         self.information_window.setText(information_text)
 
+    def fill_He3_information_window(self):
+        information_text = '<b>Measurement time:</b> %d [s]' % int(self.He3_measurement_time)
+        information_text += "<br/><b>Counts:</b> %d [Counts]" % self.He3_counts
+        information_text += '<br/><b>Data sets:</b> ' + self.He3_data_sets
+        self.He3_information_window.setText(information_text)
+
     def set_clustering_parameters(self):
         self.ILL_buses = [self.ILL_bus_1.value(), self.ILL_bus_2.value(), self.ILL_bus_3.value()]
-        self.Ei = float(self.Ei_value.text())
         self.maximum_file_size_in_mb = float(self.maximum_file_size_in_mb_value.text())
         self.adc_threshold = float(self.adc_threshold_value.text())
 

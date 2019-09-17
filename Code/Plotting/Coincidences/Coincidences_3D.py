@@ -148,8 +148,7 @@ def initiate_detector_border_lines(detector_vec):
                                    y=y_vec,
                                    z=z_vec,
                                    mode='lines',
-                                   line=dict(color='rgba(0, 0, 0, 0.5)',
-                                             width=5))
+                                   line=dict(color='rgba(0, 0, 0, 0.5)', width=5))
             b_traces.append(b_trace)
 
     detector = detector_vec[0]

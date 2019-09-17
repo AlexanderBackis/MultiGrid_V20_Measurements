@@ -4,137 +4,117 @@
 Coincidences_Projections.py: Helper functions for handling of paths and folders.
 """
 
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+import pandas as pd
+import numpy as np
+
 # =============================================================================
-# Coincidence Histogram (Front, Top, Side)
+#             Coincidence Histogram Projections (Front, Top, Side)
 # =============================================================================
 
-def Coincidences_Front_Top_Side_plot(df, data_sets, module_order,
-                                     number_of_detectors, window):
+def coincidences_projections_plot(df):
     # Ensure we only plot coincident events
     df = df[(df.wCh != -1) & (df.gCh != -1)]
-    df = filter_ce_clusters(window, df)
     # Define figure and set figure properties
     fig = plt.figure()
-    title = ('Coincident events (Front, Top, Side)' +
-             '\nData set(s): %s' % data_sets
-             )
-    height = 4
-    width = 14
-    fig = set_figure_properties(fig, title, height, width)
+    fig.suptitle('Coincident events', x=0.5, y=1.08)
+    fig.set_figheight(4)
+    fig.set_figwidth(14)
+    # Calculate colorbar limits
     if df.shape[0] != 0:
         vmin = 1
         vmax = df.shape[0] // 200 + 5
     else:
         vmin = 1
         vmax = 1
-    # Retrieve text path
-    dir_name = os.path.dirname(__file__)
-    folder_path = os.path.join(dir_name,
-                               '../../text/%s/Projections_2D/' % window.data_sets)
-    mkdir_p(folder_path)
     # Plot front view
     plt.subplot(1, 3, 1)
-    __, h_front = plot_2D_Front(module_order, df, fig, number_of_detectors, vmin, vmax)
-    path_front = folder_path + 'Front.txt'
-    if window.createText.isChecked():
-        np.savetxt(path_front, h_front, fmt="%d", delimiter=",")
+    h_front = plot_2D_Front(df, vmin, vmax)
     # Plot top view
     plt.subplot(1, 3, 2)
-    __, h_top = plot_2D_Top(module_order, df, fig, number_of_detectors, vmin, vmax)
-    path_top = folder_path + 'Top.txt'
-    if window.createText.isChecked():
-        np.savetxt(path_top, h_top, fmt="%d", delimiter=",")
+    h_top = plot_2D_Top(df, vmin, vmax)
     # Plot side view
     plt.subplot(1, 3, 3)
-    __, h_side = plot_2D_Side(module_order, df, fig, number_of_detectors, vmin, vmax)
-    path_side = folder_path + 'Side.txt'
-    if window.createText.isChecked():
-        np.savetxt(path_side, h_side, fmt="%d", delimiter=",")
-    return fig
+    h_side = plot_2D_Side(df, vmin, vmax)
+    plt.tight_layout()
+    # Collect all histograms
+    histograms = [h_front, h_top, h_side]
+    return fig, histograms
 
 
 # =============================================================================
-# Coincidence Histogram - Front
+#                       Coincidence Histogram - Front
 # =============================================================================
 
 
-def plot_2D_Front(bus_vec, df, fig, number_of_detectors, vmin, vmax):
+def plot_2D_Front(df, vmin, vmax):
     df_tot = pd.DataFrame()
-    for i, bus in enumerate(bus_vec):
-        df_clu = df[df.Bus == bus]
+    for i in range(0, 9):
+        df_clu = df[df.Bus == i]
         df_clu['wCh'] += (80 * i) + (i // 3) * 80
         df_clu['gCh'] += (-80 + 1)
         df_tot = pd.concat([df_tot, df_clu])
     h, *_ = plt.hist2d(np.floor(df_tot['wCh'] / 20).astype(int) + 1,
                        df_tot.gCh,
-                       bins=[12*number_of_detectors + 8, 40],
-                       range=[[0.5, 12*number_of_detectors + 0.5 + 8],
-                              [0.5, 40.5]
-                              ],
-                       norm=LogNorm(), cmap='jet', vmin=vmin, vmax=vmax
-                       )
-    title = 'Front view'
+                       bins=[12*3 + 8, 40],
+                       range=[[0.5, 12*3 + 0.5 + 8],
+                              [0.5, 40.5]],
+                       norm=LogNorm(), cmap='jet', vmin=vmin, vmax=vmax)
+    plt.title('Front view')
     locs_x = [1, 12, 17, 28, 33, 44]
     ticks_x = [1, 12, 13, 25, 26, 38]
-    xlabel = 'Layer'
-    ylabel = 'Grid'
-    fig = stylize(fig, xlabel, ylabel, title=title, colorbar=True,
-                  locs_x=locs_x, ticks_x=ticks_x)
+    plt.xlabel('Layer')
+    plt.ylabel('Grid')
+    plt.xticks(locs_x, ticks_x)
     plt.colorbar()
-    return fig, h
+    return h
 
 # =============================================================================
-# Coincidence Histogram - Top
+#                       Coincidence Histogram - Top
 # =============================================================================
 
 
-def plot_2D_Top(bus_vec, df, fig, number_of_detectors, vmin, vmax):
+def plot_2D_Top(df, vmin, vmax):
     df_tot = pd.DataFrame()
-    for i, bus in enumerate(bus_vec):
-        df_clu = df[df.Bus == bus]
+    for i in range(0, 9):
+        df_clu = df[df.Bus == i]
         df_clu['wCh'] += (80 * i) + (i // 3) * 80
         df_tot = pd.concat([df_tot, df_clu])
     h, *_ = plt.hist2d(np.floor(df_tot['wCh'] / 20).astype(int) + 1,
                        df_tot['wCh'] % 20 + 1,
-                       bins=[12*number_of_detectors + 8, 20],
-                       range=[[0.5, 12*number_of_detectors + 0.5 + 8],
-                              [0.5, 20.5]
-                              ],
-                       norm=LogNorm(), cmap='jet', vmin=vmin, vmax=vmax
-                       )
-    title = 'Top view'
+                       bins=[12*3 + 8, 20],
+                       range=[[0.5, 12*3 + 0.5 + 8],
+                              [0.5, 20.5]],
+                       norm=LogNorm(), cmap='jet', vmin=vmin, vmax=vmax)
+    plt.title('Top view')
+    plt.xlabel('Layer')
+    plt.ylabel('Wire')
     locs_x = [1, 12, 17, 28, 33, 44]
     ticks_x = [1, 12, 13, 25, 26, 38]
-    xlabel = 'Layer'
-    ylabel = 'Wire'
-    fig = stylize(fig, xlabel, ylabel, title=title, colorbar=True,
-                  locs_x=locs_x, ticks_x=ticks_x)
+    plt.xticks(locs_x, ticks_x)
     plt.colorbar()
-    return fig, h
+    return h
 
 
 # =============================================================================
-# Coincidence Histogram - Side
+#                       Coincidence Histogram - Side
 # =============================================================================
 
 
-def plot_2D_Side(bus_vec, df, fig, number_of_detectors, vmin, vmax):
-
+def plot_2D_Side(df, vmin, vmax):
     df_tot = pd.DataFrame()
-    for i, bus in enumerate(bus_vec):
-        df_clu = df[df.Bus == bus]
+    for i in range(0, 9):
+        df_clu = df[df.Bus == i]
         df_clu['gCh'] += (-80 + 1)
         df_tot = pd.concat([df_tot, df_clu])
     h, *_ = plt.hist2d(df_tot['wCh'] % 20 + 1, df_tot['gCh'],
                        bins=[20, 40],
                        range=[[0.5, 20.5], [0.5, 40.5]],
                        norm=LogNorm(),
-                       cmap='jet', vmin=vmin, vmax=vmax
-                       )
-
-    title = 'Side view'
-    xlabel = 'Wire'
-    ylabel = 'Grid'
-    fig = stylize(fig, xlabel, ylabel, title=title, colorbar=True)
+                       cmap='jet', vmin=vmin, vmax=vmax)
+    plt.title('Side view')
+    plt.xlabel('Wire')
+    plt.ylabel('Grid')
     plt.colorbar()
-    return fig, h
+    return h
