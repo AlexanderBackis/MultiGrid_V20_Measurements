@@ -14,6 +14,21 @@ import numpy as np
 # =============================================================================
 
 def coincidences_projections_plot(df):
+    """
+    Histograms the hitposition, histogrammed over the three projections of the
+    detector (Front, Top and Side).
+
+    Args:
+        df (DataFrame): Clustered events
+
+    Returns:
+        fig (Figure): Figure containing three 2D coincidences histograms, one
+                      for each projection (Front, Top, Side)
+        histograms (list): List containing three elements with a
+                           2D numpy array 2D matrix each. Each matrix contains
+                           the histogram from a specfic projection (front, top,
+                           side).
+    """
     # Ensure we only plot coincident events
     df = df[(df.wCh != -1) & (df.gCh != -1)]
     # Define figure and set figure properties

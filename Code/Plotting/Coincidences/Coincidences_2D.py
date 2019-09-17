@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Coincidences_2D.py: Helper functions for handling of paths and folders.
+Coincidences_2D.py: Histograms the hitposition, expressed in wire- and grid
+                    channel coincidences in all of the detector voxels.
 """
 
 import matplotlib.pyplot as plt
@@ -12,6 +13,23 @@ from matplotlib.colors import LogNorm
 # =============================================================================
 
 def coincidences_2D_plot(ce, measurement_time):
+    """
+    Histograms the hitposition, expressed in wire- and grid channel coincidences
+    in all of the detector voxels.
+
+    Args:
+        ce (DataFrame): Clustered events
+        measurement_time (float): Measurement time expressed in seconds
+
+    Returns:
+        fig (Figure): Figure containing nine 2D coincidences histograms, one
+                      for each bus.
+        histograms (numpy array): 2D numpy array containing a 2D matrix.
+                                  Columns are grids, rows are wires, and the
+                                  values in the cells are the number of counts
+                                  in that specific voxel.
+    """
+
     def plot_2D_bus(fig, sub_title, ce, vmin, vmax, duration):
         h, *_ = plt.hist2d(ce.wCh, ce.gCh, bins=[80, 40],
                            range=[[-0.5, 79.5], [79.5, 119.5]],
@@ -21,6 +39,7 @@ def coincidences_2D_plot(ce, measurement_time):
         plt.title(sub_title)
         plt.colorbar()
         return fig, h
+
     # Perform initial filter
     ce = ce[(ce.wCh != -1) & (ce.gCh != -1)]
     # Calculate color limits
@@ -39,6 +58,7 @@ def coincidences_2D_plot(ce, measurement_time):
     histograms = []
     for bus in range(0, 9):
         ce_bus = ce[ce.Bus == bus]
+        # Calculate number of events and rate in a specific bus
         number_events = ce_bus.shape[0]
         events_per_s = round(number_events/duration, 4)
         sub_title = ('Bus %d\n(%d events, %f events/s)' % (bus, number_events, events_per_s))

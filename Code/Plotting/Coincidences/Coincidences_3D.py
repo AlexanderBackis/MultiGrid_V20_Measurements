@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Coincidences_3D.py: Helper functions for handling of paths and folders.
+Coincidences_3D.py: Produces a 3D hit-position histogram in
+                    (x, y, z)-coordinates, where the colorbar indicates number
+                    of counts at that specific coordinate.
 """
 
 import plotly as py
@@ -17,6 +19,18 @@ from HelperFunctions.CreateMapping import create_full_mapping
 # =============================================================================
 
 def coincidences_3D_plot(df):
+    """
+    Produces a 3D hit-position histogram in (x, y, z)-coordinates, where the
+    colorbar indicates number of counts at that specific coordinate.
+
+    Args:
+        df (DataFrame): Clustered events
+
+    Yields:
+        HTML file containing the 3D-histogram plot, automatically opened in the
+        default browser.
+    """
+
     # Declare max and min count
     min_count = 0
     max_count = np.inf
@@ -102,6 +116,20 @@ def coincidences_3D_plot(df):
 
 
 def initiate_detector_border_lines(detector_vec):
+    """
+    Produces a 3D hit-position histogram in (x, y, z)-coordinates, where the
+    colorbar indicates number of counts at that specific coordinate.
+
+    Args:
+        detector_vec (list): List containing three elements, and each element is
+                             a dictionary conatining the (wCh, gCh, bus)->(x, y, z)
+                             mapping for a specific detector.
+
+    Returns:
+        b_traces (list): List containing the border traces for each of the three
+                         detectors.
+    """
+    
     # Initiate all pairs of corners were lines will go between
     pairs_ESS = [[[80, 0], [80, 60]],
                  [[80, 0], [80, 19]],
@@ -173,5 +201,6 @@ def initiate_detector_border_lines(detector_vec):
                                          )
                                )
         b_traces.append(b_trace)
-
+    print('hej')
+    print(type(b_traces))
     return b_traces

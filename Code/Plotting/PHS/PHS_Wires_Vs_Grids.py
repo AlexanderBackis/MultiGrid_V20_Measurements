@@ -28,7 +28,7 @@ def PHS_wires_vs_grids_plot(ce):
 
     Returns:
         fig (Figure): Figure containing nine 2D PHS plots, showing wire charge
-                      versus grid charge, one plot for each bus.
+                      versus grid charge histogrammed, one plot for each bus.
     """
     def charge_scatter(fig, ce, sub_title, bus, vmin, vmax):
         plt.xlabel('Collected charge wires [ADC channels]')
@@ -40,7 +40,7 @@ def PHS_wires_vs_grids_plot(ce):
                    vmin=vmin, vmax=vmax, cmap='jet')
         plt.colorbar()
         return fig
-    
+
     # Plot data
     fig = plt.figure()
     fig.set_figheight(12)
