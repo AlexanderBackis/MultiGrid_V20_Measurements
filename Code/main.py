@@ -14,9 +14,10 @@ from PyQt5 import uic
 # Data Analysis
 import pandas as pd
 import numpy as np
-# Local sources
+# File handling
 from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
+from FileHandling.Storage import save_data, load_data
 # Helper functions
 from HelperFunctions.CreateMapping import create_full_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
@@ -67,7 +68,7 @@ class MainWindow(QMainWindow):
     # =========================================================================
 
     def cluster_action(self):
-        zip_paths = QFileDialog.getOpenFileNames(self, "Select Directory", "../Data")[0]
+        zip_paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
         if len(zip_paths) > 0:
             self.set_clustering_parameters()
             # Import
@@ -100,6 +101,33 @@ class MainWindow(QMainWindow):
             self.refresh_window()
             print(self.ce)
             print(self.e)
+
+    def save_action(self):
+        path = QFileDialog.getSaveFileName()[0]
+        if path != '':
+            save_data(path, self.ce, self.e, self.data_sets, self.adc_threshold, self.ILL_buses)
+
+    def load_action(self):
+        path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
+        if path != '':
+            clusters, events, data_sets_temp, adc_threshold_temp, ILL_buses_temp = load_data(path)
+            if self.write.isChecked():
+                self.ce = clusters
+                self.e = events
+                self.data_sets = data_sets_temp
+                self.adc_threshold = adc_threshold_temp
+                self.ILL_buses = ILL_buses_temp
+            else:
+                self.ce = self.ce.append(clusters)
+                self.e = self.e.append(events)
+                self.data_sets += data_sets_temp
+                # Reset index
+                self.ce.reset_index(drop=True, inplace=True)
+                self.e.reset_index(drop=True, inplace=True)
+            # Update window
+            self.measurement_time = get_duration(self.ce)
+            self.fill_MG_information_window()
+            self.refresh_window()
 
 
     # =========================================================================
@@ -198,6 +226,8 @@ class MainWindow(QMainWindow):
     def setup_buttons(self):
         # File handling
         self.cluster_button.clicked.connect(self.cluster_action)
+        self.save_button.clicked.connect(self.save_action)
+        self.load_button.clicked.connect(self.load_action)
         # PHS
         self.PHS_1D_button.clicked.connect(self.PHS_1D_action)
         self.PHS_2D_button.clicked.connect(self.PHS_2D_action)

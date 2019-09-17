@@ -1134,7 +1134,7 @@ Resolution</string>
      </rect>
     </property>
     <property name="text">
-     <string>Print Clusters</string>
+     <string>...</string>
     </property>
    </widget>
    <widget class="Line" name="line_4">
@@ -1424,7 +1424,7 @@ Resolution</string>
      </rect>
     </property>
     <property name="text">
-     <string>Print Events</string>
+     <string>...</string>
     </property>
    </widget>
    <widget class="QPushButton" name="ToF_10">
@@ -1665,19 +1665,6 @@ Resolution</string>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="he3_Timestamp">
-    <property name="geometry">
-     <rect>
-      <x>1230</x>
-      <y>410</y>
-      <width>121</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Timestamp</string>
     </property>
    </widget>
    <widget class="QPushButton" name="he3_ToF">
