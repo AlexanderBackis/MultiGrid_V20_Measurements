@@ -107,9 +107,7 @@ def create_ess_channel_to_coordinate_map(theta, offset):
                 # Insert result in dictionary and reset temporary variable.
                 # Flip bus and wire row locations, as we are parsing the
                 # coordinates backwards.
-                ess_ch_to_coord[flip_bus(module),
-                                grid_ch,
-                                flip_wire(wire_ch)] = {'x': x, 'y': y, 'z': z}
+                ess_ch_to_coord[flip_bus(module), grid_ch, flip_wire(wire_ch)] = {'x': x, 'y': y, 'z': z}
                 coordinate = {'x': -1, 'y': -1, 'z': -1}
     return ess_ch_to_coord
 
