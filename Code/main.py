@@ -111,6 +111,7 @@ class MainWindow(QMainWindow):
         path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
         if path != '':
             clusters, events, data_sets_temp, adc_threshold_temp, ILL_buses_temp = load_data(path)
+            # Write or append
             if self.write.isChecked():
                 self.ce = clusters
                 self.e = events

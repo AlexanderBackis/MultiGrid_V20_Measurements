@@ -7,11 +7,6 @@ EnergyTransfer.py: Tools to calculate energy transfer.
 import numpy as np
 from HelperFunctions.CreateMapping import create_full_mapping
 
-NEUTRON_MASS = 1.674927351e-27  # Neutron mass [kg]
-meV_TO_JOULE = 1.60218e-19 * 0.001  # Convert meV to Joule
-JOULE_TO_meV = 6.24150913e18 * 1000  # Convert Joule to meV
-CHOPPER_TO_SAMPLE = 20.01 # Chopper to detector distance [m]
-
 # =============================================================================
 #                        CALCULATE ENERGY TRANSFER
 # =============================================================================
@@ -28,23 +23,20 @@ def calculate_energy_transfer(df, Ei, frame_shift):
     Returns:
         DeltaE (float): Energy transfer in meV
     """
-
-    # Get distance matric for each voxel
+    # Declare necessary constants, neutron mass in [kg]
+    NEUTRON_MASS = 1.674927351e-27
+    JOULE_TO_meV = 6.24150913e18 * 1000
+    # Get chopper-to-detector distance for each voxel
     distance_mapping = get_distances()
     # Extract necessary values from dataframe
     wChs = df.wCh
     gChs = df.gCh
     buses = df.Bus
-    ToFs = df.ToF
-    distances = distance_mapping[buses, gChs, wChs]
-    # Calculate time spend travelling chopper-sample
-    vi = np.sqrt((E_i * meV_TO_JOULE * 2)/NEUTRON_MASS)
-    ti = (CHOPPER_TO_SAMPLE/ vi)
-    # Calculate time spend travelling sample-detector
-    tf = ToF * 62.5e-9 + frame_shift - ti
-    # Filter away events with negative travel time
-    tf = tf[tf > 0]
-    # Calculate energy Ef of neutron after scattering from sample
+    ToF = df.ToF
+    d = distance_mapping[buses, gChs, wChs]
+    # Calculate time spend travelling chopper-to-detector
+    tf = ToF * 62.5e-9 + frame_shift
+    # Calculate energy Ef of detected neutron
     Ef = ((NEUTRON_MASS/2) * ((d/tf) ** 2)) * JOULE_TO_meV
     # Calculate energy transfer
     DeltaE = E_i - E_f
