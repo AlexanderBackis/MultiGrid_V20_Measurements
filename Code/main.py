@@ -37,7 +37,8 @@ from Plotting.Misc.Timestamp import timestamp_plot
 # Analysis
 from Plotting.Analysis.DeltaE import energy_transfer_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
-from Plotting.Analysis.Efficiency import
+from Plotting.Analysis.Efficiency import calculate_efficiency
+from Plotting.Analysis.Efficiency import calculate_energy_resolution
 
 # =============================================================================
 # Windows
@@ -253,6 +254,15 @@ class MainWindow(QMainWindow):
             efficiency = calculate_efficiency(MG_dE_values, He3_dE_values,
                                               self.Ei, filter_parameters)
             print('Efficiency: %.2f' % efficiency)
+
+    def Energy_Resolution_action(self):
+        if (self.data_sets != ''):
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            dE_values = calculate_energy_transfer(ce_filtered, Ei)
+            # NEED A WAY TO GET HE3 VALUES
+            FWHM = calculate_energy_resolution(dE_values, self.Ei, filter_parameters)
+            print('FWHM: %.2f' % FWHM)
 
 
 

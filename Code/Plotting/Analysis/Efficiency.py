@@ -55,7 +55,7 @@ def calculate_efficiency(MG_dE_values, He3_dE_values, Ei, parameters):
 
 def calculate_peak_area(dE_values, Ei):
     """
-    Calculates the elastic peak area. Does this in three steps:
+    Calculates the elastic peak area. Does this in five steps:
 
     1. Histogram dE values
     2. Fit peak and extract relevant fit parameters
