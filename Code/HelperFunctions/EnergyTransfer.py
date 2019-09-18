@@ -11,7 +11,7 @@ from HelperFunctions.CreateMapping import create_full_mapping
 #                        CALCULATE ENERGY TRANSFER
 # =============================================================================
 
-def calculate_energy_transfer(df, Ei, frame_shift):
+def calculate_energy_transfer(df, Ei):
     """
     Calculates the energy transfer of a data set.
 
@@ -28,6 +28,7 @@ def calculate_energy_transfer(df, Ei, frame_shift):
     JOULE_TO_meV = 6.24150913e18 * 1000
     # Get chopper-to-detector distance for each voxel
     distance_mapping = get_distances()
+    frame_shift = get_frame_shift(Ei)
     # Extract necessary values from dataframe
     wChs = df.wCh
     gChs = df.gCh
@@ -69,3 +70,11 @@ def get_distances():
                 z = vox_coordinate['z']
                 distances[bus, gCh, wCh] = np.sqrt(x ** 2 + y ** 2 + z ** 2)
     return distances
+
+
+# =============================================================================
+#                             HELPER FUNCTIONS
+# =============================================================================
+
+def get_frame_shift(Ei):
+    return 0

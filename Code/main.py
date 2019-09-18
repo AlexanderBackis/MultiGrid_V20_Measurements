@@ -21,6 +21,7 @@ from FileHandling.Storage import save_data, load_data
 # Helper functions
 from HelperFunctions.CreateMapping import create_full_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
+from HelperFunctions.EnergyTransfer import calculate_energy_transfer
 # PHS
 from Plotting.PHS.PHS_1D import PHS_1D_plot
 from Plotting.PHS.PHS_2D import PHS_2D_plot
@@ -36,6 +37,7 @@ from Plotting.Misc.Timestamp import timestamp_plot
 # Analysis
 from Plotting.Analysis.DeltaE import energy_transfer_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
+from Plotting.Analysis.Efficiency import
 
 # =============================================================================
 # Windows
@@ -242,6 +244,16 @@ class MainWindow(QMainWindow):
             count_rate = calculate_count_rate(ToF_values, self.measurement_time)
             print('Count rate: %.1f [Hz]' % count_rate)
 
+    def Efficiency_action(self):
+        if (self.data_sets != ''):
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            MG_dE_values = calculate_energy_transfer(ce_filtered, Ei)
+            # NEED A WAY TO GET HE3 VALUES
+            efficiency = calculate_efficiency(MG_dE_values, He3_dE_values,
+                                              self.Ei, filter_parameters)
+            print('Efficiency: %.2f' % efficiency)
+
 
 
 
@@ -269,6 +281,7 @@ class MainWindow(QMainWindow):
         # Analysis
         self.dE_button.clicked.connect(self.Energy_Transfer_action)
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
+        self.efficiency_button.clicked.connect(self.Efficiency_action)
         # Button toogle
         self.toogle_VMM_MG()
 

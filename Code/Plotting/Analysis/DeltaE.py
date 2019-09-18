@@ -28,8 +28,7 @@ def energy_transfer_plot(df, Ei, number_bins):
         bin_centers (numpy array): Numpy array containing the bin centers
     """
     # Calculate DeltaE
-    frame_shift = get_frame_shift(Ei)
-    dE = calculate_energy_transfer(df, Ei, frame_shift)
+    dE = calculate_energy_transfer(df, Ei)
     # Histogram DeltaE
     dE_hist, bin_edges = np.histogram(dE, bins=number_bins, range=[-Ei, Ei])
     bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
@@ -43,11 +42,3 @@ def energy_transfer_plot(df, Ei, number_bins):
     plt.yscale('log')
     plt.title('Energy transfer')
     return fig
-
-
-# =============================================================================
-#                             HELPER FUNCTIONS
-# =============================================================================
-
-def get_frame_shift(Ei):
-    pass
