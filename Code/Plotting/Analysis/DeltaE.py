@@ -19,7 +19,7 @@ def energy_transfer_plot(df, Ei, number_bins):
     Args:
         df (DataFrame): Clustered events
         Ei (float): Incident energy in meV
-        number_bins (int): Number of bins to histogram energy transfer data in
+        number_bins (int): Number of bins to histogram energy transfer data
 
     Returns:
         fig (Figure): Figure containing nine 2D coincidences histograms, one
@@ -31,8 +31,8 @@ def energy_transfer_plot(df, Ei, number_bins):
     frame_shift = get_frame_shift(Ei)
     dE = calculate_energy_transfer(df, Ei, frame_shift)
     # Histogram DeltaE
-    dE_hist, bins = np.histogram(dE, bins=number_bins, range=[-Ei, Ei])
-    bin_centers = 0.5 * (bins[1:] + bins[:-1])
+    dE_hist, bin_edges = np.histogram(dE, bins=number_bins, range=[-Ei, Ei])
+    bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
     # Plot data
     fig = plt.figure()
     plt.plot(bin_centers, dE_hist, '.-', color='black', zorder=5)
@@ -42,7 +42,7 @@ def energy_transfer_plot(df, Ei, number_bins):
     plt.ylabel('Counts')
     plt.yscale('log')
     plt.title('Energy transfer')
-    return fig, dE_hist, bin_centers
+    return fig
 
 
 # =============================================================================
