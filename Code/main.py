@@ -33,6 +33,7 @@ from Plotting.Coincidences.Coincidences_Projections import coincidences_projecti
 from Plotting.Misc.Multiplicity import multiplicity_plot
 from Plotting.Misc.ToF import ToF_histogram
 from Plotting.Misc.Timestamp import timestamp_plot
+from Plotting.Analysis.DeltaE import energy_transfer_plot
 
 # =============================================================================
 # Windows
@@ -220,6 +221,18 @@ class MainWindow(QMainWindow):
             fig = timestamp_plot(ce_filtered)
             fig.show()
 
+    # ==== Analysis ==== #
+
+    def Energy_Transfer_action(self):
+        if (self.data_sets != '') and (Ei_value != -1):
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            number_bins = int(window.dE_bins.text())
+            fig = energy_transfer_plot(ce_filtered, self.Ei, number_bins)
+            fig.show()
+
+
+
     # ========================================================================
     # Helper Functions
     # ========================================================================
@@ -241,6 +254,10 @@ class MainWindow(QMainWindow):
         self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
         self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         self.Coincidences_Projections_button.clicked.connect(self.Coincidences_Projections_action)
+        # Analysis
+        self.dE_button.clicked.connect()
+        # Button toogle
+        self.toogle_VMM_MG()
 
     def refresh_window(self):
         self.app.processEvents()
@@ -268,6 +285,12 @@ class MainWindow(QMainWindow):
         self.ILL_buses = [self.ILL_bus_1.value(), self.ILL_bus_2.value(), self.ILL_bus_3.value()]
         self.maximum_file_size_in_mb = float(self.maximum_file_size_in_mb_value.text())
         self.adc_threshold = float(self.adc_threshold_value.text())
+
+    def toogle_VMM_MG(self):
+        self.ESS_button.toggled.connect(
+            lambda checked: checked and self.ILL_button.setChecked(False))
+        self.ILL_button.toggled.connect(
+            lambda checked: checked and self.ESS_button.setChecked(False))
 
 
 

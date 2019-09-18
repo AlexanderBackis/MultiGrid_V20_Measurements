@@ -1920,7 +1920,7 @@ Resolution</string>
      <string>Detector type:</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_3">
+   <widget class="QCheckBox" name="ESS_button">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1936,7 +1936,7 @@ Resolution</string>
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_4">
+   <widget class="QCheckBox" name="ILL_button">
     <property name="geometry">
      <rect>
       <x>60</x>
