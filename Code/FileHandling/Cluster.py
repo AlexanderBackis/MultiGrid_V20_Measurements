@@ -74,18 +74,19 @@ def cluster_data(data, ILL_buses, adc_threshold):
 
     Args:
         data (tuple): Tuple containing data, one word per element.
-        detector_mappings (dict): Dictionary containing the channel-to-coordinate
-                                  mapping for the ESS- and ILL-type detectors.
         ILL_buses (list): List containg all ILL buses
         adc_threshold (int): The ADC-threshold used, all event below threshold
-                             are discarded
+                             are discarded.
 
     Returns:
         clusters (DataFrame): DataFrame containing one neutron
                               event per row. Each neutron event has
                               information about: "Bus", "Time",
                               "ToF", "wCh", "gCh", "wADC", "gADC",
-                              "wM", "gM", "Coordinate".
+                              "wM", "gM" and "ceM".
+        events (DataFrame): DataFrame containing  event per row. Each event has
+                            information about: "Bus", "Time", "ToF", "Ch",
+                            "ADC", "wM", "gM" and "ceM".
 
 
 

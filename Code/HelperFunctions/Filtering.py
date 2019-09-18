@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Filtering.py: Helper functions for handling of paths and folders.
+Filtering.py: Filters the DataFrames containing the clusters and events
+              according to specifications set on the GUI.
 """
 
 # =============================================================================
@@ -9,6 +10,19 @@ Filtering.py: Helper functions for handling of paths and folders.
 # =============================================================================
 
 def filter_clusters(ce, parameters):
+    """
+    Filters clusters based on preferences set on GUI.
+
+    Args:
+        ce (DataFrame): Clustered events
+        parameters (dict): Dictionary containing information about which
+                           parameters to filter on, and to what extent
+
+    Returns:
+        ce_red (DataFrame): DataFrame containing the reduced data according to
+                            the specifications set on the GUI.
+    """
+
     ce_red = ce
     for parameter, (min_val, max_val, filter_on) in parameters.items():
         if filter_on:
@@ -40,6 +54,24 @@ def filter_events(e, parameters):
 # =============================================================================
 
 def get_filter_parameters(window):
+    """
+    Extracts filtering information from GUI window and saves it in a dictionary.
+
+    Args:
+        window (MainWindow): GUI window
+
+    Returns:
+        parameters (dict): Dictionary containing information about which
+                           parameters to filter on, and to what extent. For each
+                           key, the values are:
+
+                           0. min_value (int/float),
+                           1. max_value (int/float),
+                           2. isFilterOn (bool)
+
+    """
+
+
     parameters = {'wM': [window.wM_min.value(),
                          window.wM_max.value(),
                          window.wM_filter.isChecked()],

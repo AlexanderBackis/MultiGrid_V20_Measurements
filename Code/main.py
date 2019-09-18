@@ -255,7 +255,7 @@ class MainWindow(QMainWindow):
         self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         self.Coincidences_Projections_button.clicked.connect(self.Coincidences_Projections_action)
         # Analysis
-        self.dE_button.clicked.connect()
+        self.dE_button.clicked.connect(self.Energy_Transfer_action)
         # Button toogle
         self.toogle_VMM_MG()
 

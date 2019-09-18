@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Storage.py:
+Storage.py: Saves and Loads clustered data via HDF5 files.
 """
 
 import pandas as pd
@@ -12,6 +12,19 @@ import pandas as pd
 # =============================================================================
 
 def load_data(path):
+    """
+    Loads clustered data from specified HDF5-path.
+
+    Args:
+        path (str): Path to HDF5 containing the saved clusters and events
+
+    Returns:
+        ce (DataFrame): Clusters
+        e (DataFrame): Events
+        data_sets (str): Data used for clustering
+        adc_threshold (int): ADC threshold used in clustering procedure
+        ILL_buses (list): List containing all ILL buses
+    """
     ce = pd.read_hdf(path, 'ce')
     e = pd.read_hdf(path, 'e')
     data_sets = pd.read_hdf(path, 'data_sets')['data_sets'].iloc[0]
@@ -24,6 +37,20 @@ def load_data(path):
 # =============================================================================
 
 def save_data(path, ce, e, data_sets, adc_threshold, ILL_buses):
+    """
+    Saves clustered data to specified HDF5-path.
+
+    Args:
+        path (str): Path to HDF5 containing the saved clusters and events
+        ce (DataFrame): Clusters
+        e (DataFrame): Events
+        data_sets (str): Data used for clustering
+        adc_threshold (int): ADC threshold used in clustering procedure
+        ILL_buses (list): List containing all ILL buses
+
+    Yields:
+        Clustered data is saved to specified path.
+    """
     # Convert values to DataFrame for easy storage
     data_sets_df = pd.DataFrame({'data_sets': [data_sets]})
     adc_threshold_df = pd.DataFrame({'adc_threshold': [adc_threshold]})

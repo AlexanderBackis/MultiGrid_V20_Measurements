@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-PathsAndFolders.py: Helper functions for handling of paths and folders.
+DeltaE.py: Function which histograms energy transfer data
 """
 
 from HelperFunctions.EnergyTransfer import calculate_energy_transfer
@@ -13,6 +13,20 @@ from HelperFunctions.EnergyTransfer import calculate_energy_transfer
 
 
 def energy_transfer_plot(df, Ei, number_bins):
+    """
+    Histograms the energy transfer values from a measurement
+
+    Args:
+        df (DataFrame): Clustered events
+        Ei (float): Incident energy in meV
+        number_bins (int): Number of bins to histogram energy transfer data in
+
+    Returns:
+        fig (Figure): Figure containing nine 2D coincidences histograms, one
+                      for each bus.
+        dE_hist (numpy array): Numpy array containing the histogram data
+        bin_centers (numpy array): Numpy array containing the bin centers
+    """
     # Calculate DeltaE
     frame_shift = get_frame_shift(Ei)
     dE = calculate_energy_transfer(df, Ei, frame_shift)
@@ -28,7 +42,7 @@ def energy_transfer_plot(df, Ei, number_bins):
     plt.ylabel('Counts')
     plt.yscale('log')
     plt.title('Energy transfer')
-    return fig
+    return fig, dE_hist, bin_centers
 
 
 # =============================================================================
