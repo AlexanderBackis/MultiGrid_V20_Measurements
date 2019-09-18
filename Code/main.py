@@ -33,7 +33,9 @@ from Plotting.Coincidences.Coincidences_Projections import coincidences_projecti
 from Plotting.Misc.Multiplicity import multiplicity_plot
 from Plotting.Misc.ToF import ToF_histogram
 from Plotting.Misc.Timestamp import timestamp_plot
+# Analysis
 from Plotting.Analysis.DeltaE import energy_transfer_plot
+from Plotting.Analysis.CountRate import calculate_count_rate
 
 # =============================================================================
 # Windows
@@ -100,6 +102,7 @@ class MainWindow(QMainWindow):
             self.measurement_time = get_duration(self.ce)
             self.fill_MG_information_window()
             self.refresh_window()
+            # Print statements for debugging purposes
             print(self.ce)
             print(self.e)
 
@@ -224,12 +227,21 @@ class MainWindow(QMainWindow):
     # ==== Analysis ==== #
 
     def Energy_Transfer_action(self):
-        if (self.data_sets != '') and (Ei_value != -1):
+        if (self.data_sets != '') and (self.Ei_value != -1):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             number_bins = int(window.dE_bins.text())
             fig = energy_transfer_plot(ce_filtered, self.Ei, number_bins)
             fig.show()
+
+    def Count_Rate_action(self):
+        if (self.data_sets != ''):
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            ToF_values = ce_filtered.ToF * 62.5e-9
+            count_rate = calculate_count_rate(ToF_values, self.measurement_time)
+            print('Count rate: %.1f [Hz]' % count_rate)
+
 
 
 
@@ -256,6 +268,7 @@ class MainWindow(QMainWindow):
         self.Coincidences_Projections_button.clicked.connect(self.Coincidences_Projections_action)
         # Analysis
         self.dE_button.clicked.connect(self.Energy_Transfer_action)
+        self.count_rate_button.clicked.connect(self.Count_Rate_action)
         # Button toogle
         self.toogle_VMM_MG()
 
