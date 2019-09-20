@@ -1580,7 +1580,7 @@ Resolution</string>
      <enum>Qt::ScrollBarAsNeeded</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="he3_import">
+   <widget class="QPushButton" name="he3_import_button">
     <property name="geometry">
      <rect>
       <x>1045</x>
@@ -1604,19 +1604,6 @@ Resolution</string>
     </property>
     <property name="text">
      <string>PHS</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="he3_export">
-    <property name="geometry">
-     <rect>
-      <x>1045</x>
-      <y>330</y>
-      <width>121</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Export</string>
     </property>
    </widget>
    <widget class="QPushButton" name="he3_hit_position">

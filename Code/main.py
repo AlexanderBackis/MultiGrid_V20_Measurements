@@ -18,6 +18,8 @@ import numpy as np
 from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
 from FileHandling.Storage import save_data, load_data
+# He-3 tubes
+from HeliumTubes.ImportHe3 import unzip_He3_data, import_He3_data
 # Helper functions
 from HelperFunctions.CreateMapping import create_full_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
@@ -38,10 +40,10 @@ from Plotting.Misc.Timestamp import timestamp_plot
 from Plotting.Analysis.DeltaE import energy_transfer_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
-from Plotting.Analysis.Efficiency import calculate_energy_resolution
+from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
 
 # =============================================================================
-# Windows
+#                                   Windows
 # =============================================================================
 
 class MainWindow(QMainWindow):
@@ -265,6 +267,18 @@ class MainWindow(QMainWindow):
             print('FWHM: %.2f' % FWHM)
 
 
+    # =========================================================================
+    # He-3 tubes
+    # =========================================================================
+
+    def Import_He3_action(self):
+        zip_paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        if len(zip_paths) > 0:
+            for zip_path in zip_paths:
+                file_path = unzip_He3_data(zip_path)
+                He3_data = import_He3_data(file_path)
+
+
 
 
     # ========================================================================
@@ -292,6 +306,8 @@ class MainWindow(QMainWindow):
         self.dE_button.clicked.connect(self.Energy_Transfer_action)
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
         self.efficiency_button.clicked.connect(self.Efficiency_action)
+        # He-3 tubes
+        self.he3_import_button.clicked.connect(self.Import_He3_action)
         # Button toogle
         self.toogle_VMM_MG()
 
