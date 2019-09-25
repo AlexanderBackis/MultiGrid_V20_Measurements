@@ -106,10 +106,7 @@ def cluster_data(data, ILL_buses, adc_threshold):
     # Initiate dictionary to store events
     e_dict = {'Bus': (-1) * np.ones([size], dtype=int),
               'Ch': (-1) * np.ones([size], dtype=int),
-              'ADC': np.zeros([size], dtype=int),
-              'wM': np.zeros([size], dtype=int),
-              'gM': np.zeros([size], dtype=int),
-              'ceM': (-1) * np.ones([size], dtype=int)}
+              'ADC': np.zeros([size], dtype=int)}
     # Declare temporary boolean variables, related to words
     isOpen, isTrigger, isData, isExTs = False, False, False, False
     # Declare temporary variables, related to events
@@ -118,7 +115,6 @@ def cluster_data(data, ILL_buses, adc_threshold):
     e_count, ce_count = 0, 0
     # Declare variables that track time and index for events and clusters
     Time, TriggerTime, e_index, ce_index = 0, 0, 0, -1
-    e_index_temp = e_index
     # Iterate through data
     for i, word in enumerate(data):
         # Five possibilities: Header, DataBusStart, DataEvent, DataExTs or EoE.
@@ -136,10 +132,6 @@ def cluster_data(data, ILL_buses, adc_threshold):
             if (previousBus in ILL_buses) and (Bus in ILL_buses):
                 pass
             else:
-                # Assign multiplicity to events (only applicable if not in first loop)
-                e_dict['wM'][e_index_temp:e_index+1] = ce_dict['wM'][ce_index]
-                e_dict['gM'][e_index_temp:e_index+1] = ce_dict['gM'][ce_index]
-                e_index_temp = e_index
                 # Initiate temporary cluster variables and increase cluster index
                 previousBus = Bus
                 maxADCw = 0
@@ -202,15 +194,10 @@ def cluster_data(data, ILL_buses, adc_threshold):
                 # Calculate ToF
                 ToF = Time - TriggerTime
                 ce_dict['Time'][ce_index-(ce_count-1):ce_index+1] = Time
-                e_dict['Time'][e_index-e_count:e_index+1] = Time
                 # Assign ToF to clusters and events
                 ce_dict['ToF'][ce_index-(ce_count-1):ce_index+1] = ToF
-                e_dict['ToF'][e_index-e_count:e_index+1] = ToF
                 # Assign multiplicity to events and clusters
                 ce_dict['ceM'][ce_index-(ce_count-1):ce_index+1] = ce_count
-                e_dict['ceM'][e_index-e_count:e_index+1] = ce_count
-                e_dict['wM'][e_index_temp:e_index+1] = ce_dict['wM'][ce_index]
-                e_dict['gM'][e_index_temp:e_index+1] = ce_dict['gM'][ce_index]
                 # Reset temporary variables, related to data in events
                 previousBus, Bus = -1, -1
                 maxADCw, maxADCg = 0, 0
