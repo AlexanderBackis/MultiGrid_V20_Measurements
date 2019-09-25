@@ -42,6 +42,9 @@ from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
 
+# TEMP
+import matplotlib.pyplot as plt
+
 # =============================================================================
 #                                   Windows
 # =============================================================================
@@ -67,6 +70,7 @@ class MainWindow(QMainWindow):
         self.He3_data_sets = ''
         self.He3_measurement_time = 0
         self.He3_counts = 0
+        self.He3_df = pd.DataFrame()
         self.fill_He3_information_window()
         self.show()
         self.refresh_window()
@@ -276,7 +280,37 @@ class MainWindow(QMainWindow):
         if len(zip_paths) > 0:
             for zip_path in zip_paths:
                 file_path = unzip_He3_data(zip_path)
-                He3_data = import_He3_data(file_path)
+                He3_df = import_He3_data(file_path)
+                fig = plt.figure()
+                plt.hist(He3_df['ADC'], histtype='step',
+                         color='blue', zorder=5, bins=100)
+                plt.grid(True, which='major', linestyle='--', zorder=0)
+                plt.grid(True, which='minor', linestyle='--', zorder=0)
+                plt.xlabel('ADC')
+                plt.ylabel('Counts')
+                plt.title('ADC')
+                fig.show()
+                fig = plt.figure()
+                plt.hist(He3_df['Ch'], histtype='step',
+                         color='red', zorder=5, bins=20)
+                plt.grid(True, which='major', linestyle='--', zorder=0)
+                plt.grid(True, which='minor', linestyle='--', zorder=0)
+                plt.xlabel('Channel')
+                plt.ylabel('Counts')
+                plt.title('Channel')
+                fig.show()
+                fig = plt.figure()
+                plt.hist(He3_df['ToF'], histtype='step',
+                         color='green', zorder=5, bins=1000)
+                plt.xlabel('ToF [s]')
+                plt.ylabel('Counts')
+                plt.yscale('log')
+                plt.title('ToF')
+                plt.grid(True, which='major', linestyle='--', zorder=0)
+                plt.grid(True, which='minor', linestyle='--', zorder=0)
+                fig.show()
+
+
 
 
 

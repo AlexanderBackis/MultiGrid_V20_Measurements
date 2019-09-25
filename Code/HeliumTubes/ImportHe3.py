@@ -10,7 +10,8 @@ import shutil
 import zipfile
 import re
 import numpy as np
-import binascii
+import pandas as pd
+from binascii import unhexlify, hexlify
 
 # =============================================================================
 #                             UNZIP HELIUM-3 DATA
@@ -47,21 +48,44 @@ def import_He3_data(file_path):
         0, 1  : Channel number 0..3 for ADC1..ADC4.
         2     : Flag for pile-up detected
         3     : Indicates scope mode. If it is on, more data words follow.
-        4->47 : 44 bit event time. If the RTC option is enabled, it is in units
-                of 8 ns, otherwise in units of 1 msec.
-        48->63: 16 bit ADC value or in scope mode the length of the waveform
-                data minus one in units of 16 bit words. This size value can be
-                4095, 8191, 16383 or 32767. The waveform data follow then next.
+        4->47 : 44 bit event time, in units of 8 [ns]
+        48->63: 16 bit ADC value, size can be 4095, 8191, 16383 or 32767.
 
     Args:
         file_path (str): Path to '.mesytec'-file that contains the data
 
     Returns:
-
-
     """
-    test = np.loadtxt(file_path, dtype='str', delimiter='\n')
-    for row in test:
-        print(binascii.unhexlify(row))
-
-    return data
+    # Masks
+    ChannelMask = 0xC000000000000000
+    TimeMask    = 0x0FFFFFFFFFFFF000
+    ADCMask     = 0x0000000000000FFF
+    BreakMask   = 0xFFF0000000000000
+    # Bit shifts
+    ChannelShift = 62
+    TimeShift    = 12
+    # Import data
+    data = np.loadtxt(file_path, dtype='str', delimiter='\n')
+    start_idx = np.where(data == '[DATA]')[0][0]
+    size = len(data)
+    # Declare dictionary to store data
+    He3_dict = {'Ch':  np.empty([size], dtype=int),
+                'ToF': np.empty([size], dtype=int),
+                'ADC': np.empty([size], dtype=int)}
+    count = 0
+    # Extracts information from data
+    for i, row in enumerate(data[start_idx+1:]):
+        # Convert ASCII encoded HEX to int (shouldn't it be uint?)
+        word = int(row, 16)
+        # Check if we should save data
+        if (word & BreakMask) != 0:
+            # Extract values using masks
+            He3_dict['Ch'][count] = (word & ChannelMask) >> ChannelShift
+            He3_dict['ToF'][count] = (word & TimeMask) >> TimeShift
+            He3_dict['ADC'][count] = (word & ADCMask)
+            count += 1
+    # Only save the events, cut unused rows
+    for key in He3_dict:
+        He3_dict[key] = He3_dict[key][0:count]
+    He3_df = pd.DataFrame(He3_dict)
+    return He3_df

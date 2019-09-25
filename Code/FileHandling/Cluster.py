@@ -105,8 +105,6 @@ def cluster_data(data, ILL_buses, adc_threshold):
                'ceM': (-1) * np.ones([size], dtype=int)}
     # Initiate dictionary to store events
     e_dict = {'Bus': (-1) * np.ones([size], dtype=int),
-              'Time': (-1) * np.ones([size], dtype=int),
-              'ToF': (-1) * np.ones([size], dtype=int),
               'Ch': (-1) * np.ones([size], dtype=int),
               'ADC': np.zeros([size], dtype=int),
               'wM': np.zeros([size], dtype=int),
