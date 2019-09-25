@@ -523,7 +523,7 @@ Events</string>
      <item row="5" column="6">
       <widget class="QLineEdit" name="ToF_max">
        <property name="text">
-        <string>16667</string>
+        <string>71429</string>
        </property>
       </widget>
      </item>

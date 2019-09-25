@@ -27,10 +27,9 @@ def ToF_histogram(df, number_bins):
     plt.title('ToF')
     plt.xlabel('ToF [$\mu$s]')
     plt.ylabel('Counts')
-    plt.yscale('log')
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     # Histogram data
-    plt.hist(df.ToF * 62.5e-9 * 1e6, bins=number_bins, log=True, color='black',
+    plt.hist(df.ToF * 62.5e-9 * 1e6, bins=number_bins, color='black',
              zorder=4, histtype='step')
     return fig
