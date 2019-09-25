@@ -46,23 +46,23 @@ def coincidences_2D_plot(ce, measurement_time):
     if ce.shape[0] != 0:
         duration = measurement_time
         vmin = 1
-        vmax = ce.shape[0] // 4500 + 5
+        vmax = ce.shape[0] // 45 + 5
     else:
         duration = 1
         vmin = 1
         vmax = 1
     # Plot data
     fig = plt.figure()
+    fig.set_figheight(4)
     fig.set_figwidth(14)
-    fig.set_figheight(12)
     histograms = []
-    for bus in range(0, 9):
+    for bus in range(0, 3):
         ce_bus = ce[ce.Bus == bus]
         # Calculate number of events and rate in a specific bus
         number_events = ce_bus.shape[0]
         events_per_s = round(number_events/duration, 4)
         sub_title = ('Bus %d\n(%d events, %f events/s)' % (bus, number_events, events_per_s))
-        plt.subplot(3, 3, bus+1)
+        plt.subplot(1, 3, bus+1)
         fig, h = plot_2D_bus(fig, sub_title, ce_bus, vmin, vmax, duration)
         histograms.append(h)
     plt.tight_layout()

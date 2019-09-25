@@ -43,7 +43,7 @@ def PHS_wires_vs_grids_plot(ce):
 
     # Plot data
     fig = plt.figure()
-    fig.set_figheight(12)
+    fig.set_figheight(5)
     fig.set_figwidth(14)
     # Set color limits
     if ce.shape[0] != 0:
@@ -53,10 +53,10 @@ def PHS_wires_vs_grids_plot(ce):
         vmin = 1
         vmax = 1
     # Plot
-    for bus in range(0, 9):
+    for bus in range(0, 3):
         events_bus = ce[ce.Bus == bus]
         sub_title = 'Bus %d\n(%d events)' % (bus, events_bus.shape[0])
-        plt.subplot(3, 3, bus+1)
+        plt.subplot(1, 3, bus+1)
         fig = charge_scatter(fig, events_bus, sub_title, bus, vmin, vmax)
     plt.tight_layout()
     return fig

@@ -43,11 +43,11 @@ def multiplicity_plot(df):
         vmax = 1
     # Prepare figure
     fig = plt.figure()
-    fig.set_figheight(14)
-    fig.set_figwidth(12)
+    fig.set_figheight(5)
+    fig.set_figwidth(14)
     # Iterate through all buses
-    for bus in range(0, 9):
-        plt.subplot(3, 3, bus+1)
+    for bus in range(0, 3):
+        plt.subplot(1, 3, bus+1)
         df_bus = df[df.Bus == bus]
         plot_multiplicity_bus(df_bus, bus, vmin, vmax)
     plt.tight_layout()
