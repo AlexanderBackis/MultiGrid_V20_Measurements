@@ -40,7 +40,7 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>140</x>
       <y>460</y>
       <width>751</width>
       <height>161</height>
@@ -1124,7 +1124,7 @@ Resolution</string>
      <string>Lineshape</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_7">
+   <widget class="QPushButton" name="ToF_Overlay">
     <property name="geometry">
      <rect>
       <x>590</x>
@@ -1134,7 +1134,8 @@ Resolution</string>
      </rect>
     </property>
     <property name="text">
-     <string>...</string>
+     <string>ToF
+Overlay</string>
     </property>
    </widget>
    <widget class="Line" name="line_4">
@@ -1414,7 +1415,7 @@ Resolution</string>
      <string>...</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_9">
+   <widget class="QPushButton" name="new_plot">
     <property name="geometry">
      <rect>
       <x>700</x>
@@ -1424,7 +1425,7 @@ Resolution</string>
      </rect>
     </property>
     <property name="text">
-     <string>...</string>
+     <string/>
     </property>
    </widget>
    <widget class="QPushButton" name="ToF_10">
@@ -1458,55 +1459,6 @@ Resolution</string>
     </property>
     <property name="text">
      <string>Measurements at the HZB using the V20 instrument, 23/9-2019 -&gt; 6/10-2019</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>850</x>
-      <y>386</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Clusters</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox_2">
-    <property name="geometry">
-     <rect>
-      <x>928</x>
-      <y>386</y>
-      <width>87</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Events</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="File_text_8">
-    <property name="geometry">
-     <rect>
-      <x>849</x>
-      <y>368</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>50</weight>
-      <italic>true</italic>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Filter on:</string>
     </property>
    </widget>
    <widget class="Line" name="line_13">
@@ -1937,6 +1889,39 @@ Resolution</string>
     </property>
     <property name="checked">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="File_text_5">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>370</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>50</weight>
+      <italic>true</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Beam Hit Voxel:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="Ei_value_2">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>390</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>-1</string>
     </property>
    </widget>
   </widget>

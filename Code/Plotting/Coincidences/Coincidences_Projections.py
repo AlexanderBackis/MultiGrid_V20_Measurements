@@ -39,7 +39,7 @@ def coincidences_projections_plot(df):
     # Calculate colorbar limits
     if df.shape[0] != 0:
         vmin = 1
-        vmax = df.shape[0] // 200 + 5
+        vmax = df.shape[0] // 20 + 5
     else:
         vmin = 1
         vmax = 1
@@ -49,7 +49,8 @@ def coincidences_projections_plot(df):
     h_front, *_ = plt.hist2d((wires + (80*buses)) // 20, grids, bins=[12, 40],
                              range=[[-0.5, 11.5], [79.5, 119.5]],
                              norm=LogNorm(),
-                             cmap='jet', vmin=vmin, vmax=vmax)
+                             vmin=vmin, vmax=vmax,
+                             cmap='jet')
     plt.title('Front view')
     plt.xlabel('Row')
     plt.ylabel('Grid')

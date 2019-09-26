@@ -22,6 +22,9 @@ def ToF_histogram(df, number_bins):
     Returns:
         fig (Figure): Figure containing the ToF histogram
     """
+    # Declare parameters
+    time_offset = (6e-3) * 1e6
+    period_time = (1/14) * 1e6
     # Prepare figure
     fig = plt.figure()
     plt.title('ToF')
@@ -30,6 +33,6 @@ def ToF_histogram(df, number_bins):
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     # Histogram data
-    plt.hist(df.ToF * 62.5e-9 * 1e6, bins=number_bins, color='black', zorder=4,
+    plt.hist((df.ToF * 62.5e-9 * 1e6 - time_offset) % period_time, bins=number_bins, color='black', zorder=4,
              histtype='step')
     return fig

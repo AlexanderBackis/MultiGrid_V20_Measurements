@@ -6,6 +6,8 @@
 # Standard library
 import os
 import sys
+import matplotlib.pyplot as plt
+import pandas as pd
 # QT
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -34,7 +36,7 @@ from Plotting.Coincidences.Coincidences_3D import coincidences_3D_plot
 from Plotting.Coincidences.Coincidences_Projections import coincidences_projections_plot
 # Misc
 from Plotting.Misc.Multiplicity import multiplicity_plot
-from Plotting.Misc.ToF import ToF_histogram
+from Plotting.Misc.ToF import ToF_histogram, ToF_histogram_overlaid
 from Plotting.Misc.Timestamp import timestamp_plot
 # Analysis
 from Plotting.Analysis.DeltaE import energy_transfer_plot
@@ -192,7 +194,11 @@ class MainWindow(QMainWindow):
         if self.data_sets != '':
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
-            coincidences_3D_plot(ce_filtered)
+            if self.ESS_button.isChecked():
+                detector_type = 'ESS'
+            else:
+                detector_type = 'ILL'
+            coincidences_3D_plot(ce_filtered, detector_type)
 
     def Coincidences_Projections_action(self):
         if self.data_sets != '':
@@ -269,6 +275,14 @@ class MainWindow(QMainWindow):
             # NEED A WAY TO GET HE3 VALUES
             FWHM = calculate_energy_resolution(dE_values, self.Ei, filter_parameters)
             print('FWHM: %.2f' % FWHM)
+
+    def ToF_Overlay_action(self):
+        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        for path in paths:
+
+
+
+
 
 
     # =========================================================================

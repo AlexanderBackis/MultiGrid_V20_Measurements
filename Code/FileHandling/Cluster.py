@@ -85,10 +85,7 @@ def cluster_data(data, ILL_buses, adc_threshold):
                               "ToF", "wCh", "gCh", "wADC", "gADC",
                               "wM", "gM" and "ceM".
         events (DataFrame): DataFrame containing  event per row. Each event has
-                            information about: "Bus", "Time", "ToF", "Ch",
-                            "ADC", "wM", "gM" and "ceM".
-
-
+                            information about: "Bus", "Ch" and "ADC"
 
     """
     size = len(data)

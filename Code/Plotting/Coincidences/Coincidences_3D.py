@@ -18,7 +18,7 @@ from HelperFunctions.CreateMapping import create_full_mapping
 #                           Coincidence Histogram (3D)
 # =============================================================================
 
-def coincidences_3D_plot(df):
+def coincidences_3D_plot(df, detector_type):
     """
     Produces a 3D hit-position histogram in (x, y, z)-coordinates, where the
     colorbar indicates number of counts at that specific coordinate.
@@ -50,10 +50,13 @@ def coincidences_3D_plot(df):
     loc = 0
     labels = []
     detector_names = ['ILL', 'ESS_CLB', 'ESS_PA']
+    if detector_type == 'ESS':
+        detector = detector_vec[1]
+    else:
+        detector = detector_vec[0]
     for wCh in range(0, 80):
         for gCh in range(80, 120):
-            for bus in range(0, 9):
-                detector = detector_vec[bus//3]
+            for bus in range(0, 3):
                 over_min = H[wCh, gCh-80, bus] > min_count
                 under_max = H[wCh, gCh-80, bus] <= max_count
                 if over_min and under_max:
@@ -63,7 +66,7 @@ def coincidences_3D_plot(df):
                     hist[2].append(coord['z'])
                     hist[3].append(H[wCh, gCh-80, bus])
                     loc += 1
-                    labels.append('Detector: ' + detector_names[(bus//3)]
+                    labels.append('Detector: ' + detector_type
                                   + '<br>'
                                   + 'Module: %d<br>' % bus
                                   + 'WireChannel: %d<br>' % wCh
@@ -129,7 +132,7 @@ def initiate_detector_border_lines(detector_vec):
         b_traces (list): List containing the border traces for each of the three
                          detectors.
     """
-    
+
     # Initiate all pairs of corners were lines will go between
     pairs_ESS = [[[80, 0], [80, 60]],
                  [[80, 0], [80, 19]],
