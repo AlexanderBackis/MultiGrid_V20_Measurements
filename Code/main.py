@@ -279,6 +279,8 @@ class MainWindow(QMainWindow):
     def ToF_Overlay_action(self):
         paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
         for path in paths:
+            pass
+
 
 
 
