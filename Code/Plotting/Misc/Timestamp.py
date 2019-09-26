@@ -28,7 +28,7 @@ def timestamp_plot(df):
     """
 
     # Filter so we only plot every 100:th element, so it is not so slow
-    df_temp = [df.index % 1000 == 0]
+    df_temp = df[df.index % 1000 == 0]
     # Prepare figure
     fig = plt.figure()
     plt.title('Timestamp (every 1000:th cluster)')

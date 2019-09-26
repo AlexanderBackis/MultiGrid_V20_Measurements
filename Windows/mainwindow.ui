@@ -734,7 +734,7 @@ Events</string>
     <property name="geometry">
      <rect>
       <x>155</x>
-      <y>395</y>
+      <y>400</y>
       <width>851</width>
       <height>51</height>
      </rect>
@@ -1124,7 +1124,7 @@ Resolution</string>
      <string>Lineshape</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_Overlay">
+   <widget class="QPushButton" name="ToF_Overlay_button">
     <property name="geometry">
      <rect>
       <x>590</x>
@@ -1142,9 +1142,9 @@ Overlay</string>
     <property name="geometry">
      <rect>
       <x>803</x>
-      <y>225</y>
+      <y>221</y>
       <width>61</width>
-      <height>181</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="lineWidth">
@@ -1914,14 +1914,53 @@ Overlay</string>
    <widget class="QLineEdit" name="Ei_value_2">
     <property name="geometry">
      <rect>
-      <x>850</x>
+      <x>890</x>
       <y>390</y>
-      <width>41</width>
+      <width>21</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>-1</string>
+     <string>40</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_30">
+    <property name="geometry">
+     <rect>
+      <x>857</x>
+      <y>390</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>wCh:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_32">
+    <property name="geometry">
+     <rect>
+      <x>918</x>
+      <y>390</y>
+      <width>31</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>gCh:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="Ei_value_3">
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>390</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>82</string>
     </property>
    </widget>
   </widget>

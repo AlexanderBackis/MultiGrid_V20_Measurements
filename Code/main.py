@@ -36,7 +36,7 @@ from Plotting.Coincidences.Coincidences_3D import coincidences_3D_plot
 from Plotting.Coincidences.Coincidences_Projections import coincidences_projections_plot
 # Misc
 from Plotting.Misc.Multiplicity import multiplicity_plot
-from Plotting.Misc.ToF import ToF_histogram, ToF_histogram_overlaid
+from Plotting.Misc.ToF import ToF_histogram
 from Plotting.Misc.Timestamp import timestamp_plot
 # Analysis
 from Plotting.Analysis.DeltaE import energy_transfer_plot
@@ -278,8 +278,35 @@ class MainWindow(QMainWindow):
 
     def ToF_Overlay_action(self):
         paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
-        for path in paths:
-            pass
+        if len(paths) > 0:
+            # Declare parameters
+            time_offset = (6e-3) * 1e6
+            period_time = (1/14) * 1e6
+            filter_parameters = get_filter_parameters(self)
+            number_bins = int(self.tofBins.text())
+            # Plot
+            fig = plt.figure()
+            for path in paths:
+                label = path.rsplit('/', 1)[-1]
+                ce = pd.read_hdf(path, 'ce')
+                ce_filtered = filter_clusters(ce, filter_parameters)
+                duration = get_duration(ce)
+                print()
+                print(label)
+                print(duration)
+                print()
+                ToF_shifted = (ce.ToF * 62.5e-9 * 1e6 - time_offset) % period_time
+                plt.hist(ToF_shifted, bins=number_bins, zorder=4, histtype='step',
+                         label=label,
+                         weights=(1/duration)*np.ones(len(ToF_shifted)))
+            plt.title('ToF')
+            plt.xlabel('ToF [$\mu$s]')
+            plt.ylabel('Counts')
+            plt.legend()
+            plt.grid(True, which='major', linestyle='--', zorder=0)
+            plt.grid(True, which='minor', linestyle='--', zorder=0)
+            fig.show()
+
 
 
 
@@ -356,6 +383,7 @@ class MainWindow(QMainWindow):
         self.dE_button.clicked.connect(self.Energy_Transfer_action)
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
         self.efficiency_button.clicked.connect(self.Efficiency_action)
+        self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
         # He-3 tubes
         self.he3_import_button.clicked.connect(self.Import_He3_action)
         # Button toogle

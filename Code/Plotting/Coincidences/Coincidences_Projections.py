@@ -49,7 +49,7 @@ def coincidences_projections_plot(df):
     h_front, *_ = plt.hist2d((wires + (80*buses)) // 20, grids, bins=[12, 40],
                              range=[[-0.5, 11.5], [79.5, 119.5]],
                              norm=LogNorm(),
-                             vmin=vmin, vmax=vmax,
+                             #vmin=vmin, vmax=vmax,
                              cmap='jet')
     plt.title('Front view')
     plt.xlabel('Row')
@@ -59,7 +59,8 @@ def coincidences_projections_plot(df):
     plt.subplot(1, 3, 2)
     h_top, *_ = plt.hist2d((wires + (80*buses)) // 20, wires % 20, bins=[12, 20],
                            range=[[-0.5, 11.5], [-0.5, 19.5]], norm=LogNorm(),
-                           cmap='jet', vmin=vmin, vmax=vmax)
+                           #vmin=vmin, vmax=vmax,
+                           cmap='jet')
     plt.title('Top view')
     plt.xlabel('Row')
     plt.ylabel('Layer')
@@ -68,7 +69,8 @@ def coincidences_projections_plot(df):
     plt.subplot(1, 3, 3)
     h_side, *_ = plt.hist2d(wires % 20, grids, bins=[20, 40],
                             range=[[-0.5, 19.5], [79.5, 119.5]], norm=LogNorm(),
-                            cmap='jet', vmin=vmin, vmax=vmax)
+                            #vmin=vmin, vmax=vmax,
+                            cmap='jet')
     plt.title('Side view')
     plt.xlabel('Layer')
     plt.ylabel('Grid')
