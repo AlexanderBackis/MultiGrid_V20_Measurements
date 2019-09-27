@@ -5,8 +5,9 @@ Efficiency.py: Calculates the efficiency through analysis of energy transfer
                spectra.
 """
 
+import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-from HelperFunctions.EnergyTransfer import calculate_energy_transfer
+from HelperFunctions.EnergyTransfer import calculate_energy
 from HelperFunctions.AreaAndSolidAngle import get_multi_grid_area_and_solid_angle
 
 

@@ -18,39 +18,37 @@ import pandas as pd
 #                        FULL MAPPING, ALL DETECTORS
 # =============================================================================
 
-def create_full_mapping():
+def create_mapping(detector_type, origin_voxel):
     """
-    Creates a channel->coordinate mapping for all three detectors.
+    Creates a channel->coordinate mapping for the detector. We place our origin
+    at the beam center.
 
     Returns:
-        detector_mappings (list): List containing the mappings for all three
-                                  detectors.
+        detector_mapping (dict): Dictionary conta
     """
-    # Import measurement of corners
-    ill_corners, ess_crb_corners, ess_pa_corners = get_detector_corners()
-    # Calculate inclination of detectors in (x, z)-plane
-    theta_ill = calculate_theta(ill_corners['left']['x'],
-                                ill_corners['right']['x'],
-                                ill_corners['left']['z'],
-                                ill_corners['right']['z'])
-    theta_crb = calculate_theta(ess_crb_corners['left']['x'],
-                                ess_crb_corners['right']['x'],
-                                ess_crb_corners['left']['z'],
-                                ess_crb_corners['right']['z'])
-    theta_pa = calculate_theta(ess_pa_corners['left']['x'],
-                               ess_pa_corners['right']['x'],
-                               ess_pa_corners['left']['z'],
-                               ess_pa_corners['right']['z'])
+
     # Calculate offset of detectors in (x, y, z)
-    offset_ill = ill_corners['right']
-    offset_crb = ess_crb_corners['right']
-    offset_pa = ess_pa_corners['right']
-    # Calculate mappings
-    ill_mapping = create_ill_channel_to_coordinate_map(theta_ill, offset_ill)
-    crb_mapping = create_ess_channel_to_coordinate_map(theta_crb, offset_crb)
-    pa_mapping = create_ess_channel_to_coordinate_map(theta_pa, offset_pa)
-    detector_mappings = [ill_mapping, crb_mapping, pa_mapping]
-    return detector_mappings
+    theta = 0
+    bus_origin, gCh_origin, wCh_origin = origin_voxel
+    temp_origin = {'x': 0, 'y': 0, 'z': 0}
+    if detector_type == 'ESS':
+        # Get offshift from corner of first voxel
+        mapping_temp = create_ess_channel_to_coordinate_map(theta, temp_origin)
+        hit_coordinate = mapping_temp[bus_origin, gCh_origin, wCh_origin]
+        x_offset = -hit_coordinate['x']
+        y_offset = -hit_coordinate['y']
+        z_offset = -hit_coordinate['z'] + 46.514e-3 + 28.366
+        offset = {'x': x_offset, 'y': y_offset, 'z': z_offset}
+        mapping = create_ess_channel_to_coordinate_map(theta, offset)
+    else:
+        mapping_temp = create_ill_channel_to_coordinate_map(theta, temp_origin)
+        hit_coordinate = mapping_temp[bus_origin, gCh_origin, wCh_origin]
+        x_offset = -hit_coordinate['x']
+        y_offset = -hit_coordinate['y']
+        z_offset = -hit_coordinate['z'] + 46.514e-3 + 28.366
+        offset = {'x': x_offset, 'y': y_offset, 'z': z_offset}
+        mapping = create_ill_channel_to_coordinate_map(theta, offset)
+    return mapping
 
 
 # =============================================================================
@@ -68,7 +66,8 @@ def create_ess_channel_to_coordinate_map(theta, offset):
         offset (float): Lower right corner deviation from sample origin
 
     Returns:
-        ess_ch_to_coord (dict): Dictionary conataining mapping for ESS detector
+        ess_ch_to_coord (dict): Dictionary conataining mapping for ESS detector,
+                                according to (Bus, gCh, wCh)->(x, y, z)
     """
     # Import voxel coordinates
     dirname = os.path.dirname(__file__)
@@ -127,7 +126,8 @@ def create_ill_channel_to_coordinate_map(theta, offset):
         offset (float): Lower right corner deviation from sample origin
 
     Returns:
-        ill_ch_to_coord (dict): Dictionary conataining mapping for ILL detector
+        ill_ch_to_coord (dict): Dictionary conataining mapping for ILL detector,
+                                according to (Bus, gCh, wCh)->(x, y, z)
     """
     # Declare distances between consecutive voxel centers in [mm]
     WireSpacing  = 10

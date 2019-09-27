@@ -7,6 +7,7 @@ Coincidences_2D.py: Histograms the hitposition, expressed in wire- and grid
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
+from HelperFunctions.AreaAndSolidAngle import get_multi_grid_area_and_solid_angle
 
 # =============================================================================
 #                          Coincidence Histogram (2D)
@@ -53,15 +54,16 @@ def coincidences_2D_plot(ce, measurement_time):
         vmax = 1
     # Plot data
     fig = plt.figure()
-    fig.set_figheight(4)
+    fig.set_figheight(5)
     fig.set_figwidth(14)
     histograms = []
     for bus in range(0, 3):
         ce_bus = ce[ce.Bus == bus]
         # Calculate number of events and rate in a specific bus
         number_events = ce_bus.shape[0]
-        events_per_s = round(number_events/duration, 4)
-        sub_title = ('Bus %d\n(%d events, %f events/s)' % (bus, number_events, events_per_s))
+        events_per_s = number_events/duration
+        events_per_m_s = events_per_s
+        sub_title = ('Bus %d\n(%d events, %.3f events/s)' % (bus, number_events, events_per_s))
         plt.subplot(1, 3, bus+1)
         fig, h = plot_2D_bus(fig, sub_title, ce_bus, vmin, vmax, duration)
         histograms.append(h)

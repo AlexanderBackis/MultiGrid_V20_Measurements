@@ -23,9 +23,9 @@ from FileHandling.Storage import save_data, load_data
 # He-3 tubes
 from HeliumTubes.ImportHe3 import unzip_He3_data, import_He3_data
 # Helper functions
-from HelperFunctions.CreateMapping import create_full_mapping
+from HelperFunctions.CreateMapping import create_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
-from HelperFunctions.EnergyTransfer import calculate_energy_transfer
+from HelperFunctions.EnergyTransfer import calculate_energy
 # PHS
 from Plotting.PHS.PHS_1D import PHS_1D_plot
 from Plotting.PHS.PHS_2D import PHS_2D_plot
@@ -39,7 +39,7 @@ from Plotting.Misc.Multiplicity import multiplicity_plot
 from Plotting.Misc.ToF import ToF_histogram
 from Plotting.Misc.Timestamp import timestamp_plot
 # Analysis
-from Plotting.Analysis.DeltaE import energy_transfer_plot
+from Plotting.Analysis.DeltaE import energy_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
@@ -194,11 +194,14 @@ class MainWindow(QMainWindow):
         if self.data_sets != '':
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
+            origin_voxel = [int(self.bus_origin.text()),
+                            int(self.gCh_origin.text()),
+                            int(self.wCh_origin.text())]
             if self.ESS_button.isChecked():
                 detector_type = 'ESS'
             else:
                 detector_type = 'ILL'
-            coincidences_3D_plot(ce_filtered, detector_type)
+            coincidences_3D_plot(ce_filtered, detector_type, origin_voxel)
 
     def Coincidences_Projections_action(self):
         if self.data_sets != '':
@@ -236,17 +239,26 @@ class MainWindow(QMainWindow):
         if (self.data_sets != ''):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
-            fig = timestamp_plot(ce_filtered)
+            number_bins = int(self.tofBins.text())
+            fig = timestamp_plot(ce_filtered, number_bins)
             fig.show()
 
     # ==== Analysis ==== #
 
-    def Energy_Transfer_action(self):
+    def Energy_action(self):
         if (self.data_sets != '') and (self.Ei_value != -1):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
-            number_bins = int(window.dE_bins.text())
-            fig = energy_transfer_plot(ce_filtered, self.Ei, number_bins)
+            number_bins = int(self.dE_bins.text())
+            origin_voxel = [int(self.bus_origin.text()),
+                            int(self.gCh_origin.text()),
+                            int(self.wCh_origin.text())]
+            if self.ESS_button.isChecked():
+                detector_type = 'ESS'
+            else:
+                detector_type = 'ILL'
+            fig = energy_plot(ce_filtered, detector_type, origin_voxel,
+                              number_bins)
             fig.show()
 
     def Count_Rate_action(self):
@@ -280,7 +292,7 @@ class MainWindow(QMainWindow):
         paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
         if len(paths) > 0:
             # Declare parameters
-            time_offset = (6e-3) * 1e6
+            time_offset = (0.6e-3) * 1e6
             period_time = (1/14) * 1e6
             filter_parameters = get_filter_parameters(self)
             number_bins = int(self.tofBins.text())
@@ -291,17 +303,16 @@ class MainWindow(QMainWindow):
                 ce = pd.read_hdf(path, 'ce')
                 ce_filtered = filter_clusters(ce, filter_parameters)
                 duration = get_duration(ce)
-                print()
-                print(label)
-                print(duration)
-                print()
                 ToF_shifted = (ce.ToF * 62.5e-9 * 1e6 - time_offset) % period_time
                 plt.hist(ToF_shifted, bins=number_bins, zorder=4, histtype='step',
                          label=label,
                          weights=(1/duration)*np.ones(len(ToF_shifted)))
+                print(label)
+                print('Duration: %f' % duration)
+                print()
             plt.title('ToF')
             plt.xlabel('ToF [$\mu$s]')
-            plt.ylabel('Counts')
+            plt.ylabel('Counts (Normalized by measurement time)')
             plt.legend()
             plt.grid(True, which='major', linestyle='--', zorder=0)
             plt.grid(True, which='minor', linestyle='--', zorder=0)
@@ -380,7 +391,7 @@ class MainWindow(QMainWindow):
         self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         self.Coincidences_Projections_button.clicked.connect(self.Coincidences_Projections_action)
         # Analysis
-        self.dE_button.clicked.connect(self.Energy_Transfer_action)
+        self.energy_button.clicked.connect(self.Energy_action)
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
         self.efficiency_button.clicked.connect(self.Efficiency_action)
         self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
@@ -434,11 +445,12 @@ def append_folder_and_files(folder, files):
 
 def get_duration(df):
     times = df.Time.values
-    diff = np.diff(times)
-    resets = np.where(diff < 0)
-    duration_in_TDC_channels = sum(times[resets]) + times[-1]
-    duration_in_seconds = duration_in_TDC_channels * 62.5e-9
-    return duration_in_seconds
+    duration = (times[-1] - times[0]) * 62.5e-9
+    #diff = np.diff(times)
+    #resets = np.where(diff < 0)
+    #duration_in_TDC_channels = sum(times[resets]) + times[-1]
+    #duration_in_seconds = duration_in_TDC_channels * 62.5e-9
+    return duration
 
 
 # =============================================================================

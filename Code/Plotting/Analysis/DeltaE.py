@@ -4,15 +4,16 @@
 DeltaE.py: Function which histograms energy transfer data
 """
 
-from HelperFunctions.EnergyTransfer import calculate_energy_transfer
-
+from HelperFunctions.EnergyTransfer import calculate_energy
+import matplotlib.pyplot as plt
+import numpy as np
 
 # =============================================================================
 #                             ENERGY TRANSFER
 # =============================================================================
 
 
-def energy_transfer_plot(df, Ei, number_bins):
+def energy_plot(df, detector_type, origin_voxel, number_bins):
     """
     Histograms the energy transfer values from a measurement
 
@@ -27,18 +28,22 @@ def energy_transfer_plot(df, Ei, number_bins):
         dE_hist (numpy array): Numpy array containing the histogram data
         bin_centers (numpy array): Numpy array containing the bin centers
     """
+    def meV_to_A(energy):
+        return np.sqrt(81.81/energy)
+
+    def A_to_meV(wavelength):
+        return (81.81/(wavelength ** 2))
     # Calculate DeltaE
-    dE = calculate_energy_transfer(df, Ei)
+    energy = calculate_energy(df, detector_type, origin_voxel)
     # Histogram DeltaE
-    dE_hist, bin_edges = np.histogram(dE, bins=number_bins, range=[-Ei, Ei])
-    bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+    print(energy)
     # Plot data
     fig = plt.figure()
-    plt.plot(bin_centers, dE_hist, '.-', color='black', zorder=5)
+    plt.hist(meV_to_A(energy), bins=number_bins, range=[0, 10], zorder=5,
+             histtype='step', color='black')
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
-    plt.xlabel('$E_i$ - $E_f$ [meV]')
+    plt.xlabel('Wavelength [Å]')
     plt.ylabel('Counts')
-    plt.yscale('log')
-    plt.title('Energy transfer')
+    plt.title('Wavelength Distribution')
     return fig

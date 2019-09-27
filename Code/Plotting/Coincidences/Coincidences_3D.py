@@ -12,13 +12,13 @@ import plotly.graph_objs as go
 import plotly.io as pio
 import os
 
-from HelperFunctions.CreateMapping import create_full_mapping
+from HelperFunctions.CreateMapping import create_mapping
 
 # =============================================================================
 #                           Coincidence Histogram (3D)
 # =============================================================================
 
-def coincidences_3D_plot(df, detector_type):
+def coincidences_3D_plot(df, detector_type, origin_voxel):
     """
     Produces a 3D hit-position histogram in (x, y, z)-coordinates, where the
     colorbar indicates number of counts at that specific coordinate.
@@ -37,30 +37,25 @@ def coincidences_3D_plot(df, detector_type):
     # Perform initial filters
     df = df[(df.wCh != -1) & (df.gCh != -1)]
     # Initiate 'voxel_id -> (x, y, z)'-mapping
-    detector_vec = create_full_mapping()
+    mapping = create_mapping(detector_type, origin_voxel)
     # Initiate border lines
-    b_traces = initiate_detector_border_lines(detector_vec)
+    b_traces = initiate_detector_border_lines(mapping, detector_type)
     # Calculate 3D histogram
     H, edges = np.histogramdd(df[['wCh', 'gCh', 'Bus']].values,
-                              bins=(80, 40, 9),
-                              range=((0, 80), (80, 120), (0, 9))
+                              bins=(80, 40, 3),
+                              range=((0, 80), (80, 120), (0, 3))
                               )
     # Insert results into an array
     hist = [[], [], [], []]
     loc = 0
     labels = []
-    detector_names = ['ILL', 'ESS_CLB', 'ESS_PA']
-    if detector_type == 'ESS':
-        detector = detector_vec[1]
-    else:
-        detector = detector_vec[0]
     for wCh in range(0, 80):
         for gCh in range(80, 120):
             for bus in range(0, 3):
                 over_min = H[wCh, gCh-80, bus] > min_count
                 under_max = H[wCh, gCh-80, bus] <= max_count
                 if over_min and under_max:
-                    coord = detector[bus % 3, gCh, wCh]
+                    coord = mapping[bus, gCh, wCh]
                     hist[0].append(coord['x'])
                     hist[1].append(coord['y'])
                     hist[2].append(coord['z'])
@@ -102,11 +97,19 @@ def coincidences_3D_plot(df, detector_type):
     a = 1
     camera = dict(up=dict(x=0, y=0, z=1), center=dict(x=0, y=0, z=0),
                   eye=dict(x=-2*a, y=-0.5*a, z=1.3*a))
+    scene=dict(camera=dict(eye=dict(x=1.15, y=1.15, z=0.8)), #the default values are 1.25, 1.25, 1.25
+           xaxis=dict(),
+           yaxis=dict(),
+           zaxis=dict(),
+           aspectmode='data', #this string can be 'data', 'cube', 'auto', 'manual'
+           #a custom aspectratio is defined as follows:
+           #aspectratio=dict(x=1, y=1, z=1)
+           )
     fig['layout']['scene1']['xaxis'].update(title='x [m]')
     fig['layout']['scene1']['yaxis'].update(title='y [m]')
     fig['layout']['scene1']['zaxis'].update(title='z [m]')
     fig['layout'].update(title='Coincidences (3D)')
-    fig['layout']['scene1']['camera'].update(camera)
+    fig['layout']['scene1'].update(scene)
     fig.layout.showlegend = False
     # If in plot He3-tubes histogram, return traces, else save HTML and plot
     py.offline.plot(fig, filename='../Output/Ce3Dhistogram.html', auto_open=True)
@@ -118,7 +121,7 @@ def coincidences_3D_plot(df, detector_type):
 # =============================================================================
 
 
-def initiate_detector_border_lines(detector_vec):
+def initiate_detector_border_lines(mapping, detector_type):
     """
     Produces a 3D hit-position histogram in (x, y, z)-coordinates, where the
     colorbar indicates number of counts at that specific coordinate.
@@ -162,16 +165,37 @@ def initiate_detector_border_lines(detector_vec):
                  ]
     # For each of the pairs, create a plotly trace with the plot
     b_traces = []
-    for bus in range(3, 9):
-        detector = detector_vec[bus//3]
-        for pair in pairs_ESS:
+    if detector_type == 'ESS':
+        for bus in range(0, 3):
+            for pair in pairs_ESS:
+                x_vec = []
+                y_vec = []
+                z_vec = []
+                for loc in pair:
+                    gCh = loc[0]
+                    wCh = loc[1]
+                    coord = mapping[bus, gCh, wCh]
+                    x_vec.append(coord['x'])
+                    y_vec.append(coord['y'])
+                    z_vec.append(coord['z'])
+                b_trace = go.Scatter3d(x=x_vec,
+                                       y=y_vec,
+                                       z=z_vec,
+                                       mode='lines',
+                                       line=dict(color='rgba(0, 0, 0, 0.5)',
+                                                 width=5))
+                b_traces.append(b_trace)
+
+    else:
+        for pair in pairs_ILL:
             x_vec = []
             y_vec = []
             z_vec = []
             for loc in pair:
                 gCh = loc[0]
                 wCh = loc[1]
-                coord = detector[bus % 3, gCh, wCh]
+                bus = loc[2]
+                coord = mapping[bus, gCh, wCh]
                 x_vec.append(coord['x'])
                 y_vec.append(coord['y'])
                 z_vec.append(coord['z'])
@@ -179,31 +203,15 @@ def initiate_detector_border_lines(detector_vec):
                                    y=y_vec,
                                    z=z_vec,
                                    mode='lines',
-                                   line=dict(color='rgba(0, 0, 0, 0.5)', width=5))
+                                   line=dict(color='rgba(0, 0, 0, 0.5)',
+                                             width=5))
             b_traces.append(b_trace)
-
-    detector = detector_vec[0]
-    for pair in pairs_ILL:
-        x_vec = []
-        y_vec = []
-        z_vec = []
-        for loc in pair:
-            gCh = loc[0]
-            wCh = loc[1]
-            bus = loc[2]
-            coord = detector[bus % 3, gCh, wCh]
-            x_vec.append(coord['x'])
-            y_vec.append(coord['y'])
-            z_vec.append(coord['z'])
-        b_trace = go.Scatter3d(x=x_vec,
-                               y=y_vec,
-                               z=z_vec,
-                               mode='lines',
-                               line=dict(color='rgba(0, 0, 0, 0.5)',
-                                         width=5
-                                         )
-                               )
-        b_traces.append(b_trace)
-    print('hej')
-    print(type(b_traces))
+    neutron_line = go.Scatter3d(x=[0, 0],
+                                y=[0, 0],
+                                z=[28, 28.7],
+                                mode='lines',
+                                line=dict(color='rgb(0, 0, 500)',
+                                          width=10),
+                                text='Neutron Beam')
+    b_traces.append(neutron_line)
     return b_traces

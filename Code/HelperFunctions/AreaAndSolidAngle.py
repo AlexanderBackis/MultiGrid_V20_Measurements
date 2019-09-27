@@ -7,7 +7,7 @@ AreaAndSolidAngle.py: Calculates the area and solid angle of the part of the
 """
 
 import numpy as np
-from HelperFunctions.CreateMapping import create_full_mapping
+from HelperFunctions.CreateMapping import create_mapping
 
 # =============================================================================
 #                      AREA AND SOLID ANGLE CALCULATIONS
@@ -51,7 +51,7 @@ def get_multi_grid_area_and_solid_angle(parameters):
     """
     # Declare parameters (voxel area is in m^2)
     VOXEL_AREA = 0.0005434375
-    detectors = create_full_mapping()
+    mapping = create_mapping()
     # Get amount of surface to include
     modules_to_include = get_modules(parameters)
     grids = get_grids(parameters)
@@ -60,12 +60,11 @@ def get_multi_grid_area_and_solid_angle(parameters):
     MG_projected_area = 0
     MG_solid_angle = 0
     for module in modules_to_include:
-        detector = detectors[module//3]
         wires = get_wires(module)
         for grid in grids:
             for wire in wires:
                 # Extract coordinates
-                vox_coordinate = detector[module % 3, grid, wire]
+                vox_coordinate = mapping[module, grid, wire]
                 x_vox = vox_coordinate['x']
                 y_vox = vox_coordinate['y']
                 z_vox = vox_coordinate['z']
@@ -97,11 +96,7 @@ def get_modules(parameters):
                              area and solid angle calculation
 
     """
-    if parameters['Bus'][2] is True:
-        first_bus, last_bus = parameters['Bus'][0], parameters['Bus'][1]
-        buses = np.arange(first_bus, last_bus+1)
-    else:
-        buses = np.arange(0, 9)
+    buses = [0, 1, 2]
     return buses
 
 

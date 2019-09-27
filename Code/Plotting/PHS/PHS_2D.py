@@ -39,19 +39,19 @@ def PHS_2D_plot(events):
 
     # Prepare figure
     fig = plt.figure()
-    fig.set_figheight(4)
+    fig.set_figheight(5)
     fig.set_figwidth(14)
     # Calculate color limits
     vmin = 1
     vmax = events.shape[0] // 1000 + 100
     # Iterate through all buses
-    for bus in range(0, 3):
+    for i, bus in enumerate(range(3, 6)):
         events_bus = events[events.Bus == bus]
         # Calculate number of grid and wire events in a specific bus
         wire_events = events_bus[events_bus.Ch < 80].shape[0]
         grid_events = events_bus[events_bus.Ch >= 80].shape[0]
         # Plot
-        plt.subplot(1, 3, bus+1)
+        plt.subplot(1, 3, i+1)
         sub_title = 'Bus: %d, events: %d' % (bus, events_bus.shape[0])
         sub_title += '\nWire events: %d, Grid events: %d' % (wire_events, grid_events)
         fig = PHS_2D_plot_bus(fig, events_bus, sub_title, vmin, vmax)

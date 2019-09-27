@@ -13,7 +13,7 @@ import numpy as np
 # =============================================================================
 
 
-def timestamp_plot(df):
+def timestamp_plot(df, number_bins):
     """
     Scatter plot of cluster index vs timestamp, where every 100:th cluster is
     plotted. The color bar shows the summation of wire and grid event, which
@@ -27,19 +27,15 @@ def timestamp_plot(df):
                       from all of the detectors.
     """
 
-    # Filter so we only plot every 100:th element, so it is not so slow
-    df_temp = df[df.index % 1000 == 0]
+
     # Prepare figure
     fig = plt.figure()
-    plt.title('Timestamp (every 1000:th cluster)')
-    plt.xlabel('Cluster [index]')
-    plt.ylabel('Timestamp [TDC channels]')
+    plt.title('Timestamp Histogram')
+    plt.xlabel('Timestamp [TDC channels]')
+    plt.ylabel('Counts [events/bin]')
     plt.grid(True, which='major', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     # Plot
-    plt.scatter(df_temp.index, df_temp.Time, c=df_temp.wM+df_temp.gM,
-                cmap='jet', zorder=5)
-    cbar = plt.colorbar()
-    cbar.set_label('Multiplicity summation [wM + gM]')
-    plt.tight_layout()
+    plt.hist(df.Time, histtype='step', bins=number_bins, color='black',
+             zorder=5)
     return fig
