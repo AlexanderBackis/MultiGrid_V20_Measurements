@@ -31,11 +31,11 @@ def timestamp_plot(df, number_bins):
     # Prepare figure
     fig = plt.figure()
     plt.title('Timestamp Histogram')
-    plt.xlabel('Timestamp [TDC channels]')
+    plt.xlabel('Time [Hours]')
     plt.ylabel('Counts [events/bin]')
     plt.grid(True, which='major', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     # Plot
-    plt.hist(df.Time, histtype='step', bins=number_bins, color='black',
-             zorder=5)
+    plt.hist((df.Time*62.5e-9)/(60 ** 2), histtype='step', bins=number_bins,
+             color='black', zorder=5)
     return fig

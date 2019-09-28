@@ -45,7 +45,7 @@ def PHS_2D_plot(events):
     vmin = 1
     vmax = events.shape[0] // 1000 + 100
     # Iterate through all buses
-    for i, bus in enumerate(range(3, 6)):
+    for i, bus in enumerate(range(0, 3)):
         events_bus = events[events.Bus == bus]
         # Calculate number of grid and wire events in a specific bus
         wire_events = events_bus[events_bus.Ch < 80].shape[0]

@@ -43,6 +43,7 @@ from Plotting.Analysis.DeltaE import energy_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
+from Plotting.Analysis.Animation3D import Animation_3D_plot
 
 # TEMP
 import matplotlib.pyplot as plt
@@ -318,6 +319,19 @@ class MainWindow(QMainWindow):
             plt.grid(True, which='minor', linestyle='--', zorder=0)
             fig.show()
 
+    def Animation_3D_action(self):
+        filter_parameters = get_filter_parameters(self)
+        ce_filtered = filter_clusters(self.ce, filter_parameters)
+        origin_voxel = [int(self.bus_origin.text()),
+                        int(self.gCh_origin.text()),
+                        int(self.wCh_origin.text())]
+        if self.ESS_button.isChecked():
+            detector_type = 'ESS'
+        else:
+            detector_type = 'ILL'
+        Animation_3D_plot(ce_filtered, detector_type, origin_voxel)
+
+
 
 
 
@@ -395,6 +409,7 @@ class MainWindow(QMainWindow):
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
         self.efficiency_button.clicked.connect(self.Efficiency_action)
         self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
+        self.Animation_3D_button.clicked.connect(self.Animation_3D_action)
         # He-3 tubes
         self.he3_import_button.clicked.connect(self.Import_He3_action)
         # Button toogle
