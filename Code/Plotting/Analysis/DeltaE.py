@@ -13,7 +13,7 @@ import numpy as np
 # =============================================================================
 
 
-def energy_plot(df, detector_type, origin_voxel, number_bins):
+def energy_plot(df, detector_type, origin_voxel, number_bins, start=0, stop=10):
     """
     Histograms the energy transfer values from a measurement
 
@@ -35,15 +35,12 @@ def energy_plot(df, detector_type, origin_voxel, number_bins):
         return (81.81/(wavelength ** 2))
     # Calculate DeltaE
     energy = calculate_energy(df, detector_type, origin_voxel)
-    # Histogram DeltaE
-    print(energy)
     # Plot data
-    fig = plt.figure()
-    plt.hist(meV_to_A(energy), bins=number_bins, range=[0, 10], zorder=5,
+    plt.hist(meV_to_A(energy), bins=number_bins, range=[start, stop], zorder=5,
              histtype='step', color='black')
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     plt.xlabel('Wavelength [Å]')
     plt.ylabel('Counts')
+    plt.yscale('log')
     plt.title('Wavelength Distribution')
-    return fig

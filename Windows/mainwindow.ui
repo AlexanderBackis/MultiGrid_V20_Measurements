@@ -1425,11 +1425,10 @@ Overlay</string>
      </rect>
     </property>
     <property name="text">
-     <string>Animation:
-3D vs Time</string>
+     <string>Time-Sweep</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ToF_10">
+   <widget class="QPushButton" name="lambda_sweep_button">
     <property name="geometry">
      <rect>
       <x>700</x>
@@ -1439,7 +1438,7 @@ Overlay</string>
      </rect>
     </property>
     <property name="text">
-     <string>...</string>
+     <string>λ-Sweep</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_26">

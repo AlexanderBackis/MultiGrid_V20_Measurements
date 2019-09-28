@@ -44,6 +44,7 @@ from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
 from Plotting.Analysis.Animation3D import Animation_3D_plot
+from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
 
 # TEMP
 import matplotlib.pyplot as plt
@@ -258,8 +259,8 @@ class MainWindow(QMainWindow):
                 detector_type = 'ESS'
             else:
                 detector_type = 'ILL'
-            fig = energy_plot(ce_filtered, detector_type, origin_voxel,
-                              number_bins)
+            fig = plt.figure()
+            energy_plot(ce_filtered, detector_type, origin_voxel, number_bins)
             fig.show()
 
     def Count_Rate_action(self):
@@ -331,7 +332,18 @@ class MainWindow(QMainWindow):
             detector_type = 'ILL'
         Animation_3D_plot(ce_filtered, detector_type, origin_voxel)
 
-
+    def lambda_sweep_action(self):
+        filter_parameters = get_filter_parameters(self)
+        ce_filtered = filter_clusters(self.ce, filter_parameters)
+        origin_voxel = [int(self.bus_origin.text()),
+                        int(self.gCh_origin.text()),
+                        int(self.wCh_origin.text())]
+        number_bins = int(self.dE_bins.text())
+        if self.ESS_button.isChecked():
+            detector_type = 'ESS'
+        else:
+            detector_type = 'ILL'
+        Lambda_Sweep_Animation(ce_filtered, number_bins, detector_type, origin_voxel)
 
 
 
@@ -410,6 +422,7 @@ class MainWindow(QMainWindow):
         self.efficiency_button.clicked.connect(self.Efficiency_action)
         self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
         self.Animation_3D_button.clicked.connect(self.Animation_3D_action)
+        self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
         # He-3 tubes
         self.he3_import_button.clicked.connect(self.Import_He3_action)
         # Button toogle

@@ -24,7 +24,7 @@ def calculate_energy(df, detector_type, origin_voxel):
     # Declare necessary constants, neutron mass in [kg]
     NEUTRON_MASS = 1.674927351e-27
     JOULE_TO_meV = 6.24150913e18 * 1000
-    time_offset = 0 #(6e-3) - 29.86e-3
+    time_offset = 0.6e-3
     period_time = (1/14)
     # Get chopper-to-detector distance for each voxel
     distance_mapping = get_distances(detector_type, origin_voxel)
@@ -32,11 +32,11 @@ def calculate_energy(df, detector_type, origin_voxel):
     wChs = df.wCh
     gChs = df.gCh
     buses = df.Bus
-    ToF = (df.ToF * 62.5e-9 - time_offset) % period_time
+    ToF = (df.ToF * 62.5e-9 + time_offset) % period_time
     d = distance_mapping[buses, gChs, wChs]
     # Calculate energy Ef of detected neutron
     energy = ((NEUTRON_MASS/2) * ((d/ToF) ** 2)) * JOULE_TO_meV
-    return energy
+    return energy.values
 
 
 
