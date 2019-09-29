@@ -1004,13 +1004,13 @@ Events</string>
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>275</y>
+      <y>273</y>
       <width>121</width>
-      <height>51</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>ToF</string>
+     <string>ToF - Single</string>
     </property>
    </widget>
    <widget class="QPushButton" name="PHS_wires_vs_grids_button">
@@ -1094,8 +1094,7 @@ Events</string>
      </rect>
     </property>
     <property name="text">
-     <string>Energy
-Resolution</string>
+     <string>...</string>
     </property>
    </widget>
    <widget class="QPushButton" name="count_rate_button">
@@ -1127,15 +1126,14 @@ Resolution</string>
    <widget class="QPushButton" name="ToF_Overlay_button">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>355</y>
+      <x>370</x>
+      <y>294</y>
       <width>121</width>
-      <height>51</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>ToF
-Overlay</string>
+     <string>ToF - Overlay</string>
     </property>
    </widget>
    <widget class="Line" name="line_4">
@@ -1157,7 +1155,7 @@ Overlay</string>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>570</x>
       <y>260</y>
       <width>71</width>
       <height>16</height>
@@ -1987,6 +1985,38 @@ Overlay</string>
     </property>
     <property name="text">
      <string>1</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_34">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>260</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Animation</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ToF_9">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>355</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>...</string>
     </property>
    </widget>
   </widget>

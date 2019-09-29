@@ -95,8 +95,8 @@ def coincidences_3D_plot(df, detector_type, origin_voxel):
     for b_trace in b_traces:
         fig.append_trace(b_trace, 1, 1)
     # Assign layout with axis labels, title and camera angle
-    a = 0.6
-    camera = dict(up=dict(x=0, y=1, z=0), center=dict(x=-3, y=-6, z=-2),
+    a = 2
+    camera = dict(up=dict(x=0, y=1, z=0), center=dict(x=0, y=0, z=0),
                   eye=dict(x=1*a, y=1*a, z=1*a))
     scene=dict(camera=camera, #the default values are 1.25, 1.25, 1.25
            xaxis=dict(),

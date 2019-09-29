@@ -43,9 +43,12 @@ from Plotting.Analysis.DeltaE import energy_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
+from Plotting.Analysis.Lineshape import analyze_Lineshape
+# Animation
 from Plotting.Analysis.Animation3D import Animation_3D_plot
 from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
 from Plotting.Analysis.TimeSweep import Time_Sweep_Animation
+
 
 # TEMP
 import matplotlib.pyplot as plt
@@ -238,6 +241,33 @@ class MainWindow(QMainWindow):
             fig = ToF_histogram(ce_filtered, number_bins)
             fig.show()
 
+    def ToF_Overlay_action(self):
+        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        if len(paths) > 0:
+            # Declare parameters
+            time_offset = (0.6e-3) * 1e6
+            period_time = (1/14) * 1e6
+            filter_parameters = get_filter_parameters(self)
+            number_bins = int(self.tofBins.text())
+            # Plot
+            fig = plt.figure()
+            for path in paths:
+                label = path.rsplit('/', 1)[-1]
+                ce = pd.read_hdf(path, 'ce')
+                ce_filtered = filter_clusters(ce, filter_parameters)
+                duration = get_duration(ce)
+                ToF_shifted = (ce.ToF * 62.5e-9 * 1e6 - time_offset) % period_time
+                plt.hist(ToF_shifted, bins=number_bins, zorder=4, histtype='step',
+                         label=label,
+                         weights=(1/duration)*np.ones(len(ToF_shifted)))
+            plt.title('ToF')
+            plt.xlabel('ToF [$\mu$s]')
+            plt.ylabel('Counts (Normalized by measurement time)')
+            plt.legend()
+            plt.grid(True, which='major', linestyle='--', zorder=0)
+            plt.grid(True, which='minor', linestyle='--', zorder=0)
+            fig.show()
+
     def Timestamp_action(self):
         if (self.data_sets != ''):
             filter_parameters = get_filter_parameters(self)
@@ -294,35 +324,28 @@ class MainWindow(QMainWindow):
             FWHM = calculate_energy_resolution(dE_values, self.Ei, filter_parameters)
             print('FWHM: %.2f' % FWHM)
 
-    def ToF_Overlay_action(self):
+    def Lineshape_action(self):
         paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
         if len(paths) > 0:
+            path = paths[0]
             # Declare parameters
-            time_offset = (0.6e-3) * 1e6
-            period_time = (1/14) * 1e6
             filter_parameters = get_filter_parameters(self)
-            number_bins = int(self.tofBins.text())
+            number_bins = int(self.dE_bins.text())
+            origin_voxel = [int(self.bus_origin.text()),
+                            int(self.gCh_origin.text()),
+                            int(self.wCh_origin.text())]
+            if self.ESS_button.isChecked():
+                detector_type = 'ESS'
+            else:
+                detector_type = 'ILL'
             # Plot
+            ce_MG = pd.read_hdf(path, 'ce')
+            ce_MG_filtered = filter_clusters(ce_MG, filter_parameters)
             fig = plt.figure()
-            for path in paths:
-                label = path.rsplit('/', 1)[-1]
-                ce = pd.read_hdf(path, 'ce')
-                ce_filtered = filter_clusters(ce, filter_parameters)
-                duration = get_duration(ce)
-                ToF_shifted = (ce.ToF * 62.5e-9 * 1e6 - time_offset) % period_time
-                plt.hist(ToF_shifted, bins=number_bins, zorder=4, histtype='step',
-                         label=label,
-                         weights=(1/duration)*np.ones(len(ToF_shifted)))
-                print(label)
-                print('Duration: %f' % duration)
-                print()
-            plt.title('ToF')
-            plt.xlabel('ToF [$\mu$s]')
-            plt.ylabel('Counts (Normalized by measurement time)')
-            plt.legend()
-            plt.grid(True, which='major', linestyle='--', zorder=0)
-            plt.grid(True, which='minor', linestyle='--', zorder=0)
+            analyze_Lineshape(ce_MG_filtered, detector_type, origin_voxel, number_bins)
             fig.show()
+
+    # ==== Animation ==== #
 
     def Animation_3D_action(self):
         filter_parameters = get_filter_parameters(self)
@@ -436,6 +459,8 @@ class MainWindow(QMainWindow):
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
         self.efficiency_button.clicked.connect(self.Efficiency_action)
         self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
+        self.lineshape_button.clicked.connect(self.Lineshape_action)
+        # Animation
         self.time_sweep_button.clicked.connect(self.time_sweep_action)
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
         # He-3 tubes
@@ -488,12 +513,11 @@ def append_folder_and_files(folder, files):
 
 def get_duration(df):
     times = df.Time.values
-    duration = (times[-1] - times[0]) * 62.5e-9
-    #diff = np.diff(times)
-    #resets = np.where(diff < 0)
-    #duration_in_TDC_channels = sum(times[resets]) + times[-1]
-    #duration_in_seconds = duration_in_TDC_channels * 62.5e-9
-    return duration
+    diff = np.diff(times)
+    resets = np.where(diff < 0)
+    duration_in_TDC_channels = sum(times[resets]) + times[-1]
+    duration_in_seconds = duration_in_TDC_channels * 62.5e-9
+    return duration_in_seconds
 
 
 # =============================================================================

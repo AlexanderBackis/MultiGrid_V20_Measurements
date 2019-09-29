@@ -13,7 +13,8 @@ import numpy as np
 # =============================================================================
 
 
-def energy_plot(df, detector_type, origin_voxel, number_bins, start=0, stop=10):
+def energy_plot(df, detector_type, origin_voxel, number_bins, start=0, stop=10,
+                plot_energy=False):
     """
     Histograms the energy transfer values from a measurement
 
@@ -36,11 +37,23 @@ def energy_plot(df, detector_type, origin_voxel, number_bins, start=0, stop=10):
     # Calculate DeltaE
     energy = calculate_energy(df, detector_type, origin_voxel)
     # Plot data
-    plt.hist(meV_to_A(energy), bins=number_bins, range=[start, stop], zorder=5,
-             histtype='step', color='black')
+    if plot_energy:
+        plt.xlabel('Energy [meV]')
+        plt.title('Energy Distribution')
+        plt.xscale('log')
+        hist, bin_edges, *_ = plt.hist(energy, bins=number_bins,
+                                       range=[A_to_meV(stop), A_to_meV(start)],
+                                       zorder=5, histtype='step', color='black')
+
+    else:
+        plt.xlabel('Wavelength [Å]')
+        plt.title('Wavelength Distribution')
+        hist, bin_edges, *_ = plt.hist(meV_to_A(energy), bins=number_bins,
+                                       range=[start, stop], zorder=5,
+                                       histtype='step', color='black')
+    bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
-    plt.xlabel('Wavelength [Å]')
     plt.ylabel('Counts')
     plt.yscale('log')
-    plt.title('Wavelength Distribution')
+    return hist, bin_centers

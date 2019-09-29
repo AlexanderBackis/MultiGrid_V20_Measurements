@@ -23,7 +23,7 @@ def ToF_histogram(df, number_bins):
         fig (Figure): Figure containing the ToF histogram
     """
     # Declare parameters
-    time_offset = (0.6e-3) * 1e6
+    time_offset = 0#(0.6e-3) * 1e6
     period_time = (1/14) * 1e6
     # Prepare figure
     fig = plt.figure()
