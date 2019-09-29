@@ -13,7 +13,7 @@ import numpy as np
 # =============================================================================
 
 
-def timestamp_plot(df, number_bins):
+def timestamp_plot(Time, number_bins, unit):
     """
     Scatter plot of cluster index vs timestamp, where every 100:th cluster is
     plotted. The color bar shows the summation of wire and grid event, which
@@ -29,13 +29,10 @@ def timestamp_plot(df, number_bins):
 
 
     # Prepare figure
-    fig = plt.figure()
     plt.title('Timestamp Histogram')
-    plt.xlabel('Time [Hours]')
+    plt.xlabel('Time [%s]' % unit)
     plt.ylabel('Counts [events/bin]')
     plt.grid(True, which='major', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     # Plot
-    plt.hist((df.Time*62.5e-9)/(60 ** 2), histtype='step', bins=number_bins,
-             color='black', zorder=5)
-    return fig
+    plt.hist(Time, histtype='step', bins=number_bins, color='black', zorder=5)

@@ -1196,7 +1196,7 @@ Overlay</string>
    <widget class="QLineEdit" name="dE_bins">
     <property name="geometry">
      <rect>
-      <x>902</x>
+      <x>914</x>
       <y>285</y>
       <width>51</width>
       <height>21</height>
@@ -1209,20 +1209,20 @@ Overlay</string>
    <widget class="QLabel" name="label_43">
     <property name="geometry">
      <rect>
-      <x>868</x>
+      <x>850</x>
       <y>245</y>
-      <width>71</width>
-      <height>16</height>
+      <width>101</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>ToF:</string>
+     <string>Time/ToF:</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="phsBins">
     <property name="geometry">
      <rect>
-      <x>902</x>
+      <x>914</x>
       <y>265</y>
       <width>51</width>
       <height>21</height>
@@ -1235,7 +1235,7 @@ Overlay</string>
    <widget class="QLineEdit" name="tofBins">
     <property name="geometry">
      <rect>
-      <x>902</x>
+      <x>914</x>
       <y>245</y>
       <width>51</width>
       <height>21</height>
@@ -1248,7 +1248,7 @@ Overlay</string>
    <widget class="QLabel" name="label_50">
     <property name="geometry">
      <rect>
-      <x>955</x>
+      <x>967</x>
       <y>246</y>
       <width>41</width>
       <height>16</height>
@@ -1261,7 +1261,7 @@ Overlay</string>
    <widget class="QLabel" name="label_45">
     <property name="geometry">
      <rect>
-      <x>868</x>
+      <x>880</x>
       <y>265</y>
       <width>71</width>
       <height>16</height>
@@ -1274,14 +1274,14 @@ Overlay</string>
    <widget class="QLabel" name="label_46">
     <property name="geometry">
      <rect>
-      <x>870</x>
-      <y>285</y>
-      <width>31</width>
-      <height>16</height>
+      <x>863</x>
+      <y>283</y>
+      <width>51</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>∆E:</string>
+     <string>Energy:</string>
     </property>
    </widget>
    <widget class="Line" name="line_12">
@@ -1300,7 +1300,7 @@ Overlay</string>
    <widget class="QLabel" name="label_51">
     <property name="geometry">
      <rect>
-      <x>955</x>
+      <x>967</x>
       <y>266</y>
       <width>41</width>
       <height>16</height>
@@ -1313,7 +1313,7 @@ Overlay</string>
    <widget class="QLabel" name="label_52">
     <property name="geometry">
      <rect>
-      <x>955</x>
+      <x>967</x>
       <y>286</y>
       <width>41</width>
       <height>16</height>
@@ -1415,7 +1415,7 @@ Overlay</string>
      <string>...</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Animation_3D_button">
+   <widget class="QPushButton" name="time_sweep_button">
     <property name="geometry">
      <rect>
       <x>700</x>

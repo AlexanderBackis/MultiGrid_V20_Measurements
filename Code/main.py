@@ -45,6 +45,7 @@ from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
 from Plotting.Analysis.Animation3D import Animation_3D_plot
 from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
+from Plotting.Analysis.TimeSweep import Time_Sweep_Animation
 
 # TEMP
 import matplotlib.pyplot as plt
@@ -242,7 +243,10 @@ class MainWindow(QMainWindow):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             number_bins = int(self.tofBins.text())
-            fig = timestamp_plot(ce_filtered, number_bins)
+            unit = 'hours'
+            fig = plt.figure()
+            Time = (ce_filtered.Time*62.5e-9)/(60 ** 2)
+            timestamp_plot(Time, number_bins, unit)
             fig.show()
 
     # ==== Analysis ==== #
@@ -345,7 +349,18 @@ class MainWindow(QMainWindow):
             detector_type = 'ILL'
         Lambda_Sweep_Animation(ce_filtered, number_bins, detector_type, origin_voxel)
 
-
+    def time_sweep_action(self):
+        filter_parameters = get_filter_parameters(self)
+        ce_filtered = filter_clusters(self.ce, filter_parameters)
+        origin_voxel = [int(self.bus_origin.text()),
+                        int(self.gCh_origin.text()),
+                        int(self.wCh_origin.text())]
+        number_bins = int(self.tofBins.text())
+        if self.ESS_button.isChecked():
+            detector_type = 'ESS'
+        else:
+            detector_type = 'ILL'
+        Time_Sweep_Animation(ce_filtered, number_bins, detector_type, origin_voxel)
 
 
 
@@ -421,7 +436,7 @@ class MainWindow(QMainWindow):
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
         self.efficiency_button.clicked.connect(self.Efficiency_action)
         self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
-        self.Animation_3D_button.clicked.connect(self.Animation_3D_action)
+        self.time_sweep_button.clicked.connect(self.time_sweep_action)
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
         # He-3 tubes
         self.he3_import_button.clicked.connect(self.Import_He3_action)
