@@ -14,7 +14,7 @@ from matplotlib.colors import LogNorm
 # =============================================================================
 
 
-def PHS_2D_plot(events):
+def PHS_2D_plot(events, bus_start, bus_stop):
     """
     Histograms the ADC-values from each channel individually and summarises it
     in a 2D histogram plot, where the color scale indicates number of counts.
@@ -39,19 +39,20 @@ def PHS_2D_plot(events):
 
     # Prepare figure
     fig = plt.figure()
-    fig.set_figheight(5)
+    number_detectors = ((bus_stop + 1) - bus_start)//3
+    fig.set_figheight(4*number_detectors)
     fig.set_figwidth(14)
     # Calculate color limits
     vmin = 1
     vmax = events.shape[0] // 1000 + 100
     # Iterate through all buses
-    for i, bus in enumerate(range(0, 3)):
+    for i, bus in enumerate(range(bus_start, bus_stop+1)):
         events_bus = events[events.Bus == bus]
         # Calculate number of grid and wire events in a specific bus
         wire_events = events_bus[events_bus.Ch < 80].shape[0]
         grid_events = events_bus[events_bus.Ch >= 80].shape[0]
         # Plot
-        plt.subplot(1, 3, i+1)
+        plt.subplot(number_detectors, 3, i+1)
         sub_title = 'Bus: %d, events: %d' % (bus, events_bus.shape[0])
         sub_title += '\nWire events: %d, Grid events: %d' % (wire_events, grid_events)
         fig = PHS_2D_plot_bus(fig, events_bus, sub_title, vmin, vmax)

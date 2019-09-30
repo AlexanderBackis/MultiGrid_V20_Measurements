@@ -169,14 +169,18 @@ class MainWindow(QMainWindow):
 
     def PHS_2D_action(self):
         if self.data_sets != '':
-            fig = PHS_2D_plot(self.e)
+            bus_start = self.module_min.value()
+            bus_stop = self.module_max.value()
+            fig = PHS_2D_plot(self.e, bus_start, bus_stop)
             fig.show()
 
     def PHS_wires_vs_grids_action(self):
         if (self.data_sets != ''):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
-            fig = PHS_wires_vs_grids_plot(ce_filtered)
+            bus_start = self.module_min.value()
+            bus_stop = self.module_max.value()
+            fig = PHS_wires_vs_grids_plot(ce_filtered, bus_start, bus_stop)
             fig.show()
 
     # ==== Coincidences ==== #
@@ -185,7 +189,9 @@ class MainWindow(QMainWindow):
         if self.data_sets != '':
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
-            fig, histograms = coincidences_2D_plot(ce_filtered, self.measurement_time)
+            bus_start = self.module_min.value()
+            bus_stop = self.module_max.value()
+            fig, histograms = coincidences_2D_plot(ce_filtered, self.measurement_time, bus_start, bus_stop)
             # Export histograms to text
             dir_name = os.path.dirname(__file__)
             output_path = os.path.join(dir_name, '../Output/')
@@ -213,7 +219,9 @@ class MainWindow(QMainWindow):
         if self.data_sets != '':
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
-            fig, histograms = coincidences_projections_plot(ce_filtered)
+            bus_start = self.module_min.value()
+            bus_stop = self.module_max.value()
+            fig, histograms = coincidences_projections_plot(ce_filtered, bus_start, bus_stop)
             # Export histograms to text
             dir_name = os.path.dirname(__file__)
             output_path = os.path.join(dir_name, '../Output/')
@@ -230,7 +238,9 @@ class MainWindow(QMainWindow):
         if (self.data_sets != ''):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
-            fig = multiplicity_plot(ce_filtered)
+            bus_start = self.module_min.value()
+            bus_stop = self.module_max.value()
+            fig = multiplicity_plot(ce_filtered, bus_start, bus_stop)
             fig.show()
 
     def ToF_action(self):

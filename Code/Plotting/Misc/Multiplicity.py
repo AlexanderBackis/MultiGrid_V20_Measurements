@@ -12,7 +12,7 @@ from matplotlib.colors import LogNorm
 #                               Multiplicity
 # =============================================================================
 
-def multiplicity_plot(df):
+def multiplicity_plot(df, bus_start, bus_stop):
     """
     Histograms multiplicity of wires versus grids in the clustered neutron
     events.
@@ -43,11 +43,12 @@ def multiplicity_plot(df):
         vmax = 1
     # Prepare figure
     fig = plt.figure()
-    fig.set_figheight(5)
+    number_detectors = ((bus_stop + 1) - bus_start)//3
+    fig.set_figheight(4*number_detectors)
     fig.set_figwidth(14)
     # Iterate through all buses
-    for bus in range(0, 3):
-        plt.subplot(1, 3, bus+1)
+    for i, bus in enumerate(range(bus_start, bus_stop+1)):
+        plt.subplot(number_detectors, 3, i+1)
         df_bus = df[df.Bus == bus]
         plot_multiplicity_bus(df_bus, bus, vmin, vmax)
     plt.tight_layout()

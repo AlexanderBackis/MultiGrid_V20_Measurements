@@ -16,7 +16,7 @@ from matplotlib.colors import LogNorm
 # =============================================================================
 
 
-def PHS_wires_vs_grids_plot(ce):
+def PHS_wires_vs_grids_plot(ce, bus_start, bus_stop):
     """
     Histograms ADC charge from wires vs grids, one for each bus, showing the
     relationship between charge collected by wires and charge collected by
@@ -43,7 +43,8 @@ def PHS_wires_vs_grids_plot(ce):
 
     # Plot data
     fig = plt.figure()
-    fig.set_figheight(5)
+    number_detectors = ((bus_stop + 1) - bus_start)//3
+    fig.set_figheight(4*number_detectors)
     fig.set_figwidth(14)
     # Set color limits
     if ce.shape[0] != 0:
@@ -53,10 +54,10 @@ def PHS_wires_vs_grids_plot(ce):
         vmin = 1
         vmax = 1
     # Plot
-    for bus in range(0, 3):
+    for i, bus in enumerate(range(bus_start, bus_stop+1)):
         events_bus = ce[ce.Bus == bus]
         sub_title = 'Bus %d\n(%d events)' % (bus, events_bus.shape[0])
-        plt.subplot(1, 3, bus+1)
+        plt.subplot(number_detectors, 3, i+1)
         fig = charge_scatter(fig, events_bus, sub_title, bus, vmin, vmax)
     plt.tight_layout()
     return fig

@@ -13,7 +13,7 @@ import numpy as np
 #             Coincidence Histogram Projections (Front, Top, Side)
 # =============================================================================
 
-def coincidences_projections_plot(df):
+def coincidences_projections_plot(df, bus_start, bus_stop):
     """
     Histograms the hitposition, histogrammed over the three projections of the
     detector (Front, Top and Side).
@@ -46,9 +46,9 @@ def coincidences_projections_plot(df):
     # Plot
     wChs, gChs, Buses = df.wCh, df.gCh, df.Bus
     plt.subplot(1, 3, 1)
-    h_front = plot_front(wChs, gChs, Buses)
+    h_front = plot_front(wChs, gChs, Buses, bus_start, bus_stop)
     plt.subplot(1, 3, 2)
-    h_top = plot_top(wChs, gChs, Buses)
+    h_top = plot_top(wChs, gChs, Buses, bus_start, bus_stop)
     plt.subplot(1, 3, 3)
     h_side = plot_side(wChs, gChs, Buses)
     # Collect all histograms and tighted layout
@@ -60,9 +60,11 @@ def coincidences_projections_plot(df):
 #                              HELPER FUNCTIONS
 # =============================================================================
 
-def plot_front(wChs, gChs, Buses, vmin=None, vmax=None):
-    h_front, *_ = plt.hist2d((wChs + (80*Buses)) // 20, gChs, bins=[12, 40],
-                             range=[[-0.5, 11.5], [79.5, 119.5]], norm=LogNorm(),
+def plot_front(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None):
+    rows = ((bus_stop + 1) - bus_start) * 4
+    h_front, *_ = plt.hist2d((wChs + (80*Buses)) // 20, gChs, bins=[rows, 40],
+                             range=[[bus_start*4-0.5, (bus_stop+1)*4-0.5], [79.5, 119.5]],
+                             norm=LogNorm(),
                              vmin=vmin, vmax=vmax,
                              cmap='jet')
     plt.title('Front view')
@@ -71,9 +73,11 @@ def plot_front(wChs, gChs, Buses, vmin=None, vmax=None):
     plt.colorbar()
     return h_front
 
-def plot_top(wChs, gChs, Buses, vmin=None, vmax=None):
-    h_top, *_ = plt.hist2d((wChs + (80*Buses)) // 20, wChs % 20, bins=[12, 20],
-                           range=[[-0.5, 11.5], [-0.5, 19.5]], norm=LogNorm(),
+def plot_top(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None):
+    rows = ((bus_stop + 1) - bus_start) * 4
+    h_top, *_ = plt.hist2d((wChs + (80*Buses)) // 20, wChs % 20, bins=[rows, 20],
+                           range=[[bus_start*4-0.5, (bus_stop+1)*4-0.5], [-0.5, 19.5]],
+                           norm=LogNorm(),
                            vmin=vmin, vmax=vmax,
                            cmap='jet')
     plt.title('Top view')
