@@ -20,7 +20,7 @@ from HelperFunctions.PathsAndFolders import mkdir_p
 #                                LAMBDA SWEEP
 # =============================================================================
 
-def Time_Sweep_Animation(ce, number_bins, detector_type, origin_voxel):
+def Time_Sweep_Animation(ce, number_bins, detector_type, origin_voxel, bus_start, bus_stop):
     # Filters
     ce = ce[(ce.wCh != -1) & (ce.gCh != -1)]
     # Storage
@@ -47,9 +47,9 @@ def Time_Sweep_Animation(ce, number_bins, detector_type, origin_voxel):
         fig.set_figheight(8)
         fig.set_figwidth(14)
         plt.subplot2grid((2, 3), (0, 0), colspan=1)
-        plot_front(wChs, gChs, Buses, vmin, vmax)
+        plot_front(wChs, gChs, Buses, bus_start, bus_stop, vmin, vmax)
         plt.subplot2grid((2, 3), (0, 1), colspan=1)
-        plot_top(wChs, gChs, Buses, vmin, vmax)
+        plot_top(wChs, gChs, Buses, bus_start, bus_stop, vmin, vmax)
         plt.subplot2grid((2, 3), (0, 2), colspan=1)
         plot_side(wChs, gChs, Buses, vmin, vmax)
         plt.subplot2grid((2, 3), (1, 0), colspan=3)

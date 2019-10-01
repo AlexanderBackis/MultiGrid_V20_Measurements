@@ -47,7 +47,7 @@ def coincidences_2D_plot(ce, measurement_time, bus_start, bus_stop):
     # Calculate color limits
     if ce.shape[0] != 0:
         duration = measurement_time
-        vmin = 10
+        vmin = 1
         vmax = ce.shape[0] // 450 + 5
     else:
         duration = 1

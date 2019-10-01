@@ -104,10 +104,10 @@ def initiate_detector_border_lines(mapping, detector_type):
             b_traces.append(b_trace)
     neutron_line = go.Scatter3d(x=[0, 0],
                                 y=[0, 0],
-                                z=[28, 28.7],
+                                z=[28, 28.5],
                                 mode='lines',
                                 line=dict(color='rgb(0, 0, 500)',
-                                          width=10),
+                                          width=15),
                                 text='Neutron Beam')
-    #b_traces.append(neutron_line)
+    b_traces.append(neutron_line)
     return b_traces

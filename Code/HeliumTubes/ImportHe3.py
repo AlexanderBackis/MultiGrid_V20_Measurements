@@ -42,6 +42,7 @@ def unzip_He3_data(zip_source):
 # =============================================================================
 
 def import_He3_data(file_path):
+    print(file_path)
     """ Imports MCA4 data. This is binary (or ascii?) and is in 64 bit "words".
         The bits in the word, starting from least significant:
 
@@ -56,14 +57,20 @@ def import_He3_data(file_path):
 
     Returns:
     """
+    # 1->4 = amplitude
+    # 5->15 = Time
+    # 16 Channel
+
     # Masks
-    ChannelMask = 0xC000000000000000
-    TimeMask    = 0x0FFFFFFFFFFFF000
-    ADCMask     = 0x0000000000000FFF
+    ChannelMask = 0x0000000000000003 
+    PileUpMask  = 0x000000000000000C
+    TimeMask    = 0x0000FFFFFFFFFFF0
+    ADCMask     = 0xFFFF000000000000
     BreakMask   = 0xFFF0000000000000
     # Bit shifts
-    ChannelShift = 62
-    TimeShift    = 12
+    ChannelShift = 0
+    TimeShift    = 4
+    ADCShift     = 48
     # Import data
     data = np.loadtxt(file_path, dtype='str', delimiter='\n')
     start_idx = np.where(data == '[DATA]')[0][0]
@@ -80,9 +87,9 @@ def import_He3_data(file_path):
         # Check if we should save data
         if (word & BreakMask) != 0:
             # Extract values using masks
-            He3_dict['Ch'][count] = (word & ChannelMask) >> ChannelShift
+            He3_dict['Ch'][count] = (word & ChannelMask)
             He3_dict['ToF'][count] = (word & TimeMask) >> TimeShift
-            He3_dict['ADC'][count] = (word & ADCMask)
+            He3_dict['ADC'][count] = (word & ADCMask) >> ADCShift
             count += 1
     # Only save the events, cut unused rows
     for key in He3_dict:

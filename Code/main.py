@@ -261,18 +261,20 @@ class MainWindow(QMainWindow):
             number_bins = int(self.tofBins.text())
             # Plot
             fig = plt.figure()
-            for path in paths:
+            for i, path in enumerate(paths):
                 label = path.rsplit('/', 1)[-1]
                 ce = pd.read_hdf(path, 'ce')
                 ce_filtered = filter_clusters(ce, filter_parameters)
                 duration = get_duration(ce)
-                ToF_shifted = (ce.ToF * 62.5e-9 * 1e6 - time_offset) % period_time
+                ToF_shifted = (ce_filtered.ToF * 62.5e-9 * 1e6 - time_offset) % period_time
+                hist, *_ = np.histogram(ToF_shifted, bins=2000)
+                norm = 1/duration
                 plt.hist(ToF_shifted, bins=number_bins, zorder=4, histtype='step',
                          label=label,
-                         weights=(1/duration)*np.ones(len(ToF_shifted)))
+                         weights=(norm)*np.ones(len(ToF_shifted)))
             plt.title('ToF')
             plt.xlabel('ToF [$\mu$s]')
-            plt.ylabel('Counts (Normalized by measurement time)')
+            plt.ylabel('Counts (Normalized by duration)')
             plt.legend()
             plt.grid(True, which='major', linestyle='--', zorder=0)
             plt.grid(True, which='minor', linestyle='--', zorder=0)
@@ -376,11 +378,14 @@ class MainWindow(QMainWindow):
                         int(self.gCh_origin.text()),
                         int(self.wCh_origin.text())]
         number_bins = int(self.dE_bins.text())
+        bus_start = self.module_min.value()
+        bus_stop = self.module_max.value()
         if self.ESS_button.isChecked():
             detector_type = 'ESS'
         else:
             detector_type = 'ILL'
-        Lambda_Sweep_Animation(ce_filtered, number_bins, detector_type, origin_voxel)
+        Lambda_Sweep_Animation(ce_filtered, number_bins, detector_type,
+                               origin_voxel, bus_start, bus_stop)
 
     def time_sweep_action(self):
         filter_parameters = get_filter_parameters(self)
@@ -389,11 +394,14 @@ class MainWindow(QMainWindow):
                         int(self.gCh_origin.text()),
                         int(self.wCh_origin.text())]
         number_bins = int(self.tofBins.text())
+        bus_start = self.module_min.value()
+        bus_stop = self.module_max.value()
         if self.ESS_button.isChecked():
             detector_type = 'ESS'
         else:
             detector_type = 'ILL'
-        Time_Sweep_Animation(ce_filtered, number_bins, detector_type, origin_voxel)
+        Time_Sweep_Animation(ce_filtered, number_bins, detector_type,
+                             origin_voxel, bus_start, bus_stop)
 
 
 
@@ -404,39 +412,38 @@ class MainWindow(QMainWindow):
     # =========================================================================
 
     def Import_He3_action(self):
-        zip_paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
-        if len(zip_paths) > 0:
-            for zip_path in zip_paths:
-                file_path = unzip_He3_data(zip_path)
-                He3_df = import_He3_data(file_path)
-                fig = plt.figure()
-                plt.hist(He3_df['ADC'], histtype='step',
-                         color='blue', zorder=5, bins=100)
-                plt.grid(True, which='major', linestyle='--', zorder=0)
-                plt.grid(True, which='minor', linestyle='--', zorder=0)
-                plt.xlabel('ADC')
-                plt.ylabel('Counts')
-                plt.title('ADC')
-                fig.show()
-                fig = plt.figure()
-                plt.hist(He3_df['Ch'], histtype='step',
-                         color='red', zorder=5, bins=20)
-                plt.grid(True, which='major', linestyle='--', zorder=0)
-                plt.grid(True, which='minor', linestyle='--', zorder=0)
-                plt.xlabel('Channel')
-                plt.ylabel('Counts')
-                plt.title('Channel')
-                fig.show()
-                fig = plt.figure()
-                plt.hist(He3_df['ToF'], histtype='step',
-                         color='green', zorder=5, bins=1000)
-                plt.xlabel('ToF [s]')
-                plt.ylabel('Counts')
-                plt.yscale('log')
-                plt.title('ToF')
-                plt.grid(True, which='major', linestyle='--', zorder=0)
-                plt.grid(True, which='minor', linestyle='--', zorder=0)
-                fig.show()
+        file_path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
+        print(file_path)
+        #file_path = unzip_He3_data(zip_path)
+        He3_df = import_He3_data(file_path)
+        fig = plt.figure()
+        plt.hist(He3_df['ADC'], histtype='step',
+                 color='blue', zorder=5, bins=100)
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        plt.xlabel('ADC')
+        plt.ylabel('Counts')
+        plt.title('ADC')
+        fig.show()
+        fig = plt.figure()
+        plt.hist(He3_df['Ch'], histtype='step',
+                 color='red', zorder=5, bins=20)
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        plt.xlabel('Channel')
+        plt.ylabel('Counts')
+        plt.title('Channel')
+        fig.show()
+        fig = plt.figure()
+        plt.hist(He3_df['ToF']*8e-9, histtype='step',
+                 color='green', zorder=5, bins=2000)
+        plt.xlabel('ToF [s]')
+        plt.ylabel('Counts')
+        plt.yscale('log')
+        plt.title('ToF')
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        fig.show()
 
 
 
