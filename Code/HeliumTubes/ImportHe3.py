@@ -42,7 +42,6 @@ def unzip_He3_data(zip_source):
 # =============================================================================
 
 def import_He3_data(file_path):
-    print(file_path)
     """ Imports MCA4 data. This is binary (or ascii?) and is in 64 bit "words".
         The bits in the word, starting from least significant:
 
@@ -62,7 +61,7 @@ def import_He3_data(file_path):
     # 16 Channel
 
     # Masks
-    ChannelMask = 0x0000000000000003 
+    ChannelMask = 0x0000000000000003
     PileUpMask  = 0x000000000000000C
     TimeMask    = 0x0000FFFFFFFFFFF0
     ADCMask     = 0xFFFF000000000000

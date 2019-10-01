@@ -23,6 +23,7 @@ from FileHandling.Storage import save_data, load_data
 # He-3 tubes
 from HeliumTubes.ImportHe3 import unzip_He3_data, import_He3_data
 from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot
+from HeliumTubes.FilteringHe3 import get_He3_filter_parameters, filter_He3
 # Helper functions
 from HelperFunctions.CreateMapping import create_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
@@ -77,7 +78,6 @@ class MainWindow(QMainWindow):
         self.fill_MG_information_window()
         # He3 attributes
         self.He3_data_sets = ''
-        self.He3_measurement_time = 0
         self.He3_counts = 0
         self.He3_df = pd.DataFrame()
         self.fill_He3_information_window()
@@ -415,22 +415,33 @@ class MainWindow(QMainWindow):
     def Import_He3_action(self):
         file_path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
         self.He3_df = import_He3_data(file_path)
+        self.He3_data_sets = '<br/>' + file_path.rsplit('/', 1)[-1]
+        self.He3_counts = self.He3_df.shape[0]
+        self.fill_He3_information_window()
+        self.show()
+        self.refresh_window()
 
     def He3_PHS_action(self):
         number_bins = int(self.phsBins.text())
+        parameters = get_He3_filter_parameters(self)
+        df_red = filter_He3(self.He3_df, parameters)
         fig = plt.figure()
-        He3_PHS_plot(self.He3_df, number_bins)
+        He3_PHS_plot(df_red, number_bins)
         fig.show()
 
     def He3_ToF_action(self):
         number_bins = int(self.tofBins.text())
+        parameters = get_He3_filter_parameters(self)
+        df_red = filter_He3(self.He3_df, parameters)
         fig = plt.figure()
-        He3_ToF_plot(self.He3_df, number_bins)
+        He3_ToF_plot(df_red, number_bins)
         fig.show()
 
     def He3_Ch_action(self):
         fig = plt.figure()
-        He3_Ch_plot(self.He3_df)
+        parameters = get_He3_filter_parameters(self)
+        df_red = filter_He3(self.He3_df, parameters)
+        He3_Ch_plot(df_red)
         fig.show()
 
 
@@ -492,8 +503,7 @@ class MainWindow(QMainWindow):
         self.information_window.setText(information_text)
 
     def fill_He3_information_window(self):
-        information_text = '<b>Measurement time:</b> %d [s]' % int(self.He3_measurement_time)
-        information_text += "<br/><b>Counts:</b> %d [Counts]" % self.He3_counts
+        information_text = "<b>Counts:</b> %d [Counts]" % self.He3_counts
         information_text += '<br/><b>Data sets:</b> ' + self.He3_data_sets
         self.He3_information_window.setText(information_text)
 
