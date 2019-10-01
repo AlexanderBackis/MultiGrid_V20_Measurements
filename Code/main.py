@@ -22,6 +22,7 @@ from FileHandling.Cluster import cluster_data
 from FileHandling.Storage import save_data, load_data
 # He-3 tubes
 from HeliumTubes.ImportHe3 import unzip_He3_data, import_He3_data
+from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot
 # Helper functions
 from HelperFunctions.CreateMapping import create_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
@@ -413,38 +414,24 @@ class MainWindow(QMainWindow):
 
     def Import_He3_action(self):
         file_path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
-        print(file_path)
-        #file_path = unzip_He3_data(zip_path)
-        He3_df = import_He3_data(file_path)
+        self.He3_df = import_He3_data(file_path)
+
+    def He3_PHS_action(self):
+        number_bins = int(self.phsBins.text())
         fig = plt.figure()
-        plt.hist(He3_df['ADC'], histtype='step',
-                 color='blue', zorder=5, bins=100)
-        plt.grid(True, which='major', linestyle='--', zorder=0)
-        plt.grid(True, which='minor', linestyle='--', zorder=0)
-        plt.xlabel('ADC')
-        plt.ylabel('Counts')
-        plt.title('ADC')
-        fig.show()
-        fig = plt.figure()
-        plt.hist(He3_df['Ch'], histtype='step',
-                 color='red', zorder=5, bins=20)
-        plt.grid(True, which='major', linestyle='--', zorder=0)
-        plt.grid(True, which='minor', linestyle='--', zorder=0)
-        plt.xlabel('Channel')
-        plt.ylabel('Counts')
-        plt.title('Channel')
-        fig.show()
-        fig = plt.figure()
-        plt.hist(He3_df['ToF']*8e-9, histtype='step',
-                 color='green', zorder=5, bins=2000)
-        plt.xlabel('ToF [s]')
-        plt.ylabel('Counts')
-        plt.yscale('log')
-        plt.title('ToF')
-        plt.grid(True, which='major', linestyle='--', zorder=0)
-        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        He3_PHS_plot(self.He3_df, number_bins)
         fig.show()
 
+    def He3_ToF_action(self):
+        number_bins = int(self.tofBins.text())
+        fig = plt.figure()
+        He3_ToF_plot(self.He3_df, number_bins)
+        fig.show()
+
+    def He3_Ch_action(self):
+        fig = plt.figure()
+        He3_Ch_plot(self.He3_df)
+        fig.show()
 
 
 
@@ -482,6 +469,9 @@ class MainWindow(QMainWindow):
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
         # He-3 tubes
         self.he3_import_button.clicked.connect(self.Import_He3_action)
+        self.he3_PHS_button.clicked.connect(self.He3_PHS_action)
+        self.he3_ToF_button.clicked.connect(self.He3_ToF_action)
+        self.he3_ch_button.clicked.connect(self.He3_Ch_action)
         # Button toogle
         self.toogle_VMM_MG()
 
