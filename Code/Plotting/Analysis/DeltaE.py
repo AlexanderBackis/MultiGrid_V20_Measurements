@@ -13,8 +13,8 @@ import numpy as np
 # =============================================================================
 
 
-def energy_plot(df, detector_type, origin_voxel, number_bins, start=0, stop=10,
-                plot_energy=False):
+def energy_plot(df, detector_type, origin_voxel, number_bins, start=1, stop=10,
+                plot_energy=False, label=None, useMaxNorm=False):
     """
     Histograms the energy transfer values from a measurement
 
@@ -33,9 +33,21 @@ def energy_plot(df, detector_type, origin_voxel, number_bins, start=0, stop=10,
         return np.sqrt(81.81/energy)
 
     def A_to_meV(wavelength):
+        print('halloj')
+        print(wavelength)
         return (81.81/(wavelength ** 2))
     # Calculate DeltaE
     energy = calculate_energy(df, detector_type, origin_voxel)
+    # Select normalization
+    if useMaxNorm is False:
+        norm = 1 * np.ones(len(energy))
+    else:
+        if plot_energy:
+            hist_temp, _ = np.histogram(energy, bins=number_bins, range=[A_to_meV(stop), A_to_meV(start)])
+            norm = (1/max(hist_temp))*np.ones(len(energy))
+        else:
+            hist_temp, _ = np.histogram(meV_to_A(energy), bins=number_bins, range=[start, stop])
+            norm = (1/max(hist_temp))*np.ones(len(energy))
     # Plot data
     if plot_energy:
         plt.xlabel('Energy [meV]')
@@ -43,14 +55,17 @@ def energy_plot(df, detector_type, origin_voxel, number_bins, start=0, stop=10,
         plt.xscale('log')
         hist, bin_edges, *_ = plt.hist(energy, bins=number_bins,
                                        range=[A_to_meV(stop), A_to_meV(start)],
-                                       zorder=5, histtype='step', color='black')
-
+                                       zorder=5, histtype='step',
+                                       label=label,
+                                       weights=norm)
     else:
         plt.xlabel('Wavelength [Å]')
         plt.title('Wavelength Distribution')
         hist, bin_edges, *_ = plt.hist(meV_to_A(energy), bins=number_bins,
                                        range=[start, stop], zorder=5,
-                                       histtype='step', color='black')
+                                       histtype='step',
+                                       label=label,
+                                       weights=norm)
     bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)

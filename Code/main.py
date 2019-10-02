@@ -22,7 +22,7 @@ from FileHandling.Cluster import cluster_data
 from FileHandling.Storage import save_data, load_data
 # He-3 tubes
 from HeliumTubes.ImportHe3 import unzip_He3_data, import_He3_data
-from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot
+from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot, energy_plot_He3
 from HeliumTubes.FilteringHe3 import get_He3_filter_parameters, filter_He3
 # Helper functions
 from HelperFunctions.CreateMapping import create_mapping
@@ -295,7 +295,7 @@ class MainWindow(QMainWindow):
     # ==== Analysis ==== #
 
     def Energy_action(self):
-        if (self.data_sets != '') and (self.Ei_value != -1):
+        if (self.data_sets != ''):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             number_bins = int(self.dE_bins.text())
@@ -320,13 +320,37 @@ class MainWindow(QMainWindow):
 
     def Efficiency_action(self):
         if (self.data_sets != ''):
-            filter_parameters = get_filter_parameters(self)
-            ce_filtered = filter_clusters(self.ce, filter_parameters)
-            MG_dE_values = calculate_energy_transfer(ce_filtered, Ei)
-            # NEED A WAY TO GET HE3 VALUES
-            efficiency = calculate_efficiency(MG_dE_values, He3_dE_values,
-                                              self.Ei, filter_parameters)
-            print('Efficiency: %.2f' % efficiency)
+            parameters_MG = get_filter_parameters(self)
+            parameters_He3 = get_He3_filter_parameters(self)
+            MG_red = filter_clusters(self.ce, parameters_MG)
+            He3_red = filter_He3(self.He3_df, parameters_He3)
+            number_bins = int(self.dE_bins.text())
+            origin_voxel = [int(self.bus_origin.text()),
+                            int(self.gCh_origin.text()),
+                            int(self.wCh_origin.text())]
+            if self.ESS_button.isChecked():
+                detector_type = 'ESS'
+            else:
+                detector_type = 'ILL'
+            MG_label, He3_label = 'Multi-Grid', 'He-3'
+            start, stop = 1, 10
+            useMaxNorm = True
+            fig = plt.figure()
+            fig.suptitle('Comparison He-3 and MG (normalized to max value)')
+            plt.subplot(1, 2, 1)
+            plot_energy = True
+            energy_plot(MG_red, detector_type, origin_voxel, number_bins,
+                        start, stop, plot_energy, MG_label, useMaxNorm)
+            energy_plot_He3(He3_red, number_bins, plot_energy, He3_label, useMaxNorm)
+            plt.legend()
+            plt.subplot(1, 2, 2)
+            plot_energy = False
+            energy_plot(MG_red, detector_type, origin_voxel, number_bins,
+                        start, stop, plot_energy, MG_label, useMaxNorm)
+            energy_plot_He3(He3_red, number_bins, plot_energy, He3_label, useMaxNorm)
+            plt.legend()
+            fig.show()
+
 
     def Energy_Resolution_action(self):
         if (self.data_sets != ''):
@@ -444,6 +468,23 @@ class MainWindow(QMainWindow):
         He3_Ch_plot(df_red)
         fig.show()
 
+    def He3_Energy_action(self):
+        parameters = get_He3_filter_parameters(self)
+        df_red = filter_He3(self.He3_df, parameters)
+        number_bins = int(self.dE_bins.text())
+        plot_energy = True
+        fig = plt.figure()
+        energy_plot_He3(df_red, number_bins, plot_energy)
+        fig.show()
+
+    def He3_Wavelength_action(self):
+        parameters = get_He3_filter_parameters(self)
+        df_red = filter_He3(self.He3_df, parameters)
+        number_bins = int(self.dE_bins.text())
+        plot_energy = False
+        fig = plt.figure()
+        energy_plot_He3(df_red, number_bins, plot_energy)
+        fig.show()
 
 
 
@@ -483,6 +524,8 @@ class MainWindow(QMainWindow):
         self.he3_PHS_button.clicked.connect(self.He3_PHS_action)
         self.he3_ToF_button.clicked.connect(self.He3_ToF_action)
         self.he3_ch_button.clicked.connect(self.He3_Ch_action)
+        self.he3_energy_button.clicked.connect(self.He3_Energy_action)
+        self.he3_wavelength_button.clicked.connect(self.He3_Wavelength_action)
         # Button toogle
         self.toogle_VMM_MG()
 
