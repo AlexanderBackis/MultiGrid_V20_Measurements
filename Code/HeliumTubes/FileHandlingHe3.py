@@ -11,7 +11,6 @@ import zipfile
 import re
 import numpy as np
 import pandas as pd
-from binascii import unhexlify, hexlify
 
 # =============================================================================
 #                             UNZIP HELIUM-3 DATA
@@ -102,28 +101,40 @@ def import_He3_data(file_path):
 #                              SAVE HELIUM-3 DATA
 # =============================================================================
 
-def save_He3_data(file_path, ce, e, data_sets, adc_threshold, ILL_buses):
+def save_He3_data(path, df, data_sets):
     """
     Saves clustered data to specified HDF5-path.
 
     Args:
         path (str): Path to HDF5 containing the saved clusters and events
-        ce (DataFrame): Clusters
-        e (DataFrame): Events
+        df (DataFrame): Events
         data_sets (str): Data used for clustering
-        adc_threshold (int): ADC threshold used in clustering procedure
-        ILL_buses (list): List containing all ILL buses
 
     Yields:
         Clustered data is saved to specified path.
     """
     # Convert values to DataFrame for easy storage
     data_sets_df = pd.DataFrame({'data_sets': [data_sets]})
-    adc_threshold_df = pd.DataFrame({'adc_threshold': [adc_threshold]})
-    ILL_buses_df = pd.DataFrame({'ILL_buses': [ILL_buses]})
     # Export to HDF5, use highest compression level
-    ce.to_hdf(path, 'ce', complevel=9)
-    e.to_hdf(path, 'e', complevel=9)
+    df.to_hdf(path, 'df', complevel=9)
     data_sets_df.to_hdf(path, 'data_sets', complevel=9)
-    adc_threshold_df.to_hdf(path, 'adc_threshold', complevel=9)
-    ILL_buses_df.to_hdf(path, 'ILL_buses', complevel=9)
+
+
+# =============================================================================
+#                                LOAD DATA
+# =============================================================================
+
+def load_He3_data(path):
+    """
+    Loads clustered data from specified HDF5-path.
+
+    Args:
+        path (str): Path to HDF5 containing the saved clusters and events
+
+    Returns:
+        df (DataFrame): Events
+        data_sets (str): Data used for clustering
+    """
+    df = pd.read_hdf(path, 'df')
+    data_sets = pd.read_hdf(path, 'data_sets')['data_sets'].iloc[0]
+    return df, data_sets

@@ -21,7 +21,7 @@ from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
 from FileHandling.Storage import save_data, load_data
 # He-3 tubes
-from HeliumTubes.ImportHe3 import unzip_He3_data, import_He3_data
+from HeliumTubes.FileHandlingHe3 import unzip_He3_data, import_He3_data, save_He3_data, load_He3_data
 from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot, energy_plot_He3
 from HeliumTubes.FilteringHe3 import get_He3_filter_parameters, filter_He3
 # Helper functions
@@ -445,6 +445,19 @@ class MainWindow(QMainWindow):
         self.show()
         self.refresh_window()
 
+    def Save_He3_action(self):
+        path = QFileDialog.getSaveFileName()[0]
+        if path != '':
+            save_He3_data(path, self.He3_df, self.He3_data_sets)
+
+    def Load_He3_action(self):
+        path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
+        if path != '':
+             self.He3_df, self.He3_data_sets = load_He3_data(path)
+        self.fill_He3_information_window()
+        self.show()
+        self.refresh_window()
+
     def He3_PHS_action(self):
         number_bins = int(self.phsBins.text())
         parameters = get_He3_filter_parameters(self)
@@ -521,6 +534,8 @@ class MainWindow(QMainWindow):
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
         # He-3 tubes
         self.he3_import_button.clicked.connect(self.Import_He3_action)
+        self.he3_save_button.clicked.connect(self.Save_He3_action)
+        self.he3_load_button.clicked.connect(self.Load_He3_action)
         self.he3_PHS_button.clicked.connect(self.He3_PHS_action)
         self.he3_ToF_button.clicked.connect(self.He3_ToF_action)
         self.he3_ch_button.clicked.connect(self.He3_Ch_action)
