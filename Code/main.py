@@ -332,7 +332,7 @@ class MainWindow(QMainWindow):
                 detector_type = 'ESS'
             else:
                 detector_type = 'ILL'
-            MG_label, He3_label = 'Multi-Grid', 'He-3'
+            MG_label, He3_label = self.data_sets, self.He3_data_sets
             start, stop = 1, 10
             useMaxNorm = True
             fig = plt.figure()
@@ -379,7 +379,7 @@ class MainWindow(QMainWindow):
             ce_MG = pd.read_hdf(path, 'ce')
             ce_MG_filtered = filter_clusters(ce_MG, filter_parameters)
             fig = plt.figure()
-            analyze_Lineshape(ce_MG_filtered, detector_type, origin_voxel, number_bins)
+            analyze_Lineshape(ce_MG_filtered, detector_type, origin_voxel)
             fig.show()
 
     # ==== Animation ==== #
@@ -438,12 +438,13 @@ class MainWindow(QMainWindow):
 
     def Import_He3_action(self):
         file_path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
-        self.He3_df = import_He3_data(file_path)
-        self.He3_data_sets = '<br/>' + file_path.rsplit('/', 1)[-1]
-        self.He3_counts = self.He3_df.shape[0]
-        self.fill_He3_information_window()
-        self.show()
-        self.refresh_window()
+        if file_path != '':
+            self.He3_df = import_He3_data(file_path)
+            self.He3_data_sets = '<br/>' + file_path.rsplit('/', 1)[-1]
+            self.He3_counts = self.He3_df.shape[0]
+            self.fill_He3_information_window()
+            self.show()
+            self.refresh_window()
 
     def Save_He3_action(self):
         path = QFileDialog.getSaveFileName()[0]

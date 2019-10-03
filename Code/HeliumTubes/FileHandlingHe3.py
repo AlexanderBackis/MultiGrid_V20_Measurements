@@ -73,6 +73,7 @@ def import_He3_data(file_path):
     ADCShift     = 48
     # Import data
     data = np.loadtxt(file_path, dtype='str', delimiter='\n')
+    print('Data loaded')
     start_idx = np.where(data == '[DATA]')[0][0]
     size = len(data)
     # Declare dictionary to store data
@@ -91,6 +92,10 @@ def import_He3_data(file_path):
             He3_dict['ToF'][count] = (word & TimeMask) >> TimeShift
             He3_dict['ADC'][count] = (word & ADCMask) >> ADCShift
             count += 1
+        # Print progress of clustering process
+        if i % 1000 == 1:
+            percentage_finished = int(round((i/len(data))*100))
+            print('Percentage: %d' % percentage_finished)
     # Only save the events, cut unused rows
     for key in He3_dict:
         He3_dict[key] = He3_dict[key][0:count]

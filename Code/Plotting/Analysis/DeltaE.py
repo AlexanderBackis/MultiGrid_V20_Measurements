@@ -33,8 +33,6 @@ def energy_plot(df, detector_type, origin_voxel, number_bins, start=1, stop=10,
         return np.sqrt(81.81/energy)
 
     def A_to_meV(wavelength):
-        print('halloj')
-        print(wavelength)
         return (81.81/(wavelength ** 2))
     # Calculate DeltaE
     energy = calculate_energy(df, detector_type, origin_voxel)
