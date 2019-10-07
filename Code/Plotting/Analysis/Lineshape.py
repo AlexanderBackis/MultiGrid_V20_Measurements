@@ -3,7 +3,9 @@
 """
 Lineshape.py: Analyses the lineshape using our Figure-of-Merit
 """
+
 import sys
+import os
 from Plotting.Analysis.DeltaE import energy_plot
 from HelperFunctions.EnergyTransfer import calculate_energy
 import matplotlib.pyplot as plt
@@ -11,18 +13,30 @@ import numpy as np
 from scipy.signal import find_peaks, peak_widths, peak_prominences
 from scipy.optimize import curve_fit
 
+from HeliumTubes.EnergyHe3 import calculate_He3_energy
+from HeliumTubes.PlottingHe3 import energy_plot_He3
+
 # =============================================================================
 #                         LINESHAPE INVESTIGATION
 # =============================================================================
 
-def analyze_Lineshape(ce_MG, detector_type, origin_voxel):
+def analyze_Lineshape(ce_MG, ce_He3, detector_type, origin_voxel):
     def Gaussian(x, a, x0, sigma):
         return a*np.exp(-(x-x0)**2/(2*sigma**2))
+    # Declare parameters
     number_bins = 5000
     plot_energy = True
+    label_MG, label_He3 = 'Multi-Grid', 'He-3'
+    useMaxNorm = True
+    # Plot Multi-Grid
     energies = calculate_energy(ce_MG, detector_type, origin_voxel)
     energy_hist, bin_centers = energy_plot(ce_MG, detector_type, origin_voxel,
-                                           number_bins, 1, 10, plot_energy)
+                                           number_bins, 1, 10, plot_energy,
+                                           label_MG)
+    # Plot He-3
+    He3_energies = calculate_He3_energy(ce_He3)
+    hist_He3, bin_centers_He3 = energy_plot_He3(ce_He3, number_bins,
+                                                plot_energy, label_He3)
     # Find peaks
     bins_part_1 = number_bins - number_bins//3
     bins_part_2 = number_bins//3
@@ -36,6 +50,7 @@ def analyze_Lineshape(ce_MG, detector_type, origin_voxel):
     plt.plot(bin_centers[peaks], energy_hist[peaks], color='red', zorder=5,
              linestyle='', marker='o')
     figs = []
+    titles = []
     print('Number of peaks: %d' % len(peaks))
     for width, peak in zip(widths, peaks):
         left, right = bin_centers[peak]-width/20, bin_centers[peak]+width/20
@@ -54,8 +69,6 @@ def analyze_Lineshape(ce_MG, detector_type, origin_voxel):
         fit_stop = find_nearest(peak_bin_centers, right_fit)
         p0 = [6.03437070e+04, 6.19310485e+00, 4.02349443e-03]
         try:
-            print('fit start: %s' % fit_start)
-            print('fit stop: %s' % fit_stop)
             # Prepare guesses
             maximum = max(peak_hist)
             maximum_idx = find_nearest(peak_hist, maximum)
@@ -76,24 +89,52 @@ def analyze_Lineshape(ce_MG, detector_type, origin_voxel):
             a, x0, sigma = popt[0], popt[1], abs(popt[2])
             # Plot Gaussian
             xx = np.linspace(left, right, 1000)
-            plt.plot(xx, Gaussian(xx, a, x0, sigma), color='purple')
+            #plt.plot(xx, Gaussian(xx, a, x0, sigma), color='purple')
+            # Plot sigma values
+            plt.axvline(x=x0 - 5*sigma, color='orange', linewidth=0.5, label='-5σ')
+            plt.axvline(x=x0 - 3*sigma, color='purple', linewidth=0.5, label='-3σ')
+            plt.axvline(x=x0 - sigma, color='green', linewidth=0.5, label='-σ')
+            plt.axvline(x=x0 + sigma, color='green', linewidth=0.5, label='σ')
         except:
             print("Unexpected error:", sys.exc_info())
+        # Define MG normalization
+        MG_norm = 1/maximum
         # Print fit edges
-        plt.axvline(x=left_fit, color='green', linewidth=0.5)
-        plt.axvline(x=right_fit, color='green', linewidth=0.5)
+        #plt.axvline(x=left_fit, color='green', linewidth=0.5)
+        #plt.axvline(x=right_fit, color='green', linewidth=0.5)
         # Plot parameters from scipy to double-check
-        plt.axvline(x=left, color='orange', linewidth=0.5)
-        plt.axvline(x=right, color='orange', linewidth=0.5)
-        plt.plot(peak_bin_centers, peak_hist, color='blue', marker='.', linestyle='')
-        plt.plot(peak_bin_centers[fit_start:fit_stop], peak_hist[fit_start:fit_stop],
-                 color='red', marker='x', linestyle='')
+        #plt.axvline(x=left, color='orange', linewidth=0.5)
+        #plt.axvline(x=right, color='orange', linewidth=0.5)
+        plt.plot(peak_bin_centers, peak_hist*MG_norm, color='blue', marker='o',
+                 linestyle='-', label=label_MG, zorder=5)
+        #plt.plot(peak_bin_centers[fit_start:fit_stop],
+        #         peak_hist[fit_start:fit_stop]*MG_norm,
+        #         color='red', marker='x', linestyle='')
         plt.title('Peak at: %s meV' % bin_centers[peak])
         plt.xlabel('Energy [meV]')
         plt.ylabel('Counts')
+        # Plot He-3 data
+        He3_peak_energies = He3_energies[(He3_energies >= left) & (He3_energies <= right)]
+        He3_peak_hist, He3_peak_edges = np.histogram(He3_peak_energies,
+                                                     bins=peak_bins, range=[left, right])
+        He3_peak_bin_centers = 0.5 * (peak_edges[1:] + peak_edges[:-1])
+        He3_norm = 1/max(He3_peak_hist)
+        plt.plot(He3_peak_bin_centers, He3_peak_hist*He3_norm, color='red',
+                 label=label_He3, marker='o', linestyle='-', zorder=5)
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        plt.legend()
+        # Append figure
         figs.append(fig_new)
+        titles.append('peak_at_%.3f_meV.pdf' % bin_centers[peak])
 
-    for fig_temp in figs:
+
+    # Plot and save all figures
+    dirname = os.path.dirname(__file__)
+    output_folder = os.path.join(dirname, '../../../Output/Lineshape/')
+    for fig_temp, title in zip(figs, titles):
+        output_path = output_folder + title
+        fig_temp.savefig(output_path, bbox_inches='tight')
         fig_temp.show()
 
 

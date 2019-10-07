@@ -378,8 +378,10 @@ class MainWindow(QMainWindow):
             # Plot
             ce_MG = pd.read_hdf(path, 'ce')
             ce_MG_filtered = filter_clusters(ce_MG, filter_parameters)
+            parameters = get_He3_filter_parameters(self)
+            ce_He3_filtered = filter_He3(self.He3_df, parameters)
             fig = plt.figure()
-            analyze_Lineshape(ce_MG_filtered, detector_type, origin_voxel)
+            analyze_Lineshape(ce_MG_filtered, ce_He3_filtered, detector_type, origin_voxel)
             fig.show()
 
     # ==== Animation ==== #
