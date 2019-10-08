@@ -23,6 +23,9 @@ from HeliumTubes.PlottingHe3 import energy_plot_He3
 def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
     def Gaussian(x, a, x0, sigma):
         return a*np.exp(-(x-x0)**2/(2*sigma**2))
+
+    def meV_to_A(energy):
+        return np.sqrt(81.81/energy)
     # Declare parameters
     number_bins = 5000
     plot_energy = True
@@ -113,9 +116,9 @@ def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
         #plt.plot(peak_bin_centers[fit_start:fit_stop],
         #         peak_hist[fit_start:fit_stop]*MG_norm,
         #         color='red', marker='x', linestyle='')
-        plt.title('Peak at: %s meV' % bin_centers[peak])
+        plt.title('Peak at: %.2f meV (%.2f Å)' % (bin_centers[peak], meV_to_A(bin_centers[peak])))
         plt.xlabel('Energy [meV]')
-        plt.ylabel('Counts')
+        plt.ylabel('Counts (Normalized to maximum height)')
         # Plot He-3 data
         He3_peak_energies = He3_energies[(He3_energies >= left_fit) & (He3_energies <= right_fit)]
         He3_peak_hist, He3_peak_edges = np.histogram(He3_peak_energies,
@@ -129,7 +132,7 @@ def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
         plt.legend()
         # Append figure
         figs.append(fig_new)
-        titles.append('peak_at_%.3f_meV.pdf' % bin_centers[peak])
+        titles.append('peak_at_%.2f_meV.pdf' % bin_centers[peak])
         plt.close()
 
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1210</width>
-    <height>664</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -178,13 +178,13 @@
      <item row="3" column="9">
       <widget class="QSpinBox" name="layer_min">
        <property name="minimum">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>20</number>
+        <number>19</number>
        </property>
        <property name="value">
-        <number>1</number>
+        <number>0</number>
        </property>
       </widget>
      </item>
@@ -396,13 +396,13 @@ Events</string>
      <item row="5" column="9">
       <widget class="QSpinBox" name="layer_max">
        <property name="minimum">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>20</number>
+        <number>19</number>
        </property>
        <property name="value">
-        <number>20</number>
+        <number>19</number>
        </property>
       </widget>
      </item>
@@ -543,26 +543,26 @@ Events</string>
      <item row="3" column="10">
       <widget class="QSpinBox" name="row_min">
        <property name="minimum">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="maximum">
         <number>12</number>
        </property>
        <property name="value">
-        <number>1</number>
+        <number>0</number>
        </property>
       </widget>
      </item>
      <item row="5" column="10">
       <widget class="QSpinBox" name="row_max">
        <property name="minimum">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="maximum">
-        <number>12</number>
+        <number>11</number>
        </property>
        <property name="value">
-        <number>12</number>
+        <number>11</number>
        </property>
       </widget>
      </item>

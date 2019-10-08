@@ -68,9 +68,7 @@ class MainWindow(QMainWindow):
         self.app = app
         # Clustering attributes
         self.data_sets = ''
-        self.ILL_buses = [-1, -1, -1]
         self.maximum_file_size_in_mb = 3000
-        self.adc_threshold = 0
         # Cluster properties
         self.measurement_time = 0
         self.ce = pd.DataFrame()
@@ -103,7 +101,7 @@ class MainWindow(QMainWindow):
                 os.remove(file_path)
                 print('%d/%d' % (i+1, len(zip_paths)))
             # Cluster
-            clusters, events = cluster_data(data, self.ILL_buses, self.adc_threshold)
+            clusters, events = cluster_data(data)
             # Write or append
             if self.write.isChecked():
                 self.ce = clusters
@@ -547,8 +545,6 @@ class MainWindow(QMainWindow):
 
     def fill_MG_information_window(self):
         information_text = '<b>Measurement time:</b> %d [s]' % int(self.measurement_time)
-        information_text += "<br/><b>ADC Threshold:</b> %d [ADC Ch's]" % self.adc_threshold
-        information_text += '<br/><b>ILL buses:</b> ' + str(self.ILL_buses)
         information_text += '<br/><b>Data sets:</b> ' + self.data_sets
         self.information_window.setText(information_text)
 

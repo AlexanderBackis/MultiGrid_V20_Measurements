@@ -62,9 +62,7 @@ def coincidences_3D_plot(df, origin_voxel):
                     hist[2].append(coord['z'])
                     hist[3].append(H[wCh, gCh-80, bus])
                     loc += 1
-                    labels.append('Detector: ' + detector_type
-                                  + '<br>'
-                                  + 'Module: %d<br>' % bus
+                    labels.append('Module: %d<br>' % bus
                                   + 'WireChannel: %d<br>' % wCh
                                   + 'GridChannel: %d<br>' % gCh
                                   + 'Counts: %d' % H[wCh, gCh-80, bus])

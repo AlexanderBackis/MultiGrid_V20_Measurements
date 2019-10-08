@@ -46,7 +46,7 @@ ExTsShift     =   30
 #                               CLUSTER DATA
 # =============================================================================
 
-def cluster_data(data, ILL_buses, adc_threshold):
+def cluster_data(data):
     """ Clusters the imported data and stores it two data frames: one for
         individual events and one for coicident events (i.e. candidate neutron
         events).
@@ -124,56 +124,49 @@ def cluster_data(data, ILL_buses, adc_threshold):
             Bus = (word & BusMask) >> BusShift
             isData = True
             #print('Bus: %d' % Bus)
-            # If Bus != previous_Bus and ILL-exception, keep filling cluster,
-            # else create new cluster
-            if (previousBus in ILL_buses) and (Bus in ILL_buses):
-                pass
-            else:
-                # Initiate temporary cluster variables and increase cluster index
-                previousBus = Bus
-                maxADCw = 0
-                maxADCg = 0
-                ce_count += 1
-                ce_index += 1
-                # Save Bus data for cluster
-                ce_dict['Bus'][ce_index] = Bus
+            # Initiate temporary cluster variables and increase cluster index
+            previousBus = Bus
+            maxADCw = 0
+            maxADCg = 0
+            ce_count += 1
+            ce_index += 1
+            # Save Bus data for cluster
+            ce_dict['Bus'][ce_index] = Bus
         elif ((word & DataMask) == DataEvent) & isOpen:
             # Extract Channel and ADC
             Channel = ((word & ChannelMask) >> ChannelShift)
             ADC = (word & ADCMask)
             #print('Channel: %d' % (Channel ^ 1))
             #print('ADC: %d' % ADC)
-            # Only save data if above ADC threshold
-            if ADC > adc_threshold:
-                # Wires have channels between 0->79
-                if 0 <= Channel <= 79:
-                    # Save event data and increase event index and event count
-                    e_dict['Bus'][e_index] = Bus
-                    e_dict['Ch'][e_index] = Channel ^ 1
-                    e_dict['ADC'][e_index] = ADC
-                    e_index += 1
-                    e_count += 1
-                    # Save cluster data
-                    ce_dict['Bus'][ce_index] = Bus ### REMOVE IF TRIGGER ON WIRE
-                    ce_dict['wADC'][ce_index] += ADC
-                    ce_dict['wM'][ce_index] += 1
-                    # Use wire with largest collected charge as hit position
-                    if ADC > maxADCw: maxADCw, ce_dict['wCh'][ce_index] = ADC, Channel ^ 1
-                # Grids have channels between 80->119
-                elif 80 <= Channel <= 119:
-                    # Save event data and increase event index and event count
-                    e_dict['Bus'][e_index] = Bus
-                    e_dict['Ch'][e_index] = Channel
-                    e_dict['ADC'][e_index] = ADC
-                    e_index += 1
-                    e_count += 1
-                    # Save cluster data, and check if current channel collected most charge
-                    ce_dict['gADC'][ce_index] += ADC
-                    ce_dict['gM'][ce_index] += 1
-                    # Use grid with largest collected charge as hit position
-                    if ADC > maxADCg: maxADCg, ce_dict['gCh'][ce_index] = ADC, Channel
-                else:
-                    pass
+            # Wires have channels between 0->79
+            if 0 <= Channel <= 79:
+                # Save event data and increase event index and event count
+                e_dict['Bus'][e_index] = Bus
+                e_dict['Ch'][e_index] = Channel ^ 1
+                e_dict['ADC'][e_index] = ADC
+                e_index += 1
+                e_count += 1
+                # Save cluster data
+                ce_dict['Bus'][ce_index] = Bus ### REMOVE IF TRIGGER ON WIRE
+                ce_dict['wADC'][ce_index] += ADC
+                ce_dict['wM'][ce_index] += 1
+                # Use wire with largest collected charge as hit position
+                if ADC > maxADCw: maxADCw, ce_dict['wCh'][ce_index] = ADC, Channel ^ 1
+            # Grids have channels between 80->119
+            elif 80 <= Channel <= 119:
+                # Save event data and increase event index and event count
+                e_dict['Bus'][e_index] = Bus
+                e_dict['Ch'][e_index] = Channel
+                e_dict['ADC'][e_index] = ADC
+                e_index += 1
+                e_count += 1
+                # Save cluster data, and check if current channel collected most charge
+                ce_dict['gADC'][ce_index] += ADC
+                ce_dict['gM'][ce_index] += 1
+                # Use grid with largest collected charge as hit position
+                if ADC > maxADCg: maxADCg, ce_dict['gCh'][ce_index] = ADC, Channel
+            else:
+                pass
         elif ((word & DataMask) == DataExTs) & isOpen:
             extended_time_stamp = (word & ExTsMask) << ExTsShift
             isExTs = True
