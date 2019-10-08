@@ -29,7 +29,6 @@ def create_mapping(origin_voxel):
 
     # Calculate offset of detectors in (x, y, z)
     theta = 0
-    slit_2_to_detector_surface = 28.366 - 28.182
     bus_origin, gCh_origin, wCh_origin = origin_voxel
     temp_origin = {'x': 0, 'y': 0, 'z': 0}
     # Get offshift from corner of first voxel
@@ -37,7 +36,7 @@ def create_mapping(origin_voxel):
     hit_coordinate = mapping_temp[bus_origin, gCh_origin, wCh_origin]
     x_offset = -hit_coordinate['x']
     y_offset = -hit_coordinate['y']
-    z_offset = -hit_coordinate['z'] + 46.514e-3 + slit_2_to_detector_surface
+    z_offset = -hit_coordinate['z'] + 46.514e-3 + 28.366
     offset = {'x': x_offset, 'y': y_offset, 'z': z_offset}
     mapping = create_channel_to_coordinate_map(theta, offset)
     return mapping
