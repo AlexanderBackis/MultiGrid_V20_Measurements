@@ -11,7 +11,7 @@ from HelperFunctions.CreateMapping import create_mapping
 #                        CALCULATE ENERGY TRANSFER
 # =============================================================================
 
-def calculate_energy(df, detector_type, origin_voxel):
+def calculate_energy(df, origin_voxel):
     """
     Calculates the energy transfer of a data set.
 
@@ -27,7 +27,7 @@ def calculate_energy(df, detector_type, origin_voxel):
     time_offset = 0.6e-3
     period_time = (1/14)
     # Get chopper-to-detector distance for each voxel
-    distance_mapping = get_distances(detector_type, origin_voxel)
+    distance_mapping = get_distances(origin_voxel)
     # Extract necessary values from dataframe
     wChs = df.wCh
     gChs = df.gCh
@@ -44,7 +44,7 @@ def calculate_energy(df, detector_type, origin_voxel):
 #                           VOXEL DISTANCES 3D MATRIX
 # =============================================================================
 
-def get_distances(detector_type, origin_voxel):
+def get_distances(origin_voxel):
     """
     Calculates the distances to each of the voxels from the sample.
 
@@ -53,7 +53,7 @@ def get_distances(detector_type, origin_voxel):
                                  The elements are the distances in m from the
                                  sample position.
     """
-    mapping = create_mapping(detector_type, origin_voxel)
+    mapping = create_mapping(origin_voxel)
     distances = np.zeros((3, 120, 80), dtype='float')
     for bus in range(0, 3):
         for gCh in range(80, 120):

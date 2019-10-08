@@ -15,10 +15,10 @@ import numpy as np
 import pandas as pd
 
 # =============================================================================
-#                        FULL MAPPING, ALL DETECTORS
+#                                CREATE MAPPING
 # =============================================================================
 
-def create_mapping(detector_type, origin_voxel):
+def create_mapping(origin_voxel):
     """
     Creates a channel->coordinate mapping for the detector. We place our origin
     at the beam center.
@@ -31,31 +31,22 @@ def create_mapping(detector_type, origin_voxel):
     theta = 0
     bus_origin, gCh_origin, wCh_origin = origin_voxel
     temp_origin = {'x': 0, 'y': 0, 'z': 0}
-    if detector_type == 'ESS':
-        # Get offshift from corner of first voxel
-        mapping_temp = create_ess_channel_to_coordinate_map(theta, temp_origin)
-        hit_coordinate = mapping_temp[bus_origin, gCh_origin, wCh_origin]
-        x_offset = -hit_coordinate['x']
-        y_offset = -hit_coordinate['y']
-        z_offset = -hit_coordinate['z'] + 46.514e-3 + 28.366
-        offset = {'x': x_offset, 'y': y_offset, 'z': z_offset}
-        mapping = create_ess_channel_to_coordinate_map(theta, offset)
-    else:
-        mapping_temp = create_ill_channel_to_coordinate_map(theta, temp_origin)
-        hit_coordinate = mapping_temp[bus_origin, gCh_origin, wCh_origin]
-        x_offset = -hit_coordinate['x']
-        y_offset = -hit_coordinate['y']
-        z_offset = -hit_coordinate['z'] + 46.514e-3 + 28.366
-        offset = {'x': x_offset, 'y': y_offset, 'z': z_offset}
-        mapping = create_ill_channel_to_coordinate_map(theta, offset)
+    # Get offshift from corner of first voxel
+    mapping_temp = create_channel_to_coordinate_map(theta, temp_origin)
+    hit_coordinate = mapping_temp[bus_origin, gCh_origin, wCh_origin]
+    x_offset = -hit_coordinate['x']
+    y_offset = -hit_coordinate['y']
+    z_offset = -hit_coordinate['z'] + 46.514e-3 + 28.366
+    offset = {'x': x_offset, 'y': y_offset, 'z': z_offset}
+    mapping = create_channel_to_coordinate_map(theta, offset)
     return mapping
 
 
 # =============================================================================
-#                            ESS DETECTOR MAPPING
+#                        INTERNAL DETECTOR MAPPING
 # =============================================================================
 
-def create_ess_channel_to_coordinate_map(theta, offset):
+def create_channel_to_coordinate_map(theta, offset):
     """
     Creates a channel->coordinate mapping for the ESS-type detectors. It needs
     a 'xlsx'-file containing the coordinates, using lower right outer detector
@@ -66,8 +57,8 @@ def create_ess_channel_to_coordinate_map(theta, offset):
         offset (float): Lower right corner deviation from sample origin
 
     Returns:
-        ess_ch_to_coord (dict): Dictionary conataining mapping for ESS detector,
-                                according to (Bus, gCh, wCh)->(x, y, z)
+        ch_to_coord (dict): Dictionary conataining mapping for ESS detector,
+                            according to (Bus, gCh, wCh)->(x, y, z)
     """
     # Import voxel coordinates
     dirname = os.path.dirname(__file__)
@@ -75,7 +66,7 @@ def create_ess_channel_to_coordinate_map(theta, offset):
     matrix = pd.read_excel(file_path).values
     coordinates = matrix[2:802]
     # Create empty dictionary to store mapping
-    ess_ch_to_coord = np.empty((3, 120, 80), dtype='object')
+    ch_to_coord = np.empty((3, 120, 80), dtype='object')
     coordinate = {'x': -1, 'y': -1, 'z': -1}
     axises =  ['x','y','z']
     # Iterate through all coordinates and start mapping procedure
@@ -106,63 +97,10 @@ def create_ess_channel_to_coordinate_map(theta, offset):
                 # Insert result in dictionary and reset temporary variable.
                 # Flip bus and wire row locations, as we are parsing the
                 # coordinates backwards.
-                ess_ch_to_coord[flip_bus(module), grid_ch, flip_wire(wire_ch)] = {'x': x, 'y': y, 'z': z}
+                ch_to_coord[flip_bus(module), grid_ch, flip_wire(wire_ch)] = {'x': x, 'y': y, 'z': z}
                 coordinate = {'x': -1, 'y': -1, 'z': -1}
-    return ess_ch_to_coord
+    return ch_to_coord
 
-
-# =============================================================================
-#                            ILL DETECTOR MAPPING
-# =============================================================================
-
-def create_ill_channel_to_coordinate_map(theta, offset):
-    """
-    Creates a channel->coordinate mapping for the ESS-type detectors. It needs
-    the offset from the lower right detector corner and the distances between
-    consecutive voxels.
-
-    Args:
-        theta (float): Inclination of vessel in (x, z)-plane (instrument system)
-        offset (float): Lower right corner deviation from sample origin
-
-    Returns:
-        ill_ch_to_coord (dict): Dictionary conataining mapping for ILL detector,
-                                according to (Bus, gCh, wCh)->(x, y, z)
-    """
-    # Declare distances between consecutive voxel centers in [mm]
-    WireSpacing  = 10
-    LayerSpacing = 23.5
-    GridSpacing  = 23.5
-    # Declare first voxel's offset
-    x_offset = 46.514
-    y_offset = 37.912
-    z_offset = 37.95
-    # Create dictionary to store data and generate full mapping
-    ill_ch_to_coord = np.empty((3, 120, 80), dtype='object')
-    for Bus in range(0, 3):
-        for GridChannel in range(80, 120):
-            for WireChannel in range(0, 80):
-                    x = (WireChannel % 20)*WireSpacing + x_offset
-                    y = ((WireChannel // 20)*LayerSpacing + (Bus*4*LayerSpacing) + y_offset)
-                    z = ((GridChannel-80)*GridSpacing) + z_offset
-                    # Convert from [mm] to [m]
-                    x = x/1000
-                    y = y/1000
-                    z = z/1000
-                    # Shift to match internal and external coordinate system
-                    z, x, y = x, y, z
-                    # Apply rotation
-                    x, z = get_new_x(x, z, theta), get_new_y(x, z, theta)
-                    # Apply translation
-                    x += offset['x']
-                    y += offset['y']
-                    z += offset['z']
-                    # Insert result in dictionary, flip bus and wire row
-                    # locations, as we are parsing the coordinates backwards.
-                    ill_ch_to_coord[flip_bus(Bus),
-                                    GridChannel,
-                                    flip_wire(WireChannel)] = {'x': x, 'y': y, 'z': z}
-    return ill_ch_to_coord
 
 # =============================================================================
 #                            Helper Functions
@@ -246,46 +184,3 @@ def get_new_y(x, y, theta):
     """
     new_y = np.sin(np.arctan(y/x)+theta)*np.sqrt(x ** 2 + y ** 2)
     return new_y
-
-def calculate_theta(x1, x2, z1, z2):
-    """
-    Calculates the angle in a triangle with sides the length of (x2-x1) and
-    (z2-z1).
-
-    Args:
-        x1 (float): First x-position
-        x2 (float): Second x-position
-        y1 (float): First y-position
-        y2 (float): Second y-position
-
-    Returns:
-        theta (float): Angle theta in triangle with sides (x2-x1) and (z2-z1).
-    """
-    theta = np.arctan((z2-z1)/(x2-x1))
-    return theta
-
-def get_detector_corners():
-    """
-    Imports the measured detector corners of the three detectors and saves them
-    in three dictionaries, which are stored in a list.
-
-    Returns:
-        theta (float): Angle theta in triangle with sides (x2-x1) and (z2-z1).
-    """
-    def create_corner_dict(corners):
-        corners = {'left': {'x': corners[0],
-                            'y': corners[1],
-                            'z': corners[2]},
-                   'right': {'x': corners[3],
-                             'y': corners[4],
-                             'z': corners[5]}}
-        return corners
-    # Import data from measurement of corners
-    dirname = os.path.dirname(__file__)
-    file_path = os.path.join(dirname, '../../Tables/Detector_Corners.xlsx')
-    matrix = pd.read_excel(file_path).values
-    # Create dictionary containing information about corners
-    ill_corners = create_corner_dict(matrix[1][1:])
-    ess_crb_corners = create_corner_dict(matrix[2][1:])
-    ess_pa_corners = create_corner_dict(matrix[3][1:])
-    return ill_corners, ess_crb_corners, ess_pa_corners

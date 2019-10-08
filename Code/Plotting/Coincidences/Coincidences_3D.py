@@ -19,7 +19,7 @@ from HelperFunctions.Borderlines import initiate_detector_border_lines
 #                           Coincidence Histogram (3D)
 # =============================================================================
 
-def coincidences_3D_plot(df, detector_type, origin_voxel):
+def coincidences_3D_plot(df, origin_voxel):
     """
     Produces a 3D hit-position histogram in (x, y, z)-coordinates, where the
     colorbar indicates number of counts at that specific coordinate.
@@ -38,9 +38,9 @@ def coincidences_3D_plot(df, detector_type, origin_voxel):
     # Perform initial filters
     df = df[(df.wCh != -1) & (df.gCh != -1)]
     # Initiate 'voxel_id -> (x, y, z)'-mapping
-    mapping = create_mapping(detector_type, origin_voxel)
+    mapping = create_mapping(origin_voxel)
     # Initiate border lines
-    b_traces = initiate_detector_border_lines(mapping, detector_type)
+    b_traces = initiate_detector_border_lines(mapping)
     # Calculate 3D histogram
     H, edges = np.histogramdd(df[['wCh', 'gCh', 'Bus']].values,
                               bins=(80, 40, 3),

@@ -20,7 +20,7 @@ from HelperFunctions.PathsAndFolders import mkdir_p
 #                                LAMBDA SWEEP
 # =============================================================================
 
-def Time_Sweep_Animation(ce, number_bins, detector_type, origin_voxel, bus_start, bus_stop):
+def Time_Sweep_Animation(ce, number_bins, origin_voxel, bus_start, bus_stop):
     # Filters
     ce = ce[(ce.wCh != -1) & (ce.gCh != -1)]
     # Storage

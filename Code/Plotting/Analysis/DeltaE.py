@@ -13,7 +13,7 @@ import numpy as np
 # =============================================================================
 
 
-def energy_plot(df, detector_type, origin_voxel, number_bins, start=1, stop=10,
+def energy_plot(df, origin_voxel, number_bins, start=1, stop=10,
                 plot_energy=False, label=None, useMaxNorm=False):
     """
     Histograms the energy transfer values from a measurement
@@ -35,7 +35,7 @@ def energy_plot(df, detector_type, origin_voxel, number_bins, start=1, stop=10,
     def A_to_meV(wavelength):
         return (81.81/(wavelength ** 2))
     # Calculate DeltaE
-    energy = calculate_energy(df, detector_type, origin_voxel)
+    energy = calculate_energy(df, origin_voxel)
     # Select normalization
     if useMaxNorm is False:
         norm = 1 * np.ones(len(energy))

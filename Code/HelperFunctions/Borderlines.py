@@ -17,7 +17,7 @@ import plotly.graph_objs as go
 # =============================================================================
 
 
-def initiate_detector_border_lines(mapping, detector_type):
+def initiate_detector_border_lines(mapping):
     """
     Produces a 3D hit-position histogram in (x, y, z)-coordinates, where the
     colorbar indicates number of counts at that specific coordinate.
@@ -33,64 +33,29 @@ def initiate_detector_border_lines(mapping, detector_type):
     """
 
     # Initiate all pairs of corners were lines will go between
-    pairs_ESS = [[[80, 0], [80, 60]],
-                 [[80, 0], [80, 19]],
-                 [[80, 79], [80, 60]],
-                 [[80, 79], [80, 19]],
-                 [[119, 0], [119, 60]],
-                 [[119, 0], [119, 19]],
-                 [[119, 79], [119, 60]],
-                 [[119, 79], [119, 19]],
-                 [[80, 0], [119, 0]],
-                 [[80, 19], [119, 19]],
-                 [[80, 60], [119, 60]],
-                 [[80, 79], [119, 79]]
-                 ]
-    pairs_ILL = [[[80, 0, 0], [80, 60, 2]],
-                 [[80, 0, 0], [80, 19, 0]],
-                 [[80, 79, 2], [80, 60, 2]],
-                 [[80, 79, 2], [80, 19, 0]],
-                 [[119, 0, 0], [119, 60, 2]],
-                 [[119, 0, 0], [119, 19, 0]],
-                 [[119, 79, 2], [119, 60, 2]],
-                 [[119, 79, 2], [119, 19, 0]],
-                 [[80, 0, 0], [119, 0, 0]],
-                 [[80, 19, 0], [119, 19, 0]],
-                 [[80, 60, 2], [119, 60, 2]],
-                 [[80, 79, 2], [119, 79, 2]]
-                 ]
+    pairs = [[[80, 0], [80, 60]],
+             [[80, 0], [80, 19]],
+             [[80, 79], [80, 60]],
+             [[80, 79], [80, 19]],
+             [[119, 0], [119, 60]],
+             [[119, 0], [119, 19]],
+             [[119, 79], [119, 60]],
+             [[119, 79], [119, 19]],
+             [[80, 0], [119, 0]],
+             [[80, 19], [119, 19]],
+             [[80, 60], [119, 60]],
+             [[80, 79], [119, 79]]
+             ]
     # For each of the pairs, create a plotly trace with the plot
     b_traces = []
-    if detector_type == 'ESS':
-        for bus in range(0, 3):
-            for pair in pairs_ESS:
-                x_vec = []
-                y_vec = []
-                z_vec = []
-                for loc in pair:
-                    gCh = loc[0]
-                    wCh = loc[1]
-                    coord = mapping[bus, gCh, wCh]
-                    x_vec.append(coord['x'])
-                    y_vec.append(coord['y'])
-                    z_vec.append(coord['z'])
-                b_trace = go.Scatter3d(x=x_vec,
-                                       y=y_vec,
-                                       z=z_vec,
-                                       mode='lines',
-                                       line=dict(color='rgba(0, 0, 0, 0.5)',
-                                                 width=5))
-                b_traces.append(b_trace)
-
-    else:
-        for pair in pairs_ILL:
+    for bus in range(0, 3):
+        for pair in pairs:
             x_vec = []
             y_vec = []
             z_vec = []
             for loc in pair:
                 gCh = loc[0]
                 wCh = loc[1]
-                bus = loc[2]
                 coord = mapping[bus, gCh, wCh]
                 x_vec.append(coord['x'])
                 y_vec.append(coord['y'])
@@ -102,6 +67,7 @@ def initiate_detector_border_lines(mapping, detector_type):
                                    line=dict(color='rgba(0, 0, 0, 0.5)',
                                              width=5))
             b_traces.append(b_trace)
+    # Append a line showing how the incident neutrons travel
     neutron_line = go.Scatter3d(x=[0, 0],
                                 y=[0, 0],
                                 z=[28, 28.5],

@@ -210,11 +210,7 @@ class MainWindow(QMainWindow):
             origin_voxel = [int(self.bus_origin.text()),
                             int(self.gCh_origin.text()),
                             int(self.wCh_origin.text())]
-            if self.ESS_button.isChecked():
-                detector_type = 'ESS'
-            else:
-                detector_type = 'ILL'
-            coincidences_3D_plot(ce_filtered, detector_type, origin_voxel)
+            coincidences_3D_plot(ce_filtered, origin_voxel)
 
     def Coincidences_Projections_action(self):
         if self.data_sets != '':
@@ -303,12 +299,8 @@ class MainWindow(QMainWindow):
             origin_voxel = [int(self.bus_origin.text()),
                             int(self.gCh_origin.text()),
                             int(self.wCh_origin.text())]
-            if self.ESS_button.isChecked():
-                detector_type = 'ESS'
-            else:
-                detector_type = 'ILL'
             fig = plt.figure()
-            energy_plot(ce_filtered, detector_type, origin_voxel, number_bins)
+            energy_plot(ce_filtered, origin_voxel, number_bins)
             fig.show()
 
     def Count_Rate_action(self):
@@ -329,10 +321,6 @@ class MainWindow(QMainWindow):
             origin_voxel = [int(self.bus_origin.text()),
                             int(self.gCh_origin.text()),
                             int(self.wCh_origin.text())]
-            if self.ESS_button.isChecked():
-                detector_type = 'ESS'
-            else:
-                detector_type = 'ILL'
             MG_label, He3_label = self.data_sets, self.He3_data_sets
             start, stop = 1, 10
             useMaxNorm = True
@@ -340,13 +328,13 @@ class MainWindow(QMainWindow):
             fig.suptitle('Comparison He-3 and MG (normalized to max value)')
             plt.subplot(1, 2, 1)
             plot_energy = True
-            energy_plot(MG_red, detector_type, origin_voxel, number_bins,
+            energy_plot(MG_red, origin_voxel, number_bins,
                         start, stop, plot_energy, MG_label, useMaxNorm)
             energy_plot_He3(He3_red, number_bins, plot_energy, He3_label, useMaxNorm)
             plt.legend()
             plt.subplot(1, 2, 2)
             plot_energy = False
-            energy_plot(MG_red, detector_type, origin_voxel, number_bins,
+            energy_plot(MG_red, origin_voxel, number_bins,
                         start, stop, plot_energy, MG_label, useMaxNorm)
             energy_plot_He3(He3_red, number_bins, plot_energy, He3_label, useMaxNorm)
             plt.legend()
@@ -372,17 +360,13 @@ class MainWindow(QMainWindow):
             origin_voxel = [int(self.bus_origin.text()),
                             int(self.gCh_origin.text()),
                             int(self.wCh_origin.text())]
-            if self.ESS_button.isChecked():
-                detector_type = 'ESS'
-            else:
-                detector_type = 'ILL'
             # Plot
             ce_MG = pd.read_hdf(path, 'ce')
             ce_MG_filtered = filter_clusters(ce_MG, filter_parameters)
             parameters = get_He3_filter_parameters(self)
             ce_He3_filtered = filter_He3(self.He3_df, parameters)
             fig = plt.figure()
-            analyze_Lineshape(ce_MG_filtered, ce_He3_filtered, detector_type, origin_voxel)
+            analyze_Lineshape(ce_MG_filtered, ce_He3_filtered, origin_voxel)
             fig.show()
 
     # ==== Animation ==== #
@@ -393,11 +377,7 @@ class MainWindow(QMainWindow):
         origin_voxel = [int(self.bus_origin.text()),
                         int(self.gCh_origin.text()),
                         int(self.wCh_origin.text())]
-        if self.ESS_button.isChecked():
-            detector_type = 'ESS'
-        else:
-            detector_type = 'ILL'
-        Animation_3D_plot(ce_filtered, detector_type, origin_voxel)
+        Animation_3D_plot(ce_filtered, origin_voxel)
 
     def lambda_sweep_action(self):
         filter_parameters = get_filter_parameters(self)
@@ -408,11 +388,7 @@ class MainWindow(QMainWindow):
         number_bins = int(self.dE_bins.text())
         bus_start = self.module_min.value()
         bus_stop = self.module_max.value()
-        if self.ESS_button.isChecked():
-            detector_type = 'ESS'
-        else:
-            detector_type = 'ILL'
-        Lambda_Sweep_Animation(ce_filtered, number_bins, detector_type,
+        Lambda_Sweep_Animation(ce_filtered, number_bins,
                                origin_voxel, bus_start, bus_stop)
 
     def time_sweep_action(self):
@@ -424,11 +400,7 @@ class MainWindow(QMainWindow):
         number_bins = int(self.tofBins.text())
         bus_start = self.module_min.value()
         bus_stop = self.module_max.value()
-        if self.ESS_button.isChecked():
-            detector_type = 'ESS'
-        else:
-            detector_type = 'ILL'
-        Time_Sweep_Animation(ce_filtered, number_bins, detector_type,
+        Time_Sweep_Animation(ce_filtered, number_bins,
                              origin_voxel, bus_start, bus_stop)
 
 
@@ -511,8 +483,9 @@ class MainWindow(QMainWindow):
         MG_red = filter_clusters(self.ce, parameters_MG)
         He3_red = filter_He3(self.He3_df, parameters_He3)
         # Declare paremeters
-        number_bins = int(self.dE_bins.text())
+        number_bins = int(self.tofBins.text())
         MG_label, He3_label = self.data_sets, self.He3_data_sets
+        useMaxNorm = True
         # plot data
         fig = plt.figure()
         He3_ToF_plot(He3_red, number_bins, He3_label)
@@ -562,8 +535,6 @@ class MainWindow(QMainWindow):
         self.he3_energy_button.clicked.connect(self.He3_Energy_action)
         self.he3_wavelength_button.clicked.connect(self.He3_Wavelength_action)
         self.ToF_MG_vs_ToF_He3_button.clicked.connect(self.ToF_MG_vs_ToF_He3_action)
-        # Button toogle
-        self.toogle_VMM_MG()
 
     def refresh_window(self):
         self.app.processEvents()
@@ -591,11 +562,7 @@ class MainWindow(QMainWindow):
         self.maximum_file_size_in_mb = float(self.maximum_file_size_in_mb_value.text())
         self.adc_threshold = float(self.adc_threshold_value.text())
 
-    def toogle_VMM_MG(self):
-        self.ESS_button.toggled.connect(
-            lambda checked: checked and self.ILL_button.setChecked(False))
-        self.ILL_button.toggled.connect(
-            lambda checked: checked and self.ESS_button.setChecked(False))
+
 
 
 

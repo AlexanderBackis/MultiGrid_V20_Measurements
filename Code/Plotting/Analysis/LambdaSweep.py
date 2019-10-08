@@ -21,7 +21,7 @@ from HelperFunctions.PathsAndFolders import mkdir_p
 #                                LAMBDA SWEEP
 # =============================================================================
 
-def Lambda_Sweep_Animation(ce, number_bins, detector_type, origin_voxel, bus_start, bus_stop):
+def Lambda_Sweep_Animation(ce, number_bins, origin_voxel, bus_start, bus_stop):
     def meV_to_A(energy):
         return np.sqrt(81.81/energy)
 
@@ -35,7 +35,7 @@ def Lambda_Sweep_Animation(ce, number_bins, detector_type, origin_voxel, bus_sta
     output_path = os.path.join(dir_name, '../../../Output/lambda_sweep.gif')
     mkdir_p(temp_folder)
     # Calculate energies
-    energy = calculate_energy(ce, detector_type, origin_voxel)
+    energy = calculate_energy(ce, origin_voxel)
     landa = meV_to_A(energy)
     # Define intervals
     iter_start = 4.3
@@ -60,7 +60,7 @@ def Lambda_Sweep_Animation(ce, number_bins, detector_type, origin_voxel, bus_sta
         plt.subplot2grid((2, 3), (0, 2), colspan=1)
         plot_side(wChs, gChs, Buses, vmin, vmax)
         plt.subplot2grid((2, 3), (1, 0), colspan=3)
-        energy_plot(ce, detector_type, origin_voxel, number_bins, iter_start, iter_stop)
+        energy_plot(ce, origin_voxel, number_bins, iter_start, iter_stop)
         plt.axvline(x=(start+stop)/2, color='red', linewidth=2, alpha=0.8, zorder=5)
         plt.tight_layout()
         fig.savefig(temp_folder + '%d.png' % i)

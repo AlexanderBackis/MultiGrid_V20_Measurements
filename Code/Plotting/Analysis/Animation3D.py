@@ -20,7 +20,7 @@ from HelperFunctions.PathsAndFolders import mkdir_p
 #                         3D Animation - Time sweep
 # =============================================================================
 
-def Animation_3D_plot(ce_full, detector_type, origin_voxel):
+def Animation_3D_plot(ce_full, origin_voxel):
     # Filters
     ce = ce_full[ce_full.Bus == 1]
     ce = ce[(ce.wCh != -1) & (ce.gCh != -1)]
@@ -30,8 +30,8 @@ def Animation_3D_plot(ce_full, detector_type, origin_voxel):
     step = 1
     conversion_factor = 1/(62.5e-9)
     # Mapping and Borders
-    mapping = create_mapping(detector_type, origin_voxel)
-    borderline_traces = initiate_detector_border_lines(mapping, detector_type)
+    mapping = create_mapping(origin_voxel)
+    borderline_traces = initiate_detector_border_lines(mapping)
     # Plotting
     min_count = 0
     max_count = np.inf

@@ -20,7 +20,7 @@ from HeliumTubes.PlottingHe3 import energy_plot_He3
 #                         LINESHAPE INVESTIGATION
 # =============================================================================
 
-def analyze_Lineshape(ce_MG, ce_He3, detector_type, origin_voxel):
+def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
     def Gaussian(x, a, x0, sigma):
         return a*np.exp(-(x-x0)**2/(2*sigma**2))
     # Declare parameters
@@ -29,8 +29,8 @@ def analyze_Lineshape(ce_MG, ce_He3, detector_type, origin_voxel):
     label_MG, label_He3 = 'Multi-Grid', 'He-3'
     useMaxNorm = True
     # Plot Multi-Grid
-    energies = calculate_energy(ce_MG, detector_type, origin_voxel)
-    energy_hist, bin_centers = energy_plot(ce_MG, detector_type, origin_voxel,
+    energies = calculate_energy(ce_MG, origin_voxel)
+    energy_hist, bin_centers = energy_plot(ce_MG, origin_voxel,
                                            number_bins, 1, 10, plot_energy,
                                            label_MG)
     # Plot He-3
