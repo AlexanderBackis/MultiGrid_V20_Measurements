@@ -44,12 +44,14 @@ def He3_Ch_plot(df):
 #                         TOF HISTOGRAM - HELIUM-3
 # =============================================================================
 
-def He3_ToF_plot(df, number_bins):
-    plt.hist(df['ToF']*(8e-9)*1e6, histtype='step', color='green', zorder=5,
-             bins=number_bins)
+def He3_ToF_plot(df, number_bins, label=None):
+    # Declare parameters
+    time_offset = (0.6e-3) * 1e6
+    period_time = (1/14) * 1e6
+    plt.hist((df.ToF * (8e-9) * 1e6 + time_offset) % period_time,
+             histtype='step', zorder=5, bins=number_bins, label=label)
     plt.xlabel('ToF [µs]')
     plt.ylabel('Counts')
-    plt.yscale('log')
     plt.title('ToF')
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)

@@ -54,47 +54,50 @@ def analyze_Lineshape(ce_MG, ce_He3, detector_type, origin_voxel):
     print('Number of peaks: %d' % len(peaks))
     for width, peak in zip(widths, peaks):
         left, right = bin_centers[peak]-width/20, bin_centers[peak]+width/20
-        left_fit, right_fit = bin_centers[peak]-width/60, bin_centers[peak]+width/60
-        # Perform new histogram within estimated peak limits
+        #left_fit, right_fit = bin_centers[peak]-width/60, bin_centers[peak]+width/60
+        # Perform new histogram to find correct peak limits
+        peak_bins_temp = 100
+        peak_energies_temp = energies[(energies >= left) & (energies <= right)]
+        peak_hist_temp, peak_edges_temp = np.histogram(peak_energies_temp, bins=peak_bins_temp, range=[left, right])
+        peak_bin_centers_temp = 0.5 * (peak_edges_temp[1:] + peak_edges_temp[:-1])
+        # Prepare guesses
+        maximum_temp = max(peak_hist_temp)
+        maximum_idx = find_nearest(peak_hist_temp, maximum_temp)
+        half_maximum = maximum_temp/2
+        half_maximum_idx_1 = find_nearest(peak_hist_temp[:maximum_idx],
+                                          half_maximum)
+        half_maximum_idx_2 = (find_nearest(peak_hist_temp[maximum_idx:],
+                                           half_maximum) + maximum_idx)
+        FWHM = peak_bin_centers_temp[half_maximum_idx_2] - peak_bin_centers_temp[half_maximum_idx_1]
+        a_guess = maximum_temp
+        x0_guess = peak_bin_centers_temp[maximum_idx]
+        sigma_guess = FWHM/(2*np.sqrt(2*np.log(2)))
+        # Prepare new histograms within +/- 5 of our guessed sigma
         peak_bins = 100
-        peak_energies = energies[(energies >= left) & (energies <= right)]
-        peak_hist, peak_edges = np.histogram(peak_energies, bins=peak_bins, range=[left, right])
+        left_fit = x0_guess - (7 * sigma_guess)
+        right_fit = x0_guess + (7 * sigma_guess)
+        peak_energies = energies[(energies >= left_fit) & (energies <= right_fit)]
+        peak_hist, peak_edges = np.histogram(peak_energies, bins=peak_bins, range=[left_fit, right_fit])
         peak_bin_centers = 0.5 * (peak_edges[1:] + peak_edges[:-1])
+        maximum = max(peak_hist)
         # Define points to to fit procedure on
-        peaks_in_peak, *_ = find_peaks(peak_hist, height=max(peak_hist)/2)
-        prominences, left_bases, right_bases = peak_prominences(peak_hist, peaks_in_peak)
         fig_new = plt.figure()
         # Try fit
-        fit_start = find_nearest(peak_bin_centers, left_fit)
-        fit_stop = find_nearest(peak_bin_centers, right_fit)
-        p0 = [6.03437070e+04, 6.19310485e+00, 4.02349443e-03]
         try:
-            # Prepare guesses
-            maximum = max(peak_hist)
-            maximum_idx = find_nearest(peak_hist, maximum)
-            half_maximum = maximum/2
-            half_maximum_idx_1 = find_nearest(peak_hist[:maximum_idx],
-                                              half_maximum)
-            half_maximum_idx_2 = (find_nearest(peak_hist[maximum_idx:],
-                                               half_maximum) + maximum_idx)
-            FWHM = peak_bin_centers[half_maximum_idx_2] - peak_bin_centers[half_maximum_idx_1]
-            a_guess = maximum
-            x0_guess = peak_bin_centers[maximum_idx]
-            sigma_guess = FWHM/(2*np.sqrt(2*np.log(2)))
             # Fit
             popt, __ = curve_fit(Gaussian,
-                                 peak_bin_centers[fit_start:fit_stop],
-                                 peak_hist[fit_start:fit_stop],
+                                 peak_bin_centers,
+                                 peak_hist,
                                  p0=[a_guess, x0_guess, sigma_guess])
             a, x0, sigma = popt[0], popt[1], abs(popt[2])
-            # Plot Gaussian
-            xx = np.linspace(left, right, 1000)
-            #plt.plot(xx, Gaussian(xx, a, x0, sigma), color='purple')
             # Plot sigma values
-            plt.axvline(x=x0 - 5*sigma, color='orange', linewidth=0.5, label='-5σ')
-            plt.axvline(x=x0 - 3*sigma, color='purple', linewidth=0.5, label='-3σ')
-            plt.axvline(x=x0 - sigma, color='green', linewidth=0.5, label='-σ')
-            plt.axvline(x=x0 + sigma, color='green', linewidth=0.5, label='σ')
+            plt.axvline(x=x0 - 5*sigma, color='orange', linewidth=2, label='-5σ')
+            plt.axvline(x=x0 - 3*sigma, color='purple', linewidth=2, label='-3σ')
+            plt.axvline(x=x0 - sigma, color='green', linewidth=2, label='-σ')
+            plt.axvline(x=x0 + sigma, color='green', linewidth=2, label='σ')
+            # Plot Gaussian
+            xx = np.linspace(left_fit, right_fit, 1000)
+            plt.plot(xx, Gaussian(xx, a, x0, sigma)/a, color='green', label='Gaussian fit')
         except:
             print("Unexpected error:", sys.exc_info())
         # Define MG normalization
@@ -114,9 +117,9 @@ def analyze_Lineshape(ce_MG, ce_He3, detector_type, origin_voxel):
         plt.xlabel('Energy [meV]')
         plt.ylabel('Counts')
         # Plot He-3 data
-        He3_peak_energies = He3_energies[(He3_energies >= left) & (He3_energies <= right)]
+        He3_peak_energies = He3_energies[(He3_energies >= left_fit) & (He3_energies <= right_fit)]
         He3_peak_hist, He3_peak_edges = np.histogram(He3_peak_energies,
-                                                     bins=peak_bins, range=[left, right])
+                                                     bins=peak_bins, range=[left_fit, right_fit])
         He3_peak_bin_centers = 0.5 * (peak_edges[1:] + peak_edges[:-1])
         He3_norm = 1/max(He3_peak_hist)
         plt.plot(He3_peak_bin_centers, He3_peak_hist*He3_norm, color='red',
@@ -127,15 +130,16 @@ def analyze_Lineshape(ce_MG, ce_He3, detector_type, origin_voxel):
         # Append figure
         figs.append(fig_new)
         titles.append('peak_at_%.3f_meV.pdf' % bin_centers[peak])
+        plt.close()
 
 
-    # Plot and save all figures
+    # Save all figures
     dirname = os.path.dirname(__file__)
     output_folder = os.path.join(dirname, '../../../Output/Lineshape/')
     for fig_temp, title in zip(figs, titles):
         output_path = output_folder + title
         fig_temp.savefig(output_path, bbox_inches='tight')
-        fig_temp.show()
+
 
 
 # =============================================================================

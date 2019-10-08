@@ -26,7 +26,7 @@ def filter_clusters(ce, parameters):
     ce_red = ce
     for parameter, (min_val, max_val, filter_on) in parameters.items():
         if filter_on:
-            if parameter == 'wire':
+            if parameter == 'layer':
                 ce_red = ce_red[(((ce_red.wCh >= min_val - 1) &
                                   (ce_red.wCh <= max_val - 1)) |
                                  ((ce_red.wCh >= min_val + 20 - 1) &
@@ -96,11 +96,11 @@ def get_filter_parameters(window):
                   'Bus': [window.module_min.value(),
                           window.module_max.value(),
                           window.module_filter.isChecked()],
-                  'wire': [window.wire_min.value(),
-                           window.wire_max.value(),
-                           window.wire_filter.isChecked()],
-                  'gCh': [window.grid_min.value() + 80 - 1,
-                          window.grid_max.value() + 80 - 1,
+                  'layer': [window.layer_min.value(),
+                           window.layer_max.value(),
+                           window.layer_filter.isChecked()],
+                  'gCh': [window.grid_min.value(),
+                          window.grid_max.value(),
                           window.grid_filter.isChecked()]
                   }
     return parameters

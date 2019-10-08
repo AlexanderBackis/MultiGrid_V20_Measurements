@@ -249,7 +249,8 @@ class MainWindow(QMainWindow):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             number_bins = int(self.tofBins.text())
-            fig = ToF_histogram(ce_filtered, number_bins)
+            fig = plt.figure()
+            ToF_histogram(ce_filtered, number_bins)
             fig.show()
 
     def ToF_Overlay_action(self):
@@ -267,7 +268,7 @@ class MainWindow(QMainWindow):
                 ce = pd.read_hdf(path, 'ce')
                 ce_filtered = filter_clusters(ce, filter_parameters)
                 duration = get_duration(ce)
-                ToF_shifted = (ce_filtered.ToF * 62.5e-9 * 1e6 - time_offset) % period_time
+                ToF_shifted = (ce_filtered.ToF * 62.5e-9 * 1e6 + time_offset) % period_time
                 hist, *_ = np.histogram(ToF_shifted, bins=2000)
                 norm = 1/duration
                 plt.hist(ToF_shifted, bins=number_bins, zorder=4, histtype='step',
@@ -502,6 +503,22 @@ class MainWindow(QMainWindow):
         energy_plot_He3(df_red, number_bins, plot_energy)
         fig.show()
 
+    def ToF_MG_vs_ToF_He3_action(self):
+        # Get filter parameters for MG and He-3
+        parameters_MG = get_filter_parameters(self)
+        parameters_He3 = get_He3_filter_parameters(self)
+        # Filter data
+        MG_red = filter_clusters(self.ce, parameters_MG)
+        He3_red = filter_He3(self.He3_df, parameters_He3)
+        # Declare paremeters
+        number_bins = int(self.dE_bins.text())
+        MG_label, He3_label = self.data_sets, self.He3_data_sets
+        # plot data
+        fig = plt.figure()
+        He3_ToF_plot(He3_red, number_bins, He3_label)
+        ToF_histogram(MG_red, number_bins, MG_label)
+        plt.legend()
+        fig.show()
 
 
 
@@ -544,6 +561,7 @@ class MainWindow(QMainWindow):
         self.he3_ch_button.clicked.connect(self.He3_Ch_action)
         self.he3_energy_button.clicked.connect(self.He3_Energy_action)
         self.he3_wavelength_button.clicked.connect(self.He3_Wavelength_action)
+        self.ToF_MG_vs_ToF_He3_button.clicked.connect(self.ToF_MG_vs_ToF_He3_action)
         # Button toogle
         self.toogle_VMM_MG()
 

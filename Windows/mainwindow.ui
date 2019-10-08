@@ -40,9 +40,9 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>158</x>
       <y>460</y>
-      <width>751</width>
+      <width>831</width>
       <height>161</height>
      </rect>
     </property>
@@ -79,7 +79,7 @@
       </widget>
      </item>
      <item row="6" column="9">
-      <widget class="QCheckBox" name="wire_filter">
+      <widget class="QCheckBox" name="layer_filter">
        <property name="text">
         <string/>
        </property>
@@ -176,7 +176,7 @@
       </widget>
      </item>
      <item row="3" column="9">
-      <widget class="QSpinBox" name="wire_min">
+      <widget class="QSpinBox" name="layer_min">
        <property name="minimum">
         <number>1</number>
        </property>
@@ -201,7 +201,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="10">
+     <item row="1" column="11">
       <widget class="QLabel" name="label_22">
        <property name="font">
         <font>
@@ -210,7 +210,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Grids</string>
+        <string>   gCh</string>
        </property>
       </widget>
      </item>
@@ -276,7 +276,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Wires</string>
+        <string> Layer</string>
        </property>
       </widget>
      </item>
@@ -293,14 +293,14 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="9" colspan="2">
+     <item row="0" column="9" colspan="3">
       <widget class="QLabel" name="label_20">
        <property name="text">
-        <string>Coordinates</string>
+        <string>        Coordinates</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="10">
+     <item row="6" column="11">
       <widget class="QCheckBox" name="grid_filter">
        <property name="text">
         <string/>
@@ -394,7 +394,7 @@ Events</string>
       </widget>
      </item>
      <item row="5" column="9">
-      <widget class="QSpinBox" name="wire_max">
+      <widget class="QSpinBox" name="layer_max">
        <property name="minimum">
         <number>1</number>
        </property>
@@ -494,29 +494,29 @@ Events</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="10">
+     <item row="5" column="11">
       <widget class="QSpinBox" name="grid_max">
        <property name="minimum">
-        <number>1</number>
+        <number>80</number>
        </property>
        <property name="maximum">
-        <number>40</number>
+        <number>119</number>
        </property>
        <property name="value">
-        <number>40</number>
+        <number>119</number>
        </property>
       </widget>
      </item>
-     <item row="3" column="10">
+     <item row="3" column="11">
       <widget class="QSpinBox" name="grid_min">
        <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
         <number>80</number>
        </property>
+       <property name="maximum">
+        <number>119</number>
+       </property>
        <property name="value">
-        <number>1</number>
+        <number>80</number>
        </property>
       </widget>
      </item>
@@ -524,6 +524,55 @@ Events</string>
       <widget class="QLineEdit" name="ToF_max">
        <property name="text">
         <string>71429</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="10">
+      <widget class="QLabel" name="label_39">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>  Row</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="10">
+      <widget class="QSpinBox" name="row_min">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>12</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="10">
+      <widget class="QSpinBox" name="row_max">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>12</number>
+       </property>
+       <property name="value">
+        <number>12</number>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="10">
+      <widget class="QCheckBox" name="row_filter">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -1514,7 +1563,7 @@ Resolution</string>
     <property name="geometry">
      <rect>
       <x>1052</x>
-      <y>360</y>
+      <y>362</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -1552,7 +1601,7 @@ Resolution</string>
      </rect>
     </property>
     <property name="text">
-     <string>ToF</string>
+     <string>ToF - single</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_24">
@@ -1930,7 +1979,7 @@ MG and He-3</string>
     <property name="geometry">
      <rect>
       <x>1052</x>
-      <y>340</y>
+      <y>341</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -1956,7 +2005,7 @@ MG and He-3</string>
     <property name="geometry">
      <rect>
       <x>1052</x>
-      <y>380</y>
+      <y>383</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -1989,6 +2038,19 @@ MG and He-3</string>
     </property>
     <property name="text">
      <string>Load ('.h5')</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ToF_MG_vs_ToF_He3_button">
+    <property name="geometry">
+     <rect>
+      <x>1052</x>
+      <y>404</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ToF vs MG-ToF</string>
     </property>
    </widget>
   </widget>
