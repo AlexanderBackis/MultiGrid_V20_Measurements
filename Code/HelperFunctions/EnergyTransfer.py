@@ -54,7 +54,6 @@ def get_distances(origin_voxel):
                                  sample position.
     """
     mapping = create_mapping(origin_voxel)
-    distance_source_chopper_to_slit_2 = 28.182  # [m]
     distances = np.zeros((3, 120, 80), dtype='float')
     for bus in range(0, 3):
         for gCh in range(80, 120):
@@ -63,5 +62,5 @@ def get_distances(origin_voxel):
                 x = coordinate['x']
                 y = coordinate['y']
                 z = coordinate['z']
-                distances[bus, gCh, wCh] = np.sqrt(x ** 2 + y ** 2 + z ** 2) + distance_source_chopper_to_slit_2 
+                distances[bus, gCh, wCh] = np.sqrt(x ** 2 + y ** 2 + z ** 2)
     return distances
