@@ -24,6 +24,7 @@ from FileHandling.Storage import save_data, load_data
 from HeliumTubes.FileHandlingHe3 import unzip_He3_data, import_He3_data, save_He3_data, load_He3_data
 from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot, energy_plot_He3
 from HeliumTubes.FilteringHe3 import get_He3_filter_parameters, filter_He3
+from HeliumTubes.EnergyHe3 import calculate_He3_energy
 # Helper functions
 from HelperFunctions.CreateMapping import create_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
@@ -45,7 +46,7 @@ from Plotting.Analysis.DeltaE import energy_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
-from Plotting.Analysis.Lineshape import analyze_Lineshape
+from Plotting.Analysis.Lineshape import analyze_Lineshape, analyze_all_lineshapes
 # Animation
 from Plotting.Analysis.Animation3D import Animation_3D_plot
 from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
@@ -89,7 +90,6 @@ class MainWindow(QMainWindow):
     def cluster_action(self):
         zip_paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
         if len(zip_paths) > 0:
-            self.set_clustering_parameters()
             # Import
             data = ()
             data_sets_temp = '<br/>'
@@ -125,19 +125,17 @@ class MainWindow(QMainWindow):
     def save_action(self):
         path = QFileDialog.getSaveFileName()[0]
         if path != '':
-            save_data(path, self.ce, self.e, self.data_sets, self.adc_threshold, self.ILL_buses)
+            save_data(path, self.ce, self.e, self.data_sets)
 
     def load_action(self):
         path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
         if path != '':
-            clusters, events, data_sets_temp, adc_threshold_temp, ILL_buses_temp = load_data(path)
+            clusters, events, data_sets_temp = load_data(path)
             # Write or append
             if self.write.isChecked():
                 self.ce = clusters
                 self.e = events
                 self.data_sets = data_sets_temp
-                self.adc_threshold = adc_threshold_temp
-                self.ILL_buses = ILL_buses_temp
             else:
                 self.ce = self.ce.append(clusters)
                 self.e = self.e.append(events)
@@ -319,6 +317,45 @@ class MainWindow(QMainWindow):
             energy_plot(ce_filtered, origin_voxel, number_bins, start, stop, plot_energy)
             fig.show()
 
+    def Wavelength_overlay_action(self):
+        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        number_bins = int(self.dE_bins.text())
+        origin_voxel = [int(self.bus_origin.text()),
+                        int(self.gCh_origin.text()),
+                        int(self.wCh_origin.text())]
+        MG_filter_parameters = get_filter_parameters(self)
+        He3_filter_parameters = get_He3_filter_parameters(self)
+        fig = plt.figure()
+        # Multi-Grid
+        for path in paths:
+            label = path.rsplit('/', 1)[-1]
+            ce = pd.read_hdf(path, 'ce')
+            ce_filtered = filter_clusters(ce, MG_filter_parameters)
+            duration = get_duration(ce)
+            norm = 1/duration
+            energy = calculate_energy(ce_filtered, origin_voxel)
+            plt.hist(meV_to_A(energy), bins=number_bins, range=[0, 10], zorder=5,
+                     histtype='step', label=label, weights=norm*np.ones(len(energy)))
+        # He-3
+        He3_df_red = filter_He3(self.He3_df, He3_filter_parameters)
+        energy_He3 = calculate_He3_energy(He3_df_red)
+        norm_He3 = 1/54304
+        plt.hist(meV_to_A(energy_He3), bins=number_bins, range=[0, 10], zorder=5,
+                 histtype='step',
+                 label='2019_09_HZB_He3InBeam54304s_overnight.lst',
+                 weights=norm*np.ones(len(energy_He3)))
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        plt.ylabel('Counts (Normalized to duration)')
+        plt.xlabel('Wavelength [Å]')
+        plt.title('Wavelength Distribution')
+        fig.show()
+
+
+
+
+
+
     def Count_Rate_action(self):
         if (self.data_sets != ''):
             filter_parameters = get_filter_parameters(self)
@@ -367,23 +404,30 @@ class MainWindow(QMainWindow):
             print('FWHM: %.2f' % FWHM)
 
     def Lineshape_action(self):
-        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
-        if len(paths) > 0:
-            path = paths[0]
-            # Declare parameters
-            filter_parameters = get_filter_parameters(self)
-            number_bins = int(self.dE_bins.text())
-            origin_voxel = [int(self.bus_origin.text()),
-                            int(self.gCh_origin.text()),
-                            int(self.wCh_origin.text())]
-            # Plot
-            ce_MG = pd.read_hdf(path, 'ce')
-            ce_MG_filtered = filter_clusters(ce_MG, filter_parameters)
-            parameters = get_He3_filter_parameters(self)
-            ce_He3_filtered = filter_He3(self.He3_df, parameters)
-            fig = plt.figure()
-            analyze_Lineshape(ce_MG_filtered, ce_He3_filtered, origin_voxel)
-            fig.show()
+        #paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        #if len(paths) > 0:
+        #    path = paths[0]
+        #    # Declare parameters
+        #    filter_parameters = get_filter_parameters(self)
+        #    number_bins = int(self.dE_bins.text())
+        #    origin_voxel = [int(self.bus_origin.text()),
+        #                    int(self.gCh_origin.text()),
+        #                    int(self.wCh_origin.text())]
+        #    # Plot
+        #    ce_MG = pd.read_hdf(path, 'ce')
+        #    ce_MG_filtered = filter_clusters(ce_MG, filter_parameters)
+        #    parameters = get_He3_filter_parameters(self)
+        #    ce_He3_filtered = filter_He3(self.He3_df, parameters)
+        #    fig = plt.figure()
+        #    analyze_Lineshape(ce_MG_filtered, ce_He3_filtered, origin_voxel)
+        #    fig.show()
+
+        origin_voxel = [int(self.bus_origin.text()),
+                        int(self.gCh_origin.text()),
+                        int(self.wCh_origin.text())]
+        MG_filter_parameters = get_filter_parameters(self)
+        He3_filter_parameters = get_He3_filter_parameters(self)
+        analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parameters)
 
     # ==== Animation ==== #
 
@@ -539,6 +583,7 @@ class MainWindow(QMainWindow):
         self.efficiency_button.clicked.connect(self.Efficiency_action)
         self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
         self.lineshape_button.clicked.connect(self.Lineshape_action)
+        self.Wavelength_Overlay_button.clicked.connect(self.Wavelength_overlay_action)
         # Animation
         self.time_sweep_button.clicked.connect(self.time_sweep_action)
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
@@ -572,13 +617,6 @@ class MainWindow(QMainWindow):
         information_text += '<br/><b>Data sets:</b> ' + self.He3_data_sets
         self.He3_information_window.setText(information_text)
 
-    def set_clustering_parameters(self):
-        self.ILL_buses = [self.ILL_bus_1.value(), self.ILL_bus_2.value(), self.ILL_bus_3.value()]
-        self.maximum_file_size_in_mb = float(self.maximum_file_size_in_mb_value.text())
-        self.adc_threshold = float(self.adc_threshold_value.text())
-
-
-
 
 
 # =============================================================================
@@ -596,6 +634,9 @@ def get_duration(df):
     duration_in_TDC_channels = sum(times[resets]) + times[-1]
     duration_in_seconds = duration_in_TDC_channels * 62.5e-9
     return duration_in_seconds
+
+def meV_to_A(energy):
+    return np.sqrt(81.81/energy)
 
 
 # =============================================================================

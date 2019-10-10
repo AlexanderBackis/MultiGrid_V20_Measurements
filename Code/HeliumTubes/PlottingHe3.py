@@ -104,7 +104,7 @@ def energy_plot_He3(df, number_bins, plot_energy=False, label=None, useMaxNorm=F
                                        zorder=5, histtype='step',
                                        label=label,
                                        weights=norm,
-                                       linestyle='--')
+                                       linestyle='-')
     else:
         plt.xlabel('Wavelength [Å]')
         plt.title('Wavelength Distribution')
@@ -113,7 +113,7 @@ def energy_plot_He3(df, number_bins, plot_energy=False, label=None, useMaxNorm=F
                                        histtype='step',
                                        label=label,
                                        weights=norm,
-                                       linestyle='--')
+                                       linestyle='-')
     bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
