@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1210</width>
-    <height>643</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -996,13 +996,13 @@ Events</string>
     <property name="geometry">
      <rect>
       <x>480</x>
-      <y>268</y>
+      <y>289</y>
       <width>121</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Wavelength</string>
+     <string>Energy</string>
     </property>
    </widget>
    <widget class="QPushButton" name="efficiency_button">
@@ -1809,17 +1809,17 @@ MG and He-3</string>
      <string>Channel</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="energy_button_2">
+   <widget class="QPushButton" name="wavelength_button">
     <property name="geometry">
      <rect>
       <x>480</x>
-      <y>289</y>
+      <y>268</y>
       <width>121</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Energy</string>
+     <string>Wavelength</string>
     </property>
    </widget>
    <widget class="QPushButton" name="he3_energy_button">

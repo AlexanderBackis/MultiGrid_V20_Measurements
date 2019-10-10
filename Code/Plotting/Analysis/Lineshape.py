@@ -21,6 +21,12 @@ from HeliumTubes.PlottingHe3 import energy_plot_He3
 # =============================================================================
 
 def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
+    """
+
+    Non-Coated One Voxel: 800, 100
+    Coated, Full Volume: 40000, 10000
+
+    """
     def Gaussian(x, a, x0, sigma):
         return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
@@ -40,11 +46,12 @@ def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
     He3_energies = calculate_He3_energy(ce_He3)
     hist_He3, bin_centers_He3 = energy_plot_He3(ce_He3, number_bins,
                                                 plot_energy, label_He3)
+    plt.legend()
     # Find peaks
     bins_part_1 = number_bins - number_bins//3
     bins_part_2 = number_bins//3
-    heights_part1 = np.ones(bins_part_1)*12000
-    heights_part2 = np.ones(bins_part_2)*1000
+    heights_part1 = np.ones(bins_part_1)*20000
+    heights_part2 = np.ones(bins_part_2)*10000
     heights = np.append(heights_part1, heights_part2)
     plt.plot(bin_centers[:bins_part_1], heights_part1, color='purple')
     plt.plot(bin_centers[bins_part_1:], heights_part2, color='purple')
@@ -100,7 +107,7 @@ def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
             plt.axvline(x=x0 + sigma, color='green', linewidth=2, label='σ')
             # Plot Gaussian
             xx = np.linspace(left_fit, right_fit, 1000)
-            plt.plot(xx, Gaussian(xx, a, x0, sigma)/a, color='green', label='Gaussian fit')
+            #plt.plot(xx, Gaussian(xx, a, x0, sigma)/a, color='green', label='Gaussian fit')
         except:
             print("Unexpected error:", sys.exc_info())
         # Define MG normalization
@@ -119,6 +126,7 @@ def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
         plt.title('Peak at: %.2f meV (%.2f Å)' % (bin_centers[peak], meV_to_A(bin_centers[peak])))
         plt.xlabel('Energy [meV]')
         plt.ylabel('Counts (Normalized to maximum height)')
+        #plt.yscale('log')
         # Plot He-3 data
         He3_peak_energies = He3_energies[(He3_energies >= left_fit) & (He3_energies <= right_fit)]
         He3_peak_hist, He3_peak_edges = np.histogram(He3_peak_energies,
@@ -144,10 +152,11 @@ def analyze_Lineshape(ce_MG, ce_He3, origin_voxel):
         fig_temp.savefig(output_path, bbox_inches='tight')
 
 
-
 # =============================================================================
 #                                HELPER FUNCTIONS
 # =============================================================================
+
+
 
 
 def find_nearest(array, value):

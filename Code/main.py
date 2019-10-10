@@ -298,7 +298,25 @@ class MainWindow(QMainWindow):
                             int(self.gCh_origin.text()),
                             int(self.wCh_origin.text())]
             fig = plt.figure()
-            energy_plot(ce_filtered, origin_voxel, number_bins)
+            start = 1
+            stop = 10
+            plot_energy = True
+            energy_plot(ce_filtered, origin_voxel, number_bins, start, stop, plot_energy)
+            fig.show()
+
+    def Wavelength_action(self):
+        if (self.data_sets != ''):
+            filter_parameters = get_filter_parameters(self)
+            ce_filtered = filter_clusters(self.ce, filter_parameters)
+            number_bins = int(self.dE_bins.text())
+            origin_voxel = [int(self.bus_origin.text()),
+                            int(self.gCh_origin.text()),
+                            int(self.wCh_origin.text())]
+            fig = plt.figure()
+            start = 1
+            stop = 10
+            plot_energy = False
+            energy_plot(ce_filtered, origin_voxel, number_bins, start, stop, plot_energy)
             fig.show()
 
     def Count_Rate_action(self):
@@ -515,6 +533,7 @@ class MainWindow(QMainWindow):
         self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         self.Coincidences_Projections_button.clicked.connect(self.Coincidences_Projections_action)
         # Analysis
+        self.wavelength_button.clicked.connect(self.Wavelength_action)
         self.energy_button.clicked.connect(self.Energy_action)
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
         self.efficiency_button.clicked.connect(self.Efficiency_action)
