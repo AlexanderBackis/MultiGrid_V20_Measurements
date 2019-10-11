@@ -34,8 +34,6 @@ def calculate_energy(df, origin_voxel):
     buses = df.Bus
     ToF = (df.ToF * 62.5e-9 + time_offset) % period_time
     d = distance_mapping[buses, gChs, wChs]
-    print('DISTANCES')
-    print(d)
     # Calculate energy Ef of detected neutron
     energy = ((NEUTRON_MASS/2) * ((d/ToF) ** 2)) * JOULE_TO_meV
     return energy.values

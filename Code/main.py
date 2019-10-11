@@ -46,7 +46,7 @@ from Plotting.Analysis.DeltaE import energy_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
-from Plotting.Analysis.Lineshape import analyze_Lineshape, analyze_all_lineshapes
+from Plotting.Analysis.Lineshape import analyze_all_lineshapes
 # Animation
 from Plotting.Analysis.Animation3D import Animation_3D_plot
 from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
@@ -327,7 +327,7 @@ class MainWindow(QMainWindow):
         He3_filter_parameters = get_He3_filter_parameters(self)
         fig = plt.figure()
         # Multi-Grid
-        for path in paths:
+        for i, path in enumerate(paths):
             label = path.rsplit('/', 1)[-1]
             ce = pd.read_hdf(path, 'ce')
             ce_filtered = filter_clusters(ce, MG_filter_parameters)
@@ -336,6 +336,7 @@ class MainWindow(QMainWindow):
             energy = calculate_energy(ce_filtered, origin_voxel)
             plt.hist(meV_to_A(energy), bins=number_bins, range=[0, 10], zorder=5,
                      histtype='step', label=label, weights=norm*np.ones(len(energy)))
+            print('Progress: %d/%d' % (i+1, len(paths)))
         # He-3
         He3_df_red = filter_He3(self.He3_df, He3_filter_parameters)
         energy_He3 = calculate_He3_energy(He3_df_red)
@@ -349,6 +350,7 @@ class MainWindow(QMainWindow):
         plt.ylabel('Counts (Normalized to duration)')
         plt.xlabel('Wavelength [Å]')
         plt.title('Wavelength Distribution')
+        plt.legend(loc=1)
         fig.show()
 
 
@@ -404,24 +406,6 @@ class MainWindow(QMainWindow):
             print('FWHM: %.2f' % FWHM)
 
     def Lineshape_action(self):
-        #paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
-        #if len(paths) > 0:
-        #    path = paths[0]
-        #    # Declare parameters
-        #    filter_parameters = get_filter_parameters(self)
-        #    number_bins = int(self.dE_bins.text())
-        #    origin_voxel = [int(self.bus_origin.text()),
-        #                    int(self.gCh_origin.text()),
-        #                    int(self.wCh_origin.text())]
-        #    # Plot
-        #    ce_MG = pd.read_hdf(path, 'ce')
-        #    ce_MG_filtered = filter_clusters(ce_MG, filter_parameters)
-        #    parameters = get_He3_filter_parameters(self)
-        #    ce_He3_filtered = filter_He3(self.He3_df, parameters)
-        #    fig = plt.figure()
-        #    analyze_Lineshape(ce_MG_filtered, ce_He3_filtered, origin_voxel)
-        #    fig.show()
-
         origin_voxel = [int(self.bus_origin.text()),
                         int(self.gCh_origin.text()),
                         int(self.wCh_origin.text())]

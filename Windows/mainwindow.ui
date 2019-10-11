@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1210</width>
-    <height>643</height>
+    <height>656</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
       <x>-10</x>
       <y>450</y>
       <width>831</width>
-      <height>161</height>
+      <height>167</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
@@ -296,7 +296,8 @@
      <item row="0" column="9" colspan="3">
       <widget class="QLabel" name="label_20">
        <property name="text">
-        <string>        Coordinates</string>
+        <string>           Coordinates
+         (                       )</string>
        </property>
       </widget>
      </item>
@@ -1886,6 +1887,22 @@ MG and He-3</string>
     <property name="text">
      <string>Wavelength
 Overlay</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="inverse_button">
+    <property name="geometry">
+     <rect>
+      <x>724</x>
+      <y>479</y>
+      <width>71</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Inverse</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
