@@ -33,6 +33,7 @@ def PHS_1D_plot(events, clusters, number_bins):
     titles = ['Wires', 'Grids']
     limits = [[0, 79], [80, 119]]
     ADC_types = ['wADC', 'gADC']
+    print('Number bins: %d' % number_bins)
     for i, (title, limit, ADC_type) in enumerate(zip(titles, limits, ADC_types)):
         plt.subplot(1, 2, i+1)
         # Set figure properties
@@ -43,12 +44,13 @@ def PHS_1D_plot(events, clusters, number_bins):
         plt.grid(True, which='major', linestyle='--', zorder=0)
         plt.grid(True, which='minor', linestyle='--', zorder=0)
         # Separate wires and grids
-        indices_to_use = ((events['Ch'] >= limit[0]) & (events['Ch'] <= limit[1]))
+        #indices_to_use = ((events['Ch'] >= limit[0]) & (events['Ch'] <= limit[1]))
         # Calculate histogram
-        plt.hist(events[indices_to_use].ADC, bins=number_bins, range=[0, 4400],
-                 histtype='step', color='blue', label='Events', zorder=5)
-        plt.hist(clusters[ADC_type], bins=number_bins, range=[0, 4400],
+        #plt.hist(events[indices_to_use].ADC, bins=number_bins, range=[0, 4400],
+        #         histtype='step', color='blue', label='Events', zorder=5)
+        plt.hist(clusters[ADC_type], bins=number_bins,
                  histtype='step', color='red', label='Clusters', zorder=5)
+        print(clusters[ADC_type])
         plt.legend()
     plt.tight_layout()
     return fig

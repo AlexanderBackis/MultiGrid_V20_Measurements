@@ -35,7 +35,7 @@ def PHS_wires_vs_grids_plot(ce, bus_start, bus_stop):
         plt.ylabel('Collected charge grids [ADC channels]')
         plt.title(sub_title)
         bins = [200, 200]
-        ADC_range = [[0, 5000], [0, 5000]]
+        ADC_range = [[0, 10000], [0, 10000]]
         plt.hist2d(ce.wADC, ce.gADC, bins=bins, norm=LogNorm(), range=ADC_range,
                    vmin=vmin, vmax=vmax, cmap='jet')
         plt.colorbar()

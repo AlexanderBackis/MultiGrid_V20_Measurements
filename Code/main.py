@@ -47,6 +47,7 @@ from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
 from Plotting.Analysis.Lineshape import analyze_all_lineshapes
+from Plotting.Analysis.Layers import investigate_layers_ToF, investigate_layers_FWHM
 # Animation
 from Plotting.Analysis.Animation3D import Animation_3D_plot
 from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
@@ -147,6 +148,7 @@ class MainWindow(QMainWindow):
             self.measurement_time = get_duration(self.ce)
             self.fill_MG_information_window()
             self.refresh_window()
+        print(self.ce)
 
 
     # =========================================================================
@@ -353,11 +355,6 @@ class MainWindow(QMainWindow):
         plt.legend(loc=1)
         fig.show()
 
-
-
-
-
-
     def Count_Rate_action(self):
         if (self.data_sets != ''):
             filter_parameters = get_filter_parameters(self)
@@ -412,6 +409,18 @@ class MainWindow(QMainWindow):
         MG_filter_parameters = get_filter_parameters(self)
         He3_filter_parameters = get_He3_filter_parameters(self)
         analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parameters)
+
+    def Layers_action(self):
+        # Extract origin voxel
+        origin_voxel = [int(self.bus_origin.text()),
+                        int(self.gCh_origin.text()),
+                        int(self.wCh_origin.text())]
+        # Perform initial filter on data
+        filter_parameters = get_filter_parameters(self)
+        ce_filtered = filter_clusters(self.ce, filter_parameters)
+        #investigate_layers_ToF(ce_filtered)
+        investigate_layers_FWHM(ce_filtered, origin_voxel)
+
 
     # ==== Animation ==== #
 
@@ -568,6 +577,7 @@ class MainWindow(QMainWindow):
         self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
         self.lineshape_button.clicked.connect(self.Lineshape_action)
         self.Wavelength_Overlay_button.clicked.connect(self.Wavelength_overlay_action)
+        self.layers_button.clicked.connect(self.Layers_action)
         # Animation
         self.time_sweep_button.clicked.connect(self.time_sweep_action)
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)

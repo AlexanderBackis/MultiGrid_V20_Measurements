@@ -10,7 +10,7 @@ import numpy as np
 #                        CALCULATE ENERGY TRANSFER
 # =============================================================================
 
-def calculate_He3_energy(df):
+def calculate_He3_energy(df, distance_offset=0):
     """
     Calculates the energy transfer of a data set. Distance is from source
     chopper to the center of the tube.
@@ -24,7 +24,7 @@ def calculate_He3_energy(df):
     # Declare necessary constants, neutron mass in [kg], DISTANCE in [m]
     NEUTRON_MASS = 1.674927351e-27 # [kg]
     JOULE_TO_meV = 6.24150913e18 * 1000
-    DISTANCE = 28.239 # [m]
+    DISTANCE = 28.239 + distance_offset # [m]
     time_offset = 0.6e-3 # [s]
     period_time = (1/14) # [s]
     ToF = (df.ToF * 8e-9 + time_offset) % period_time

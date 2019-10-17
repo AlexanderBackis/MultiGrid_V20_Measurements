@@ -15,11 +15,11 @@ from scipy.signal import find_peaks, peak_widths, peak_prominences
 from scipy.optimize import curve_fit
 
 from HelperFunctions.PathsAndFolders import mkdir_p
+from HelperFunctions.Filtering import filter_clusters
+from HelperFunctions.Fitting import fit_data, get_fit_parameters_guesses, get_hist
 
 from HeliumTubes.EnergyHe3 import calculate_He3_energy
 from HeliumTubes.PlottingHe3 import energy_plot_He3
-
-from HelperFunctions.Filtering import filter_clusters
 from HeliumTubes.FilteringHe3 import filter_He3
 
 # =============================================================================
@@ -30,35 +30,51 @@ from HeliumTubes.FilteringHe3 import filter_He3
 def analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parameters):
     # Define parameters
     colors = {'MG_Coated': 'blue', 'MG_Non_Coated': 'green', 'He3': 'red'}
+
     # Prepare data
     full_data = prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters)
     MG_coated_data, MG_non_coated_data, He3_data = full_data[0], full_data[1], full_data[4]
     MG_coated_background, MG_non_coated_background, He3_background = full_data[2], full_data[3], full_data[5]
+
     # Plot all individual peaks
-    #plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'])
-    #plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'])
-    #plot_all_peaks(He3_data, 'He3', colors['He3'])
+    plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'])
+    plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'])
+    plot_all_peaks(He3_data, 'He3', colors['He3'])
+
     # Plot MG compared to He-3
     plot_all_peaks_from_two_data_sets(MG_coated_data, 'MG_Coated', colors['MG_Coated'], He3_data, 'He3', colors['He3'])
     plot_all_peaks_from_two_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], He3_data, 'He3', colors['He3'])
+
     # Plot Coated Radial blades compared to non-coated radial blades
     plot_all_peaks_from_two_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], MG_coated_data, 'MG_Coated', colors['MG_Coated'])
+
     # Plot data with background and extract important values
-    FWHM_Coated, FoM_Coated, err_Coated, energies_Coated = plot_all_peaks_with_background(MG_coated_data, 'MG_Coated', colors['MG_Coated'], MG_coated_background)
-    FWHM_NonCoated, FoM_NonCoated, err_NonCoated, energies_NonCoated = plot_all_peaks_with_background(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], MG_non_coated_background)
-    FWHM_He3, FoM_He3, err_He3, energies_He3 = plot_all_peaks_with_background(He3_data, 'He3', colors['He3'], He3_background)
+    #FWHM_Coated, FoM_Coated, err_Coated, energies_Coated = plot_all_peaks_with_background(MG_coated_data, 'MG_Coated', colors['MG_Coated'], MG_coated_background)
+    #FWHM_NonCoated, FoM_NonCoated, err_NonCoated, energies_NonCoated = plot_all_peaks_with_background(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], MG_non_coated_background)
+    #FWHM_He3, FoM_He3, err_He3, energies_He3 = plot_all_peaks_with_background(He3_data, 'He3', colors['He3'], He3_background)
+
     # Plot important values
     FWHMs = [FWHM_Coated, FWHM_NonCoated, FWHM_He3]
     energies = [energies_Coated, energies_NonCoated, energies_He3]
     labels = ['MG_Coated', 'MG_Non_Coated', 'He3']
     FoMs = [FoM_Coated, FoM_NonCoated, FoM_He3]
     errors = [err_Coated, err_NonCoated, err_He3]
+
     # Plot FWHM
     fig = plt.figure()
     for energy, FWHM, label in zip(energies, FWHMs, labels):
         plot_FWHM(energy, FWHM, label)
+
+    # Plot SEQUOIA data
+    dirname = os.path.dirname(__file__)
+    overview_folder = os.path.join(dirname, '../../../Tables/')
+    MG_SEQ_FWHM = np.loadtxt(overview_folder + 'MG_SEQ_FWHM.txt', delimiter=",")
+    MG_SEQ_Ei = np.loadtxt(overview_folder + 'MG_SEQ_Ei.txt', delimiter=",")
+    plt.plot(MG_SEQ_Ei, MG_SEQ_FWHM, marker='o', linestyle='-', zorder=5,
+             label='Multi-Grid: SEQUOIA', color='black')
     plt.legend()
     fig.show()
+
     # Plot FoM
     fig = plt.figure()
     for energy, FoM, error, label in zip(energies, FoMs, errors, labels):
@@ -77,6 +93,7 @@ def plot_FoM(energies, FoMs, errors, label):
 
 
 def plot_FWHM(energies, FWHMs, label):
+    # Plot V20 data
     plt.title('FWHM')
     plt.ylabel('FWHM [meV]')
     plt.xlabel('Peak energy [meV]')
@@ -112,7 +129,7 @@ def plot_all_peaks_with_background(data, label_data, color_data, background):
         hist_fit, bins_fit = get_hist(energies, number_bins, left_fit, right_fit)
         try:
             # Fit data
-            a, x0, sigma = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
+            a, x0, sigma, *_ = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
             fig = plt.figure()
             plot_sigma_borders(x0, sigma)
             # Prepare data within +/- 25 of our estimated sigma, we'll use this to plot
@@ -173,29 +190,33 @@ def plot_all_peaks_from_two_data_sets(data_1, label_1, color_1, data_2, label_2,
         hist_fit, bins_fit = get_hist(energies, number_bins, left_fit, right_fit)
         try:
             # Fit data
-            a, x0, sigma = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
+            a, x0, sigma, *_ = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
             fig = plt.figure()
             plot_sigma_borders(x0, sigma)
             # Prepare data within +/- 25 of our estimated sigma, we'll use this to plot
-            left_plot, right_plot = (x0 - (25 * sigma)), (x0+ (25 * sigma))
+            left_plot, right_plot = (x0 - (7 * sigma)), (x0 + (7 * sigma))
             hist_plot, bins_plot = get_hist(energies, number_bins, left_plot, right_plot)
             # Plot from main data
             norm_1 = 1/max(hist_plot)
-            plt.plot(bins_plot, hist_plot*norm_1, marker='o', linestyle='-', label=label_1,
-                     zorder=5, color=color_1)
+            #plt.plot(bins_plot, hist_plot*norm_1, marker='o', linestyle='-', label=label_1,
+            #         zorder=5, color=color_1)
+            plt.errorbar(bins_plot, hist_plot*norm_1, np.sqrt(hist_plot)*norm_1, fmt='.-',
+                         capsize=5, zorder=5, label=label_1, color=color_1)
             # Plot from second data
             hist_2, bins_2 = get_hist(energies_2, number_bins, left_plot, right_plot)
             norm_2 = 1/max(hist_2)
-            plt.plot(bins_2, hist_2*norm_2, marker='o', linestyle='-', label=label_2,
-                     zorder=5, color=color_2)
+            #plt.plot(bins_2, hist_2*norm_2, marker='o', linestyle='-', label=label_2,
+            #         zorder=5, color=color_2)
+            plt.errorbar(bins_2, hist_2*norm_2, np.sqrt(hist_fit)*norm_2, fmt='.-',
+                         capsize=5, zorder=5, label=label_2, color=color_2)
             # Stylise plot
             plt.grid(True, which='major', linestyle='--', zorder=0)
             plt.grid(True, which='minor', linestyle='--', zorder=0)
             plt.title('Peak at: %.2f meV (%.2f Å)' % (bins[peak], meV_to_A(bins[peak])))
             plt.xlabel('Energy [meV]')
             plt.ylabel('Counts (Normalized to maximum)')
-            plt.xlim(x0 - (25 * sigma), x0 + (25 * sigma))
-            plt.yscale('log')
+            plt.xlim(x0 - (7 * sigma), x0 + (7 * sigma))
+            #plt.yscale('log')
             plt.legend(loc=1)
             # Save plot
             file_name = '%s_Peak_at_%.2f_meV_(%.2f_Å).pdf' % (label_1, bins[peak], meV_to_A(bins[peak]))
@@ -227,10 +248,13 @@ def plot_all_peaks(data, label, color):
         try:
             fig = plt.figure()
             # Fit data
-            a, x0, sigma = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
+            a, x0, sigma, x_fit, y_fit = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
+            plt.plot(x_fit, y_fit, label='Gaussian fit', color='black')
             plot_sigma_borders(x0, sigma)
-            plt.plot(bins_fit, hist_fit, marker='o', linestyle='-', label=label,
-                     zorder=5, color=color)
+            #plt.plot(bins_fit, hist_fit, marker='o', linestyle='-', label=label,
+            #         zorder=5, color=color)
+            plt.errorbar(bins_fit, hist_fit, np.sqrt(hist_fit), fmt='.-',
+                         capsize=5, zorder=5, label=label, color=color)
             # Stylise plot
             plt.grid(True, which='major', linestyle='--', zorder=0)
             plt.grid(True, which='minor', linestyle='--', zorder=0)
@@ -246,45 +270,6 @@ def plot_all_peaks(data, label, color):
             plt.close()
         except:
             print("Unexpected error:", sys.exc_info())
-
-
-def fit_data(hist, bins, a_guess, x0_guess, sigma_guess):
-    def Gaussian(x, a, x0, sigma):
-        return a*np.exp(-(x-x0)**2/(2*sigma**2))
-
-    popt, __ = curve_fit(Gaussian, bins, hist, p0=[a_guess, x0_guess, sigma_guess])
-    a, x0, sigma = popt[0], popt[1], abs(popt[2])
-    # Plot Gaussian
-    xx = np.linspace(bins[0], bins[-1], 1000)
-    plt.plot(xx, Gaussian(xx, a, x0, sigma), label='Gaussian fit', color='black')
-    return a, x0, sigma
-
-
-def plot_sigma_borders(x0, sigma):
-    plt.axvline(x=x0 - 5*sigma, color='orange', linewidth=2, label='-5σ')
-    plt.axvline(x=x0 - 3*sigma, color='purple', linewidth=2, label='-3σ')
-    plt.axvline(x=x0 - sigma, color='green', linewidth=2, label='-σ')
-    plt.axvline(x=x0 + sigma, color='green', linewidth=2, label='σ')
-
-
-
-
-
-def get_fit_parameters_guesses(hist, bins):
-    # Extract relavant parameters
-    maximum = max(hist)
-    maximum_idx = find_nearest(hist, maximum)
-    half_maximum = maximum/2
-    half_maximum_idx_1 = find_nearest(hist[:maximum_idx], half_maximum)
-    half_maximum_idx_2 = find_nearest(hist[maximum_idx:], half_maximum) + maximum_idx
-    FWHM = bins[half_maximum_idx_2] - bins[half_maximum_idx_1]
-    # Calculate guesses
-    a_guess = maximum
-    x0_guess = bins[maximum_idx]
-    sigma_guess = FWHM/(2*np.sqrt(2*np.log(2)))
-    return a_guess, x0_guess, sigma_guess
-
-
 
 
 def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
@@ -323,9 +308,10 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
     MG_NON_COATED = 'mvmelst_135_190930_141618_Det1_overnight2_30x80_14x60.h5'
     MG_NON_COATED_BACKGROUND = 'mvmelst_141_191001_120405_He3InBeam_overnight3.h5'
     HE_3 = '2019_09_HZB_He3InBeam54304s_overnight.h5'
-    HE_3_BACKGROUND = '2019_09_HZB_out_of_beam_overnight_58094s.h5'
+    HE_3_BACKGROUND = '2019_09_HZB_He_3_background_beam_blocked_by_boron_cadmium_9208s.h5'
     MG_file_names = [MG_COATED, MG_NON_COATED,
                      MG_COATED_BACKGROUND, MG_NON_COATED_BACKGROUND]
+    MG_distance_offsets = [1.5e-3, 0, 1.5e-3, 0]
     He3_file_names = [HE_3, HE_3_BACKGROUND]
     # Declare list to store all data
     full_data = []
@@ -336,7 +322,7 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
         df = pd.read_hdf(path, 'ce')
         df_red = filter_clusters(df, MG_filter_parameters)
         duration = get_duration(df)
-        energies = calculate_energy(df_red, origin_voxel)
+        energies = calculate_energy(df_red, origin_voxel, MG_distance_offsets[i])
         hist, bins = get_hist(energies, number_bins, start, end)
         data = [duration, energies, hist, bins]
         if i < 2:
@@ -346,13 +332,14 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
             data.extend([peaks, widths])
         full_data.append(data)
     # Store He-3 data
-    He3_durations = [54304, 58094]
+    He3_durations = [54304, 9208]
+    He3_distance_offset = 3e-3
     print('He-3...')
     for i, (file_name, duration) in enumerate(zip(He3_file_names, He3_durations)):
         path = os.path.join(dirname, '../../../Data/Lineshape/%s' % file_name)
         df = pd.read_hdf(path, 'df')
         df_red = filter_He3(df, He3_filter_parameters)
-        energies = calculate_He3_energy(df_red)
+        energies = calculate_He3_energy(df_red, He3_distance_offset)
         hist, bins = get_hist(energies, number_bins, start, end)
         data = [duration, energies, hist, bins]
         if i < 1:
@@ -415,11 +402,11 @@ def get_peaks(hist, heights, number_bins):
     peaks, *_ = find_peaks(hist, height=heights)
     return peaks
 
-
-def get_hist(energies, number_bins, start, stop):
-    hist, bin_edges = np.histogram(energies, bins=number_bins, range=[start, stop])
-    bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
-    return hist, bin_centers
+def plot_sigma_borders(x0, sigma):
+    plt.axvline(x=x0 - 5*sigma, color='orange', linewidth=2, label='-5σ')
+    plt.axvline(x=x0 - 3*sigma, color='purple', linewidth=2, label='-3σ')
+    plt.axvline(x=x0 - sigma, color='green', linewidth=2, label='-σ')
+    plt.axvline(x=x0 + sigma, color='green', linewidth=2, label='σ')
 
 
 def find_nearest(array, value):

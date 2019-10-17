@@ -18,7 +18,7 @@ import pandas as pd
 #                                CREATE MAPPING
 # =============================================================================
 
-def create_mapping(origin_voxel):
+def create_mapping(origin_voxel, distance_offset=0):
     """
     Creates a channel->coordinate mapping for the detector. We place our origin
     at the beam center, where z=0 is at the location of the slit.
@@ -36,7 +36,7 @@ def create_mapping(origin_voxel):
     hit_coordinate = mapping_temp[bus_origin, gCh_origin, wCh_origin]
     x_offset = -hit_coordinate['x']
     y_offset = -hit_coordinate['y']
-    z_offset = -hit_coordinate['z'] + 46.514e-3 + 28.366
+    z_offset = -hit_coordinate['z'] + 46.514e-3 + 28.366 + distance_offset
     offset = {'x': x_offset, 'y': y_offset, 'z': z_offset}
     mapping = create_channel_to_coordinate_map(theta, offset)
     return mapping
