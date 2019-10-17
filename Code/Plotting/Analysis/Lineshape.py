@@ -37,21 +37,21 @@ def analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parame
     MG_coated_background, MG_non_coated_background, He3_background = full_data[2], full_data[3], full_data[5]
 
     # Plot all individual peaks
-    plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'])
-    plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'])
-    plot_all_peaks(He3_data, 'He3', colors['He3'])
+    #plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'])
+    #plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'])
+    #plot_all_peaks(He3_data, 'He3', colors['He3'])
 
     # Plot MG compared to He-3
-    plot_all_peaks_from_two_data_sets(MG_coated_data, 'MG_Coated', colors['MG_Coated'], He3_data, 'He3', colors['He3'])
-    plot_all_peaks_from_two_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], He3_data, 'He3', colors['He3'])
+    #plot_all_peaks_from_two_data_sets(MG_coated_data, 'MG_Coated', colors['MG_Coated'], He3_data, 'He3', colors['He3'])
+    #plot_all_peaks_from_two_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], He3_data, 'He3', colors['He3'])
 
     # Plot Coated Radial blades compared to non-coated radial blades
-    plot_all_peaks_from_two_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], MG_coated_data, 'MG_Coated', colors['MG_Coated'])
+    #plot_all_peaks_from_two_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], MG_coated_data, 'MG_Coated', colors['MG_Coated'])
 
     # Plot data with background and extract important values
-    #FWHM_Coated, FoM_Coated, err_Coated, energies_Coated = plot_all_peaks_with_background(MG_coated_data, 'MG_Coated', colors['MG_Coated'], MG_coated_background)
-    #FWHM_NonCoated, FoM_NonCoated, err_NonCoated, energies_NonCoated = plot_all_peaks_with_background(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], MG_non_coated_background)
-    #FWHM_He3, FoM_He3, err_He3, energies_He3 = plot_all_peaks_with_background(He3_data, 'He3', colors['He3'], He3_background)
+    FWHM_Coated, FoM_Coated, err_Coated, energies_Coated = plot_all_peaks_with_background(MG_coated_data, 'MG_Coated', colors['MG_Coated'], MG_coated_background)
+    FWHM_NonCoated, FoM_NonCoated, err_NonCoated, energies_NonCoated = plot_all_peaks_with_background(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], MG_non_coated_background)
+    FWHM_He3, FoM_He3, err_He3, energies_He3 = plot_all_peaks_with_background(He3_data, 'He3', colors['He3'], He3_background)
 
     # Plot important values
     FWHMs = [FWHM_Coated, FWHM_NonCoated, FWHM_He3]
@@ -133,17 +133,22 @@ def plot_all_peaks_with_background(data, label_data, color_data, background):
             fig = plt.figure()
             plot_sigma_borders(x0, sigma)
             # Prepare data within +/- 25 of our estimated sigma, we'll use this to plot
-            left_plot, right_plot = (x0 - (25 * sigma)), (x0+ (25 * sigma))
+            left_plot, right_plot = (x0 - (25 * sigma)), (x0 + (25 * sigma))
             hist_plot, bins_plot = get_hist(energies, number_bins, left_plot, right_plot)
             # Plot from beam
             norm_beam = 1/duration
-            plt.plot(bins_plot, hist_plot*norm_beam, marker='o', linestyle='-', label=label_data,
-                     zorder=5, color=color_data)
+            #plt.plot(bins_plot, hist_plot*norm_beam, marker='o', linestyle='-', label=label_data,
+            #         zorder=5, color=color_data)
+            plt.errorbar(bins_plot, hist_plot*norm_beam, np.sqrt(hist_plot)*norm_beam, fmt='.-',
+                         capsize=5, zorder=5, label=label_data, color=color_data)
             # Plot from background
             hist_background, bins_background = get_hist(energies_background, number_bins, left_plot, right_plot)
             norm_background = 1/duration_background
-            plt.plot(bins_background, hist_background*norm_background, marker='o',
-                     linestyle='-', label='Background', zorder=5, color='black')
+            #plt.plot(bins_background, hist_background*norm_background, marker='o',
+            #         linestyle='-', label='Background', zorder=5, color='black')
+            plt.errorbar(bins_background, hist_background*norm_background,
+                         np.sqrt(hist_background)*norm_background, fmt='.-',
+                         capsize=5, zorder=5, label='Background', color='black')
             # Stylise plot
             plt.grid(True, which='major', linestyle='--', zorder=0)
             plt.grid(True, which='minor', linestyle='--', zorder=0)
@@ -308,7 +313,7 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
     MG_NON_COATED = 'mvmelst_135_190930_141618_Det1_overnight2_30x80_14x60.h5'
     MG_NON_COATED_BACKGROUND = 'mvmelst_141_191001_120405_He3InBeam_overnight3.h5'
     HE_3 = '2019_09_HZB_He3InBeam54304s_overnight.h5'
-    HE_3_BACKGROUND = '2019_09_HZB_He_3_background_beam_blocked_by_boron_cadmium_9208s.h5'
+    HE_3_BACKGROUND = '2019_09_HZB_out_of_beam_overnight_58094s.h5'
     MG_file_names = [MG_COATED, MG_NON_COATED,
                      MG_COATED_BACKGROUND, MG_NON_COATED_BACKGROUND]
     MG_distance_offsets = [1.5e-3, 0, 1.5e-3, 0]
@@ -332,7 +337,7 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
             data.extend([peaks, widths])
         full_data.append(data)
     # Store He-3 data
-    He3_durations = [54304, 9208]
+    He3_durations = [54304, 58094]
     He3_distance_offset = 3e-3
     print('He-3...')
     for i, (file_name, duration) in enumerate(zip(He3_file_names, He3_durations)):

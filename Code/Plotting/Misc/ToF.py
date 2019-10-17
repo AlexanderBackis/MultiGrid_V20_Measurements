@@ -30,6 +30,7 @@ def ToF_histogram(df, number_bins, label=None):
     plt.title('ToF')
     plt.xlabel('ToF [$\mu$s]')
     plt.ylabel('Counts')
+    plt.yscale('log')
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     # Histogram data

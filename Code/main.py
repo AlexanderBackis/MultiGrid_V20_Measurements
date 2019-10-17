@@ -52,6 +52,7 @@ from Plotting.Analysis.Layers import investigate_layers_ToF, investigate_layers_
 from Plotting.Analysis.Animation3D import Animation_3D_plot
 from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
 from Plotting.Analysis.TimeSweep import Time_Sweep_Animation
+from Plotting.Analysis.ToFSweep import ToF_Sweep_Animation
 
 
 # TEMP
@@ -456,6 +457,14 @@ class MainWindow(QMainWindow):
         Time_Sweep_Animation(ce_filtered, number_bins,
                              origin_voxel, bus_start, bus_stop)
 
+    def ToF_sweep_action(self):
+        filter_parameters = get_filter_parameters(self)
+        ce_filtered = filter_clusters(self.ce, filter_parameters)
+        number_bins = int(self.tofBins.text())
+        bus_start = self.module_min.value()
+        bus_stop = self.module_max.value()
+        ToF_Sweep_Animation(ce_filtered, number_bins, bus_start, bus_stop)
+
 
 
 
@@ -581,6 +590,7 @@ class MainWindow(QMainWindow):
         # Animation
         self.time_sweep_button.clicked.connect(self.time_sweep_action)
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
+        self.ToF_sweep_button.clicked.connect(self.ToF_sweep_action)
         # He-3 tubes
         self.he3_import_button.clicked.connect(self.Import_He3_action)
         self.he3_save_button.clicked.connect(self.Save_He3_action)
