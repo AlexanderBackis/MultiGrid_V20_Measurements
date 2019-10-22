@@ -75,5 +75,5 @@ def initiate_detector_border_lines(mapping):
                                 line=dict(color='rgb(0, 0, 500)',
                                           width=15),
                                 text='Neutron Beam')
-    b_traces.append(neutron_line)
+    #b_traces.append(neutron_line)
     return b_traces

@@ -7,6 +7,7 @@ DeltaE.py: Function which histograms energy transfer data
 from HelperFunctions.EnergyTransfer import calculate_energy
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.signal import find_peaks
 
 # =============================================================================
 #                             ENERGY TRANSFER

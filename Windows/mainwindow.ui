@@ -230,7 +230,7 @@
      <item row="5" column="8">
       <widget class="QSpinBox" name="module_max">
        <property name="maximum">
-        <number>5</number>
+        <number>8</number>
        </property>
        <property name="value">
         <number>2</number>
@@ -296,8 +296,7 @@
      <item row="0" column="9" colspan="3">
       <widget class="QLabel" name="label_20">
        <property name="text">
-        <string>           Coordinates
-         (                       )</string>
+        <string>           Coordinates</string>
        </property>
       </widget>
      </item>
@@ -1889,22 +1888,6 @@ MG and He-3</string>
 Overlay</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="inverse_button">
-    <property name="geometry">
-     <rect>
-      <x>724</x>
-      <y>479</y>
-      <width>71</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Inverse</string>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QPushButton" name="layers_button">
     <property name="geometry">
      <rect>
@@ -1916,6 +1899,19 @@ Overlay</string>
     </property>
     <property name="text">
      <string>Layers</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="peak_finding_button">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>350</y>
+      <width>121</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Peak Finding</string>
     </property>
    </widget>
   </widget>

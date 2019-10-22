@@ -14,6 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from HeliumTubes.EnergyHe3 import calculate_He3_energy
+from scipy.signal import find_peaks
 
 # =============================================================================
 #                               PHS - HELIUM-3
@@ -84,15 +85,18 @@ def energy_plot_He3(df, number_bins, plot_energy=False, label=None, useMaxNorm=F
         return (81.81/(wavelength ** 2))
     # Calculate DeltaE
     energy = calculate_He3_energy(df)
+    # Define lambda range
+    start = 1
+    end = 10
     # Select normalization
     if useMaxNorm is False:
         norm = 1 * np.ones(len(energy))
     else:
         if plot_energy:
-            hist_temp, _ = np.histogram(energy, bins=number_bins, range=[A_to_meV(10), A_to_meV(1)])
+            hist_temp, _ = np.histogram(energy, bins=number_bins, range=[A_to_meV(end), A_to_meV(start)])
             norm = (1/max(hist_temp))*np.ones(len(energy))
         else:
-            hist_temp, _ = np.histogram(meV_to_A(energy), bins=number_bins, range=[1, 10])
+            hist_temp, _ = np.histogram(meV_to_A(energy), bins=number_bins, range=[start, end])
             norm = (1/max(hist_temp))*np.ones(len(energy))
     # Plot data
     if plot_energy:
@@ -100,16 +104,27 @@ def energy_plot_He3(df, number_bins, plot_energy=False, label=None, useMaxNorm=F
         plt.title('Energy Distribution')
         plt.xscale('log')
         hist, bin_edges, *_ = plt.hist(energy, bins=number_bins,
-                                       range=[A_to_meV(10), A_to_meV(1)],
+                                       range=[A_to_meV(end), A_to_meV(start)],
                                        zorder=5, histtype='step',
                                        label=label,
                                        weights=norm,
                                        linestyle='-')
+        bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+        # Extract heights
+        heights = np.zeros(len(bin_centers))
+        heights[(bin_centers >= 0) & (bin_centers <= 2.5)] = 2000
+        heights[(bin_centers >= 2.5) & (bin_centers <= 50.0)] = 20000
+        heights[(bin_centers >= 50.0) & (bin_centers <= 70.0)] = 2000
+        heights[(bin_centers >= 70.0) & (bin_centers <= 100.0)] = 286
+        # Get peaks
+        peaks, *_ = find_peaks(hist, height=heights)
+        plt.plot(bin_centers[peaks], hist[peaks], marker='x', linestyle='', color='red')
+        plt.plot(bin_centers, heights, color='black')
     else:
         plt.xlabel('Wavelength [Å]')
         plt.title('Wavelength Distribution')
         hist, bin_edges, *_ = plt.hist(meV_to_A(energy), bins=number_bins,
-                                       range=[1, 10], zorder=5,
+                                       range=[start, end], zorder=5,
                                        histtype='step',
                                        label=label,
                                        weights=norm,

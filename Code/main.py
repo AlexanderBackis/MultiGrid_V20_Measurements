@@ -47,7 +47,8 @@ from Plotting.Analysis.CountRate import calculate_count_rate
 from Plotting.Analysis.Efficiency import calculate_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
 from Plotting.Analysis.Lineshape import analyze_all_lineshapes
-from Plotting.Analysis.Layers import investigate_layers_ToF, investigate_layers_FWHM
+from Plotting.Analysis.Layers import (investigate_layers_ToF, investigate_layers_FWHM,
+                                      investigate_layers_delta_ToF)
 # Animation
 from Plotting.Analysis.Animation3D import Animation_3D_plot
 from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
@@ -284,8 +285,15 @@ class MainWindow(QMainWindow):
             number_bins = int(self.tofBins.text())
             unit = 'hours'
             fig = plt.figure()
-            Time = (ce_filtered.Time*62.5e-9)/(60 ** 2)
-            timestamp_plot(Time, number_bins, unit)
+            bus_start = self.module_min.value()
+            bus_stop = self.module_max.value()
+            for Bus in np.arange(bus_start, bus_stop+1, 1):
+                df_temp = ce_filtered[ce_filtered.Bus == Bus]
+                if df_temp.shape[0] > 0:
+                    Time = (df_temp.Time*62.5e-9)/(60 ** 2)
+                    label = 'Bus %d' % Bus
+                    timestamp_plot(Time, number_bins, unit, label)
+            plt.legend(loc=2)
             fig.show()
 
     # ==== Analysis ==== #
@@ -299,7 +307,7 @@ class MainWindow(QMainWindow):
                             int(self.gCh_origin.text()),
                             int(self.wCh_origin.text())]
             fig = plt.figure()
-            start = 1
+            start = 7
             stop = 10
             plot_energy = True
             energy_plot(ce_filtered, origin_voxel, number_bins, start, stop, plot_energy)
@@ -417,10 +425,40 @@ class MainWindow(QMainWindow):
                         int(self.gCh_origin.text()),
                         int(self.wCh_origin.text())]
         # Perform initial filter on data
+        #filter_parameters = get_filter_parameters(self)
+        #ce_filtered = filter_clusters(self.ce, filter_parameters)
+        #investigate_layers_ToF(ce_filtered)
+        #investigate_layers_FWHM(ce_filtered, origin_voxel)
+
+
+        # Get MG data
+        MG_parameters = get_filter_parameters(self)
+        df_MG = filter_clusters(self.ce, MG_parameters)
+        # Get He3 data
+        He3_parameters = get_He3_filter_parameters(self)
+        df_He3 = filter_He3(self.He3_df, He3_parameters)
+        # Investigate ToF spread
+        investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel)
+
+    def peak_finding_action(self):
         filter_parameters = get_filter_parameters(self)
         ce_filtered = filter_clusters(self.ce, filter_parameters)
-        #investigate_layers_ToF(ce_filtered)
-        investigate_layers_FWHM(ce_filtered, origin_voxel)
+        number_bins = int(self.dE_bins.text())
+        origin_voxel = [int(self.bus_origin.text()),
+                        int(self.gCh_origin.text()),
+                        int(self.wCh_origin.text())]
+        energies = calculate_energy(ce_filtered, origin_voxel)
+        start_A = 1
+        stop_A = 10
+        start_meV = A_to_meV(stop_A)
+        stop_meV = A_to_meV(start_A)
+        hist, bins, *_ = plt.hist(energies, bins=number_bins,
+                                  range=[start_meV, stop_meV],
+                                  zorder=5, histtype='step')
+
+
+
+
 
 
     # ==== Animation ==== #
@@ -587,6 +625,7 @@ class MainWindow(QMainWindow):
         self.lineshape_button.clicked.connect(self.Lineshape_action)
         self.Wavelength_Overlay_button.clicked.connect(self.Wavelength_overlay_action)
         self.layers_button.clicked.connect(self.Layers_action)
+        self.peak_finding_button.clicked.connect(self.peak_finding_action)
         # Animation
         self.time_sweep_button.clicked.connect(self.time_sweep_action)
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
@@ -641,6 +680,9 @@ def get_duration(df):
 
 def meV_to_A(energy):
     return np.sqrt(81.81/energy)
+
+def A_to_meV(wavelength):
+    return (81.81/(wavelength ** 2))
 
 
 # =============================================================================

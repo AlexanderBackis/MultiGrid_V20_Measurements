@@ -37,16 +37,18 @@ def analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parame
     MG_coated_background, MG_non_coated_background, He3_background = full_data[2], full_data[3], full_data[5]
 
     # Plot all individual peaks
-    #plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'])
-    #plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'])
-    #plot_all_peaks(He3_data, 'He3', colors['He3'])
+    plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'])
+    plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'])
+    plot_all_peaks(He3_data, 'He3', colors['He3'])
 
     # Plot MG compared to He-3
     #plot_all_peaks_from_two_data_sets(MG_coated_data, 'MG_Coated', colors['MG_Coated'], He3_data, 'He3', colors['He3'])
     #plot_all_peaks_from_two_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], He3_data, 'He3', colors['He3'])
 
     # Plot Coated Radial blades compared to non-coated radial blades
-    #plot_all_peaks_from_two_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], MG_coated_data, 'MG_Coated', colors['MG_Coated'])
+    plot_all_peaks_from_three_data_sets(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'],
+                                        MG_coated_data, 'MG_Coated', colors['MG_Coated'],
+                                        He3_data, 'He3', colors['He3'])
 
     # Plot data with background and extract important values
     #FWHM_Coated, FoM_Coated, err_Coated, energies_Coated = plot_all_peaks_with_background(MG_coated_data, 'MG_Coated', colors['MG_Coated'], MG_coated_background)
@@ -54,7 +56,7 @@ def analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parame
     #FWHM_He3, FoM_He3, err_He3, energies_He3 = plot_all_peaks_with_background(He3_data, 'He3', colors['He3'], He3_background)
 
     # Plot difference between NonCoated and Coated
-    plot_difference_from_two_data_sets(MG_non_coated_data, MG_coated_data, 'MG_Non_Coated', 'MG_Coated')
+    #plot_difference_from_two_data_sets(MG_non_coated_data, MG_coated_data, 'MG_Non_Coated', 'MG_Coated')
 
 
     # Plot important values
@@ -234,7 +236,9 @@ def plot_all_peaks_with_background(data, label_data, color_data, background):
     return FWHM_list, FoM_list, uncertainites, peak_energies
 
 
-def plot_all_peaks_from_two_data_sets(data_1, label_1, color_1, data_2, label_2, color_2):
+def plot_all_peaks_from_three_data_sets(data_1, label_1, color_1,
+                                        data_2, label_2, color_2,
+                                        data_3, label_3, color_3):
     # Prepare output paths
     dirname = os.path.dirname(__file__)
     output_folder = os.path.join(dirname, '../../../Output/Comparison_%s_and_%s/' % (label_1, label_2))
@@ -242,6 +246,7 @@ def plot_all_peaks_from_two_data_sets(data_1, label_1, color_1, data_2, label_2,
     # Extract parameters
     energies, hist, bins, peaks, widths = data_1[1], data_1[2], data_1[3], data_1[4], data_1[5]
     energies_2 = data_2[1]
+    energies_3 = data_3[1]
     number_bins = 100
     # Iterate through all peaks
     for width, peak in zip(widths, peaks):
@@ -258,7 +263,7 @@ def plot_all_peaks_from_two_data_sets(data_1, label_1, color_1, data_2, label_2,
             fig = plt.figure()
             plot_sigma_borders(x0, sigma)
             # Prepare data within +/- 25 of our estimated sigma, we'll use this to plot
-            left_plot, right_plot = (x0 - (7 * sigma)), (x0 + (7 * sigma))
+            left_plot, right_plot = (x0 - (50 * sigma)), (x0 + (10 * sigma))
             hist_plot, bins_plot = get_hist(energies, number_bins, left_plot, right_plot)
             # Plot from main data
             norm_1 = 1/max(hist_plot)
@@ -267,17 +272,22 @@ def plot_all_peaks_from_two_data_sets(data_1, label_1, color_1, data_2, label_2,
             # Plot from second data
             hist_2, bins_2 = get_hist(energies_2, number_bins, left_plot, right_plot)
             norm_2 = 1/max(hist_2)
-            plt.errorbar(bins_2, hist_2*norm_2, np.sqrt(hist_fit)*norm_2, fmt='.-',
+            plt.errorbar(bins_2, hist_2*norm_2, np.sqrt(hist_2)*norm_2, fmt='.-',
                          capsize=5, zorder=5, label=label_2, color=color_2)
+            # Plot from third data
+            hist_3, bins_3 = get_hist(energies_3, number_bins, left_plot, right_plot)
+            norm_3 = 1/max(hist_3)
+            plt.errorbar(bins_3, hist_3*norm_3, np.sqrt(hist_3)*norm_3, fmt='.-',
+                         capsize=5, zorder=5, label=label_3, color=color_3)
             # Stylise plot
             plt.grid(True, which='major', linestyle='--', zorder=0)
             plt.grid(True, which='minor', linestyle='--', zorder=0)
             plt.title('Peak at: %.2f meV (%.2f Å)' % (bins[peak], meV_to_A(bins[peak])))
             plt.xlabel('Energy [meV]')
             plt.ylabel('Counts (Normalized to maximum)')
-            plt.xlim(x0 - (7 * sigma), x0 + (7 * sigma))
-            #plt.yscale('log')
-            plt.legend(loc=1)
+            plt.xlim(x0 - (50 * sigma), x0 + (10 * sigma))
+            plt.yscale('log')
+            plt.legend(loc=2)
             # Save plot
             file_name = '%s_Peak_at_%.2f_meV_(%.2f_Å).pdf' % (label_1, bins[peak], meV_to_A(bins[peak]))
             output_path = output_folder + file_name
@@ -298,14 +308,14 @@ def plot_all_peaks(data, label, color):
     number_bins = 100
     # Iterate through all peaks
     for width, peak in zip(widths, peaks):
-        # Extract fit guesses and peak borders
-        left, right = bins[peak]-width/20, bins[peak]+width/20
-        hist_peak, bins_peak = get_hist(energies, number_bins, left, right)
-        a_guess, x0_guess, sigma_guess = get_fit_parameters_guesses(hist_peak, bins_peak)
-        # Prepare peak within +/- 7 of our estimated sigma
-        left_fit, right_fit = (x0_guess - (7 * sigma_guess)), (x0_guess + (7 * sigma_guess))
-        hist_fit, bins_fit = get_hist(energies, number_bins, left_fit, right_fit)
         try:
+            # Extract fit guesses and peak borders
+            left, right = bins[peak]-width/20, bins[peak]+width/20
+            hist_peak, bins_peak = get_hist(energies, number_bins, left, right)
+            a_guess, x0_guess, sigma_guess = get_fit_parameters_guesses(hist_peak, bins_peak)
+            # Prepare peak within +/- 7 of our estimated sigma
+            left_fit, right_fit = (x0_guess - (7 * sigma_guess)), (x0_guess + (7 * sigma_guess))
+            hist_fit, bins_fit = get_hist(energies, number_bins, left_fit, right_fit)
             fig = plt.figure()
             # Fit data
             a, x0, sigma, x_fit, y_fit = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
@@ -359,6 +369,7 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
     heights_MG_coated = [20000, 10000]
     heights_MG_non_coated = [12000, 1000]
     heights_He3 = [20000, 1000]
+    get_heights = [get_heights_Coated, get_heights_NonCoated]
     heights_vec_MG = [heights_MG_coated, heights_MG_non_coated]
     # Declare file names
     MG_COATED = 'mvmelst_165_191002_111641_Det2_overnight3.h5'
@@ -386,6 +397,8 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
         if i < 2:
             # If it is a beam measurement, extract peaks
             peaks = get_peaks(hist, heights_vec_MG[i], number_bins)
+            #heights = get_heights[i](bins)
+            #peaks, *_ = find_peaks(hist, height=heights)
             widths, *_ = peak_widths(hist, peaks)
             data.extend([peaks, widths])
         full_data.append(data)
@@ -403,6 +416,8 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
         if i < 1:
             # If it is a beam measurement, extract peaks
             peaks = get_peaks(hist, heights_He3, number_bins)
+            #heights = get_heights_He3(bins)
+            #peaks, *_ = find_peaks(hist, height=heights)
             widths, *_ = peak_widths(hist, peaks)
             data.extend([peaks, widths])
         full_data.append(data)
@@ -454,9 +469,6 @@ def get_peaks(hist, heights, number_bins):
     heights_part1 = np.ones(bins_part_1)*height_1
     heights_part2 = np.ones(bins_part_2)*height_2
     heights = np.append(heights_part1, heights_part2)
-    # Histogram data
-    start = A_to_meV(10)
-    stop = A_to_meV(1)
     # Get peaks
     peaks, *_ = find_peaks(hist, height=heights)
     return peaks
@@ -482,6 +494,33 @@ def find_nearest(array, value):
     """
     idx = (np.abs(array - value)).argmin()
     return idx
+
+def get_heights_NonCoated(bin_centers):
+    heights = np.zeros(len(bin_centers))
+    heights[(bin_centers >= 0) & (bin_centers <= 1.1)] = 12000
+    heights[(bin_centers >= 1.1) & (bin_centers <= 3.0)] = 7500
+    heights[(bin_centers >= 3.0) & (bin_centers <= 50.0)] = 12000
+    heights[(bin_centers >= 50.0) & (bin_centers <= 70.0)] = 1000
+    heights[(bin_centers >= 70.0) & (bin_centers <= 100.0)] = 85
+    return heights
+
+def get_heights_Coated(bin_centers):
+    heights = np.zeros(len(bin_centers))
+    heights[(bin_centers >= 0) & (bin_centers <= 1.1)] = 20000
+    heights[(bin_centers >= 1.1) & (bin_centers <= 3.0)] = 10000
+    heights[(bin_centers >= 3.0) & (bin_centers <= 50.0)] = 20000
+    heights[(bin_centers >= 50.0) & (bin_centers <= 70.0)] = 2000
+    heights[(bin_centers >= 70.0) & (bin_centers <= 100.0)] = 105
+    return heights
+
+def get_heights_He3(bin_centers):
+    heights = np.zeros(len(bin_centers))
+    heights[(bin_centers >= 0) & (bin_centers <= 2.5)] = 2000
+    heights[(bin_centers >= 2.5) & (bin_centers <= 50.0)] = 20000
+    heights[(bin_centers >= 50.0) & (bin_centers <= 70.0)] = 2000
+    heights[(bin_centers >= 70.0) & (bin_centers <= 100.0)] = 286
+    return heights
+
 
 
 def meV_to_A(energy):
