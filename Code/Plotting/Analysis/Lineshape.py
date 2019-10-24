@@ -37,9 +37,9 @@ def analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parame
     MG_coated_background, MG_non_coated_background, He3_background = full_data[2], full_data[3], full_data[5]
 
     # Plot all individual peaks
-    plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'])
-    plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'])
-    plot_all_peaks(He3_data, 'He3', colors['He3'])
+    #plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'])
+    #plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'])
+    #plot_all_peaks(He3_data, 'He3', colors['He3'])
 
     # Plot MG compared to He-3
     #plot_all_peaks_from_two_data_sets(MG_coated_data, 'MG_Coated', colors['MG_Coated'], He3_data, 'He3', colors['He3'])
@@ -261,7 +261,7 @@ def plot_all_peaks_from_three_data_sets(data_1, label_1, color_1,
             # Fit data
             a, x0, sigma, *_ = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
             fig = plt.figure()
-            plot_sigma_borders(x0, sigma)
+            #plot_sigma_borders(x0, sigma)
             # Prepare data within +/- 25 of our estimated sigma, we'll use this to plot
             left_plot, right_plot = (x0 - (50 * sigma)), (x0 + (10 * sigma))
             hist_plot, bins_plot = get_hist(energies, number_bins, left_plot, right_plot)
@@ -318,7 +318,7 @@ def plot_all_peaks(data, label, color):
             hist_fit, bins_fit = get_hist(energies, number_bins, left_fit, right_fit)
             fig = plt.figure()
             # Fit data
-            a, x0, sigma, x_fit, y_fit = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
+            a, x0, sigma, x_fit, y_fit, *_ = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
             plt.plot(x_fit, y_fit, label='Gaussian fit', color='black')
             plot_sigma_borders(x0, sigma)
             plt.errorbar(bins_fit, hist_fit, np.sqrt(hist_fit), fmt='.-',
@@ -478,6 +478,32 @@ def plot_sigma_borders(x0, sigma):
     plt.axvline(x=x0 - 3*sigma, color='purple', linewidth=2, label='-3σ')
     plt.axvline(x=x0 - sigma, color='green', linewidth=2, label='-σ')
     plt.axvline(x=x0 + sigma, color='green', linewidth=2, label='σ')
+
+def calculate_distance_borders(bins, hist):
+    def E_to_v(energy_in_meV):
+        # Define constants
+        JOULE_TO_meV = 6.24150913e18 * 1000
+        meV_TO_JOULE = 1/JOULE_TO_meV
+        NEUTRON_MASS = 1.674927351e-27
+        # Calculate velocity of neutron
+        v = np.sqrt((2*energy_in_meV*meV_TO_JOULE)/NEUTRON_MASS)
+        return v
+    # Declare intervals, in m
+    distance_intervals = np.array([np.array([0, 5])* 1e-2), np.array([5, 10]) * 1e-2),
+                                   np.array([10, 20]) * 1e-2), np.array([20, 40]) * 1e-2)])
+    # Extract average E
+    average_E = bins[hist == max(hist)]
+    average_v = E_to_v(average_E)
+    # Calculate additional ToF for these intervals
+    ToF_intervals = []
+    for distance_interval in distance_intervals:
+        ToF_intervals.append(first_interval_distance / average_v)
+    ToF_intervals = np.array(ToF_intervals)
+    # Calculate reduced energy from additional ToF
+    d_first_voxel = 0
+    ToF_first_Voxel = 0
+
+
 
 
 def find_nearest(array, value):

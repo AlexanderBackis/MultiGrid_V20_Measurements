@@ -847,7 +847,7 @@ Events</string>
       <x>150</x>
       <y>270</y>
       <width>121</width>
-      <height>51</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -1912,6 +1912,22 @@ Overlay</string>
     </property>
     <property name="text">
      <string>Peak Finding</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PHS_comparison_button">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>290</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>Comparison</string>
     </property>
    </widget>
   </widget>

@@ -15,10 +15,10 @@ def fit_data(hist, bins, a_guess, x0_guess, sigma_guess):
     def Gaussian(x, a, x0, sigma):
         return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
-    popt, __ = curve_fit(Gaussian, bins, hist, p0=[a_guess, x0_guess, sigma_guess])
+    popt, pcov = curve_fit(Gaussian, bins, hist, p0=[a_guess, x0_guess, sigma_guess])
     a, x0, sigma = popt[0], popt[1], abs(popt[2])
     xx = np.linspace(bins[0], bins[-1], 1000)
-    return a, x0, sigma, xx, Gaussian(xx, a, x0, sigma)
+    return a, x0, sigma, xx, Gaussian(xx, a, x0, sigma), pcov
 
 
 # =============================================================================

@@ -164,7 +164,8 @@ class MainWindow(QMainWindow):
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             number_bins = int(self.phsBins.text())
-            fig = PHS_1D_plot(self.e, ce_filtered, number_bins)
+            fig = plt.figure()
+            PHS_1D_plot(ce_filtered, number_bins)
             fig.show()
 
 
@@ -182,6 +183,29 @@ class MainWindow(QMainWindow):
             bus_start = self.module_min.value()
             bus_stop = self.module_max.value()
             fig = PHS_wires_vs_grids_plot(ce_filtered, bus_start, bus_stop)
+            fig.show()
+
+    def PHS_comparison_action(self):
+        if (self.data_sets != ''):
+            # Declare parameters
+            number_bins = int(self.phsBins.text())
+            filter_parameters = get_filter_parameters(self)
+            df = filter_clusters(self.ce, filter_parameters)
+            # Extract data from different regions
+            df_cross = df[(((df.Bus * 4) + df.wCh//20) >= 4) &
+                          (((df.Bus * 4) + df.wCh//20) <= 7) &
+                          (df.gCh >= 98) &
+                          (df.gCh <= 101)]
+            df_neutron = df[(((df.Bus * 4) + df.wCh//20) == 6) &
+                          (df.gCh >= 87) &
+                          (df.gCh <= 89)]
+            norm = 1/self.measurement_time
+            fig = plt.figure()
+            fig.set_figheight(5)
+            fig.set_figwidth(10)
+            PHS_1D_plot(df_cross, number_bins, '(Cross talk)', norm)
+            PHS_1D_plot(df_neutron, number_bins, '(Neutrons)', norm)
+            plt.legend()
             fig.show()
 
     # ==== Coincidences ==== #
@@ -428,7 +452,6 @@ class MainWindow(QMainWindow):
         #filter_parameters = get_filter_parameters(self)
         #ce_filtered = filter_clusters(self.ce, filter_parameters)
         #investigate_layers_ToF(ce_filtered)
-        #investigate_layers_FWHM(ce_filtered, origin_voxel)
 
 
         # Get MG data
@@ -438,7 +461,9 @@ class MainWindow(QMainWindow):
         He3_parameters = get_He3_filter_parameters(self)
         df_He3 = filter_He3(self.He3_df, He3_parameters)
         # Investigate ToF spread
+        #investigate_layers_FWHM(df_MG, df_He3, origin_voxel)
         investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel)
+
 
     def peak_finding_action(self):
         filter_parameters = get_filter_parameters(self)
@@ -608,6 +633,7 @@ class MainWindow(QMainWindow):
         self.PHS_1D_button.clicked.connect(self.PHS_1D_action)
         self.PHS_2D_button.clicked.connect(self.PHS_2D_action)
         self.PHS_wires_vs_grids_button.clicked.connect(self.PHS_wires_vs_grids_action)
+        self.PHS_comparison_button.clicked.connect(self.PHS_comparison_action)
         # Misc
         self.multiplicity_button.clicked.connect(self.Multiplicity_action)
         self.ToF_button.clicked.connect(self.ToF_action)
