@@ -242,7 +242,8 @@ class MainWindow(QMainWindow):
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             bus_start = self.module_min.value()
             bus_stop = self.module_max.value()
-            fig, histograms = coincidences_projections_plot(ce_filtered, bus_start, bus_stop)
+            norm = 1/self.measurement_time
+            fig, histograms = coincidences_projections_plot(ce_filtered, bus_start, bus_stop, norm)
             # Export histograms to text
             dir_name = os.path.dirname(__file__)
             output_path = os.path.join(dir_name, '../Output/')

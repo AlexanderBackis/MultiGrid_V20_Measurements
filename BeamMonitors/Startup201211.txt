@@ -1,0 +1,133 @@
+# File Startup.txt for parameter initialization of event recording routine TsdauControl1104 
+# The file is read by the command <Read Parameters> with Filename='Startup'.
+# Input starts at the line 'Section=<sectionName>' until the next line 'Section=' or EndOfFile.
+# If no <sectionName> is given input starts or continues with the next section up to an empty line.
+#
+# Parameters are read in the format  'name1=value1 name2=value2 ....'
+# All names on the Grafical_User_Interface are accepted exactly as displayed.
+# Input starting with '# ' is ignored and can be used for comments.
+#  
+# If the name 'Header=' is encountered, the rest of the current line is ignored and
+# the following lines up to an empty line are copied to the Header textfield. 
+# 
+
+Section=SpektrumEss	 # PulseGeneration->TrigA (e.g.CH1), PulseReduction->TrigB (e.g.CH3)
+Counts=20000 Events=10000  x0Hi=1000 x1Hi=100 InpList=3  Start=0 Stop=1000
+TrigA=4 offset=0.0 delay=0 TrigB=4 dtBtoA=0 tol=2  	# dtB_to_A =periodB -RefDelayTrigB;
+Flight-Path/m=25.22  Detector_efficiency=0.00001  at_lamda/A=3.5  Background=0.  Scale=0.001 
+# Flight-Path/m=18.23  Detector_efficiency=0.001  at_lamda/A=3.3  Background=0.  Scale=0.001
+# Flight-Path/m=52  Detector_efficiency=0.0005  at_lamda/A=3.5   Background=0.  Scale=0.001
+File=D:/TsdauEss201211/Spectrum_1
+Header=
+Spectrum with Pulse-chopper @ 14Hz 
+
+Section=Pneumatik-Zylinder    # Messung der Schliesszeiten 
+Counts=20 Events=20 TrigA=2 offset=0 delay=0 TrigB=2 dtBtoA=0.0 tol=0.1 
+x0Hi=300 x1Hi=1000 InpList=1-4  Start=0 Stop=1000
+File=E:/Tsdau201110/Zylinder_1
+Header=
+Schliesszeit der Pneumatik-Zylinder bei 3bar, Schlauch=15m, AUF-Zeit=100h
+Ventil_Auf=1, Ventil_Zu=2, Zyl_Oben=3, Zyl_Unten=4
+
+Section=TDC-Calibration   # Calibration of Chopper Trigger Signal
+TrigA=7 offset=0 delay=0 
+Counts=1000 Events=1500 Phase=20.0  					# Y-axis units
+  y0Lo=0      y1Lo=0     y2Lo=-10  
+x0Hi=500 x1Hi=1000 x5Hi=130 InpList=6  Start=0 Stop=2500
+File=E:/Tsdau201107/TdcCH1Acw_1
+Header=
+Scan:      TDC-record CH1A as fuction of speed
+Inputs:    5=Close, 6=Open,  7=TdcOutUp, 8=TdcOutDn
+
+
+Section=OS-Schieber    # Messung der Schliesszeiten 
+Counts=20 Events=20 TrigA=2 offset=0 delay=0 TrigB=2 dtBtoA=0.0 tol=0.1 
+x0Hi=300 x1Hi=1000 InpList=2,4  Start=0 Stop=1500
+File=E:/Tsdau201106/OSx-Schieber_3
+# Header=
+# Schliesszeit der OS-Schieber 3bar/ 4bar, mit/ohne SE, 1m/ 14m Schlauch, AUF-Zeit 10 bis 6000s
+# Reihenfolge OS1a,b, OS2n,a, OS3
+Header=
+Schliesszeit der OS-Schieber bei 3bar, ohne Schnellentluefter, AUF-Zeit 100h
+Reihenfolge OS1a  =0.5m,  OS1b =14m,  OS2n =0.7m,  OS2a =10m,  OS3 =1m 
+Reihenfolge OS1a  =0.5m,  OS1b =0.7m,  OS2n =14m,  OS2a =1m,  OS3 =10m 
+
+Section=General    # 
+Counts=2000 Events=2000 Phase=50.0  					# Y-axis units
+  y0Lo=0      y1Lo=0     y2Lo=-50  
+x0Hi=500 x1Hi=200 x2Hi=15.0 x3Hi=7.0 x4Hi=100 x5Hi=20  			# X-axis units
+x0Lo=0   x1Lo=0   x2Lo=0    x3Lo=0   x4Lo=0   x5Lo=0 
+File=FermiScan0911_05   InpList=1  Start=0 Stop=500 
+TrigA=3 offset=1.63 delay=61 TrigB=3 dtBtoA=200 tol=3
+Header=
+The first two lines will be overwritten with scan-parameters by <RECORD> and <SAVE>.
+Example of additional Header-information (see 'Header1' in file TsdauHelp0909.txt):    
+Sample:    Al2O3 d15xh40 /empty Instrument /empty can 
+Scan:      Omega=0 to 10 step 1 /HorSlit z=490 to 590 /RefDly ChA=0 to 10ms
+Inputs:    1=Mon 3=FC 4=Ch3 5,6,7,8=Det1,2,3,4
+Chopper:   FC=36000,2.345 ChA=12000,3.123 ChB=12000ccw,0  Ch2,3,4,5=0
+Beam:  	   guideExit=w30xh50  sampleSlit=w13xh20  HorSlit z=490 to 590
+Setup:     HM3 /Orange /Oven 800K /Argon Box /Cd-Cone&air /open detector
+
+Section=Focus   # Transverse Scans of primary beam near the focus
+Counts=2000 Events=2000 Phase=50.0  					# Y-axis units
+  y0Lo=0      y1Lo=0     y2Lo=-50  
+x0Hi=500 x1Hi=200 x2Hi=15.0 x3Hi=7.0 x4Hi=100 x5Hi=20  			# X-axis units
+x0Lo=0   x1Lo=0   x2Lo=0    x3Lo=0   x4Lo=0   x5Lo=0 
+Flight-Path/m=52.24
+File=Focus0912_01   InpList=1,3,4  Start=0 Stop=500 
+TrigA=3 offset=-6.05 delay=70 TrigB=4 dtBtoA=199.9 tol=0.5 # 3=Fermi-Chopper, 4=Ch3
+Header=
+Transverse Scans of primary beam near the focus
+FC->Inp3, Ch3->Inp4, Monitor->Inp1, Detector->5,6,7,8 
+Chopper[offs,dly]=rpm/refDly: Fc[-6.05,70]=24000/0.221  ChA[26.63,61]=6000/2.627  ChB[50.94,49]=6000/0.260
+Ch2[-1.03,69]=1200/6.605  Ch3[3.63,62]=300/0.342  Ch4[3.75,55]=0/0.000  Ch5[5.42,64]=0/0.000 
+
+
+Section=Pid
+nBins=500 first=0 last=500  File=PidScanChn_n  InpList=4		# Binning, Zoom
+TrigA=3 offset=0 delay=0  TrigB=3 dtBtoA=0.0 tol=1  			# Each Trigger-signal is used
+Header=
+Optimization of pid-parameters for different speeds
+Inputs:    3=RefOut 4=Tdc
+
+Section=B
+# Startup file for TsdauControl0911 parameter initialization
+TrigA=3 offset=1.6 delay=61 TrigB=4 dtBtoA=198 tol=2
+Header=
+Header section A
+
+Section=all   			# List of all Names
+Counts=1000 Events=1000 Phase=50.0  					# Y-axis units
+  y0Lo=0      y1Lo=0     y2Lo=-50  
+nBins=500 first=0 last=500   						# Binning, Zoom
+TrigA=3 offset=1.63 delay=61  TrigB=4 dtBtoA=10.0 tol=1  		# Trigger Inputs
+#               Fermi         ChA         ChB         Ch3
+# Distance/m   -53.214     -53.063     -53.013     -51.539  
+# Delay/us        70          61          49          62
+# OffsetCw%  -6.05 -6.05   1.63 26.63  0.94 50.94    3.63
+# OffsetCcw% -5.67 -5.67   8.61 83.61 10.53 60.531  10.28 	
+Start=0 Stop=1000 File=Spectrum01  InpList=1,2,5-8  Color=0 error=3
+x0Hi=500 x1Hi=200 x2Hi=14.0 x3Hi=7.0 x4Hi=100 x5Hi=20  			# X-axis units
+x0Lo=0   x1Lo=0   x2Lo=0    x3Lo=0   x4Lo=0   x5Lo=0 
+SizeHistHeader=10 							# Non GUI-parameters
+
+# parameters read by <Pattern(tof)> are also copied to <ReadParameters>    # ReadParameters
+Keyword=index  							 	   # Help
+Flight-Path/m=52.06 Detector_efficiency=1.0 at_lamda/A=3.5 Background=0    # Spectrum(tof)
+FlightPath/m=54.0  TwoTheta/deg=175.0  d2Theta/deg=-3.12   		   # Pattern(tof)
+  TofMin/ms=0  TofMax=300 
+FrequencyMin/Hz=1   FrequencyMax/Hz=300  Slope_ns/Hz=0  		   # Events(phase)
+deltaOffsetA/%=20  SlopeOffsA_ns/Hz=0  nEventMin=5      		   # Phase(speed)
+Strobe-Trigger=2    							   # Strobe(dtAB-S
+SourceFile=Data0    File_type=bn4  insert_y/n=y   			   # ReadHeader
+Source_File=Data4  File_type_P=bn4  First_Byte=0x0000 Last_Byte=0x1800     # Print
+SourceFileBn8=File2  Set_Time_Origin/s=0 				   # bn8_to_bn4
+SourceFileBn4=Data1  							   # RemoveTrig
+SourceFile_C=Data3  Remove_yes/no=no   				   	   # CheckTime
+TestCommand=Help  Parameter=1 						   # Test
+
+
+Header=
+General Input, all names
+

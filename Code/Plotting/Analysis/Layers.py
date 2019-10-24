@@ -239,6 +239,7 @@ def investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel):
                  linestyle='-', label=None, zorder=50)
         # Store important values
         distance = voxel_to_distance_dict[MG_red.Bus, MG_red.gCh, MG_red.wCh][0]
+        print('Layer: %d, distance: %')
         distances.append(distance)
         FWHMs.append(FWHM_fit)
         errors.append(FWHM_err)

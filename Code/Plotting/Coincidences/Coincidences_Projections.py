@@ -13,7 +13,7 @@ import numpy as np
 #             Coincidence Histogram Projections (Front, Top, Side)
 # =============================================================================
 
-def coincidences_projections_plot(df, bus_start, bus_stop):
+def coincidences_projections_plot(df, bus_start, bus_stop, norm=1):
     """
     Histograms the hitposition, histogrammed over the three projections of the
     detector (Front, Top and Side).
@@ -46,11 +46,11 @@ def coincidences_projections_plot(df, bus_start, bus_stop):
     # Plot
     wChs, gChs, Buses = df.wCh, df.gCh, df.Bus
     plt.subplot(1, 3, 1)
-    h_front = plot_front(wChs, gChs, Buses, bus_start, bus_stop, 3e1, 5e6)
+    h_front = plot_front(wChs, gChs, Buses, bus_start, bus_stop, 6e-4, 3e-1, norm) #, 3e1, 5e6)
     plt.subplot(1, 3, 2)
-    h_top = plot_top(wChs, gChs, Buses, bus_start, bus_stop, 2e3 ,2e6)
+    h_top = plot_top(wChs, gChs, Buses, bus_start, bus_stop, 6e-2, 6e-1, norm) #, 2e3 ,2e6)
     plt.subplot(1, 3, 3)
-    h_side = plot_side(wChs, gChs, Buses, 2e2, 6e5)
+    h_side = plot_side(wChs, gChs, Buses, 6e-3, 4e-1, norm) #, 2e2, 6e5)
     # Collect all histograms and tighted layout
     plt.tight_layout()
     histograms = [h_front, h_top, h_side]
@@ -60,39 +60,50 @@ def coincidences_projections_plot(df, bus_start, bus_stop):
 #                              HELPER FUNCTIONS
 # =============================================================================
 
-def plot_front(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None):
+def plot_front(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None,
+               norm=1):
+    weights = np.ones(wChs.shape[0]) * norm
     rows = ((bus_stop + 1) - bus_start) * 4
     h_front, *_ = plt.hist2d((wChs + (80*Buses)) // 20, gChs, bins=[rows, 40],
                              range=[[bus_start*4-0.5, (bus_stop+1)*4-0.5], [79.5, 119.5]],
                              norm=LogNorm(),
                              vmin=vmin, vmax=vmax,
-                             cmap='jet')
+                             cmap='jet',
+                             weights=weights)
     plt.title('Front view')
     plt.xlabel('Row')
     plt.ylabel('Grid')
-    plt.colorbar()
+    cbar = plt.colorbar()
+    cbar.set_label('Counts (Normalized to duration)')
     return h_front
 
-def plot_top(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None):
+def plot_top(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None,
+             norm=1):
+    weights = np.ones(wChs.shape[0]) * norm
     rows = ((bus_stop + 1) - bus_start) * 4
     h_top, *_ = plt.hist2d((wChs + (80*Buses)) // 20, wChs % 20, bins=[rows, 20],
                            range=[[bus_start*4-0.5, (bus_stop+1)*4-0.5], [-0.5, 19.5]],
                            norm=LogNorm(),
                            vmin=vmin, vmax=vmax,
-                           cmap='jet')
+                           cmap='jet',
+                           weights=weights)
     plt.title('Top view')
     plt.xlabel('Row')
     plt.ylabel('Layer')
-    plt.colorbar()
+    cbar = plt.colorbar()
+    cbar.set_label('Counts (Normalized to duration)')
     return h_top
 
-def plot_side(wChs, gChs, Buses, vmin=None, vmax=None):
+def plot_side(wChs, gChs, Buses, vmin=None, vmax=None, norm=1):
+    weights = np.ones(wChs.shape[0]) * norm
     h_side, *_ = plt.hist2d(wChs % 20, gChs, bins=[20, 40],
                             range=[[-0.5, 19.5], [79.5, 119.5]], norm=LogNorm(),
                             vmin=vmin, vmax=vmax,
-                            cmap='jet')
+                            cmap='jet',
+                            weights=weights)
     plt.title('Side view')
     plt.xlabel('Layer')
     plt.ylabel('Grid')
-    plt.colorbar()
+    cbar = plt.colorbar()
+    cbar.set_label('Counts (Normalized to duration)')
     return h_side

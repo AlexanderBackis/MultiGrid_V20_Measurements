@@ -7,7 +7,7 @@ Lineshape.py: Analyses the lineshape using our Figure-of-Merit
 import sys
 import os
 from Plotting.Analysis.DeltaE import energy_plot
-from HelperFunctions.EnergyTransfer import calculate_energy
+from HelperFunctions.EnergyTransfer import calculate_energy, get_distances
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -30,7 +30,6 @@ from HeliumTubes.FilteringHe3 import filter_He3
 def analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parameters):
     # Define parameters
     colors = {'MG_Coated': 'blue', 'MG_Non_Coated': 'green', 'He3': 'red'}
-
     # Prepare data
     full_data = prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters)
     MG_coated_data, MG_non_coated_data, He3_data = full_data[0], full_data[1], full_data[4]
@@ -479,7 +478,7 @@ def plot_sigma_borders(x0, sigma):
     plt.axvline(x=x0 - sigma, color='green', linewidth=2, label='-σ')
     plt.axvline(x=x0 + sigma, color='green', linewidth=2, label='σ')
 
-def calculate_distance_borders(bins, hist):
+def calculate_distance_borders(bins, hist, distances):
     def E_to_v(energy_in_meV):
         # Define constants
         JOULE_TO_meV = 6.24150913e18 * 1000
@@ -489,8 +488,10 @@ def calculate_distance_borders(bins, hist):
         v = np.sqrt((2*energy_in_meV*meV_TO_JOULE)/NEUTRON_MASS)
         return v
     # Declare intervals, in m
-    distance_intervals = np.array([np.array([0, 5])* 1e-2), np.array([5, 10]) * 1e-2),
-                                   np.array([10, 20]) * 1e-2), np.array([20, 40]) * 1e-2)])
+    distance_intervals = np.array([np.array([0, 5]) * 1e-2,
+                                   np.array([5, 10]) * 1e-2,
+                                   np.array([10, 20]) * 1e-2,
+                                   np.array([20, 40]) * 1e-2])
     # Extract average E
     average_E = bins[hist == max(hist)]
     average_v = E_to_v(average_E)
@@ -500,8 +501,7 @@ def calculate_distance_borders(bins, hist):
         ToF_intervals.append(first_interval_distance / average_v)
     ToF_intervals = np.array(ToF_intervals)
     # Calculate reduced energy from additional ToF
-    d_first_voxel = 0
-    ToF_first_Voxel = 0
+
 
 
 
