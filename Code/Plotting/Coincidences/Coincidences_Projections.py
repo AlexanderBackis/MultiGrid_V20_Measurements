@@ -35,7 +35,7 @@ def coincidences_projections_plot(df, bus_start, bus_stop, norm=1):
     fig = plt.figure()
     fig.suptitle('Coincident events', x=0.5, y=1.08)
     fig.set_figheight(5)
-    fig.set_figwidth(14)
+    fig.set_figwidth(17)
     # Calculate colorbar limits
     if df.shape[0] != 0:
         vmin = 1
@@ -46,11 +46,11 @@ def coincidences_projections_plot(df, bus_start, bus_stop, norm=1):
     # Plot
     wChs, gChs, Buses = df.wCh, df.gCh, df.Bus
     plt.subplot(1, 3, 1)
-    h_front = plot_front(wChs, gChs, Buses, bus_start, bus_stop, 6e-4, 3e-1, norm) #, 3e1, 5e6)
+    h_front = plot_front(wChs, gChs, Buses, bus_start, bus_stop, None, None, norm) #, 3e1, 5e6)
     plt.subplot(1, 3, 2)
-    h_top = plot_top(wChs, gChs, Buses, bus_start, bus_stop, 6e-2, 6e-1, norm) #, 2e3 ,2e6)
+    h_top = plot_top(wChs, gChs, Buses, bus_start, bus_stop, None, None, norm) #, 2e3 ,2e6)
     plt.subplot(1, 3, 3)
-    h_side = plot_side(wChs, gChs, Buses, 6e-3, 4e-1, norm) #, 2e2, 6e5)
+    h_side = plot_side(wChs, gChs, Buses, None, None, norm) #, 2e2, 6e5)
     # Collect all histograms and tighted layout
     plt.tight_layout()
     histograms = [h_front, h_top, h_side]
@@ -74,7 +74,7 @@ def plot_front(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None,
     plt.xlabel('Row')
     plt.ylabel('Grid')
     cbar = plt.colorbar()
-    cbar.set_label('Counts (Normalized to duration)')
+    cbar.set_label('Counts (Normalized to beam monitor)')
     return h_front
 
 def plot_top(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None,
@@ -91,7 +91,7 @@ def plot_top(wChs, gChs, Buses, bus_start, bus_stop, vmin=None, vmax=None,
     plt.xlabel('Row')
     plt.ylabel('Layer')
     cbar = plt.colorbar()
-    cbar.set_label('Counts (Normalized to duration)')
+    cbar.set_label('Counts (Normalized to beam monitor)')
     return h_top
 
 def plot_side(wChs, gChs, Buses, vmin=None, vmax=None, norm=1):
@@ -105,5 +105,5 @@ def plot_side(wChs, gChs, Buses, vmin=None, vmax=None, norm=1):
     plt.xlabel('Layer')
     plt.ylabel('Grid')
     cbar = plt.colorbar()
-    cbar.set_label('Counts (Normalized to duration)')
+    cbar.set_label('Counts (Normalized to beam monitor)')
     return h_side

@@ -16,6 +16,8 @@ from PyQt5 import uic
 # Data Analysis
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 # File handling
 from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
@@ -56,8 +58,7 @@ from Plotting.Analysis.TimeSweep import Time_Sweep_Animation
 from Plotting.Analysis.ToFSweep import ToF_Sweep_Animation
 
 
-# TEMP
-import matplotlib.pyplot as plt
+
 
 # =============================================================================
 #                                   Windows
@@ -85,6 +86,10 @@ class MainWindow(QMainWindow):
         self.fill_He3_information_window()
         self.show()
         self.refresh_window()
+        # Beam Monitor attributes
+        self.BM_counts_dict = {}
+        #self.import_beam_monitor_data()
+        self.initialize_bm_dict()
 
     # =========================================================================
     # File handling
@@ -186,6 +191,47 @@ class MainWindow(QMainWindow):
             fig.show()
 
     def PHS_comparison_action(self):
+        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        if len(paths) > 0:
+            # Declare parameters
+            filter_parameters = get_filter_parameters(self)
+            number_bins = int(self.phsBins.text())
+            ylabel = '(Normalized to beam monitor)'
+            intervals = [[0, 4095], [0, 10000]]
+            # Extract histogram data
+            fig = plt.figure()
+            fig.set_figheight(5)
+            fig.set_figwidth(10)
+            labels = ['(Beam)', '(Background)']
+            hists = []
+            bins_vec = []
+            errors = []
+            norms = []
+            # Plot data
+            for path, label in zip(paths, labels):
+                # Import data
+                data_set = path.rsplit('/', 1)[-1][:-3] + '.zip'
+                ce = pd.read_hdf(path, 'ce')
+                ce_filtered = filter_clusters(ce, filter_parameters)
+                # Extract normalization
+                norm = 1/self.BM_counts_dict[data_set]
+                bins, hist = PHS_1D_plot(ce_filtered, number_bins, label, norm,
+                                         ylabel, intervals)
+                hists.append(np.array(hist))
+                errors.append(np.array(hist)/norm)
+                norms.append(norm)
+                bins_vec.append(bins)
+            # Plot difference
+            for i in range(0, 2):
+                plt.subplot(1, 2, i+1)
+                plt.plot(bins_vec[0][i], hists[0][i] - hists[1][i],
+                         #np.sqrt((errors[0][i]*norms[0]) ** 2 + (errors[1][i]*norms[1]) ** 2),
+                         #fmt='.-', capsize=5,
+                         zorder=3, label='Difference')
+                plt.legend(loc=1)
+            fig.show()
+
+    def PHS_comparison_region_action(self):
         if (self.data_sets != ''):
             # Declare parameters
             number_bins = int(self.phsBins.text())
@@ -242,7 +288,9 @@ class MainWindow(QMainWindow):
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             bus_start = self.module_min.value()
             bus_stop = self.module_max.value()
-            norm = 1/self.measurement_time
+            # Get beam monitor data
+            file_name = self.data_sets[5:-5]
+            norm = 1/self.BM_counts_dict[file_name]
             fig, histograms = coincidences_projections_plot(ce_filtered, bus_start, bus_stop, norm)
             # Export histograms to text
             dir_name = os.path.dirname(__file__)
@@ -253,6 +301,66 @@ class MainWindow(QMainWindow):
                 np.savetxt(path, histogram, fmt="%d", delimiter=",")
             # Plot figure
             fig.show()
+
+
+    def CE_2D_comparison_action(self):
+        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        if len(paths) > 0:
+            # Declare parameters
+            filter_parameters = get_filter_parameters(self)
+            front_hists = []
+            top_hists = []
+            side_hists = []
+            # Extract histogram data
+            for i, path in enumerate(paths):
+                # Import data
+                data_set = path.rsplit('/', 1)[-1][:-3] + '.zip'
+                ce = pd.read_hdf(path, 'ce')
+                ce_filtered = filter_clusters(ce, filter_parameters)
+                # Extract histograms
+                bus_start = self.module_min.value()
+                bus_stop = self.module_max.value()
+                norm = 1/self.BM_counts_dict[data_set]
+                __, histograms = coincidences_projections_plot(ce_filtered, bus_start, bus_stop, norm)
+                front_hists.append(np.transpose(histograms[0]))
+                top_hists.append(np.transpose(histograms[1]))
+                side_hists.append(np.transpose(histograms[2]))
+            # Take difference between histograms
+            projections_hists = [front_hists, top_hists, side_hists]
+            diffs = []
+            for hists in projections_hists:
+                diffs.append(hists[0] - hists[1])
+            # Define figure properties
+            labels_vec = [['Front view', 'Row', 'Grid'],
+                          ['Top view', 'Row', 'Layer'],
+                          ['Side view', 'Layer', 'Grid']]
+            limits_vec = [[3e-6, 2e-3], [3e-4, 4e-3], [3e-5, 2e-3]]
+            # Plot difference
+            fig = plt.figure()
+            fig.set_figheight(5)
+            fig.set_figwidth(17)
+            for i, (diff, labels, limits) in enumerate(zip(diffs, labels_vec, limits_vec)):
+                vmin, vmax = limits
+                plt.subplot(1, 3, 1+i)
+                plt.imshow(diff, cmap='jet', norm=LogNorm(), origin='lower',
+                           interpolation='nearest', aspect='auto',
+                           vmin=vmin, vmax=vmax)
+                # Stylize plot
+                title, xlabel, ylabel = labels
+                plt.title(title)
+                plt.xlabel(xlabel)
+                plt.ylabel(ylabel)
+                cbar = plt.colorbar()
+                cbar.set_label('Counts (Normalized to beam monitor)')
+            plt.tight_layout()
+            fig.show()
+
+
+
+
+
+
+
 
     # ==== Misc ==== #
 
@@ -278,26 +386,29 @@ class MainWindow(QMainWindow):
         paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
         if len(paths) > 0:
             # Declare parameters
-            time_offset = (0.6e-3) * 1e6
-            period_time = (1/14) * 1e6
             filter_parameters = get_filter_parameters(self)
             number_bins = int(self.tofBins.text())
+            labels = ['Beam', 'Background']
             # Plot
             fig = plt.figure()
-            for i, path in enumerate(paths):
-                label = path.rsplit('/', 1)[-1]
+            hists = []
+            bin_centers_vec = []
+            range = [0, 71e3]
+            for path, label in zip(paths, labels):
+                # Get data
+                data_set = path.rsplit('/', 1)[-1][:-3] + '.zip'
                 ce = pd.read_hdf(path, 'ce')
                 ce_filtered = filter_clusters(ce, filter_parameters)
-                duration = get_duration(ce)
-                ToF_shifted = (ce_filtered.ToF * 62.5e-9 * 1e6 + time_offset) % period_time
-                hist, *_ = np.histogram(ToF_shifted, bins=2000)
-                norm = 1/duration
-                plt.hist(ToF_shifted, bins=number_bins, zorder=4, histtype='step',
-                         label=label,
-                         weights=(norm)*np.ones(len(ToF_shifted)))
+                # Get normalization
+                norm = 1/self.BM_counts_dict[data_set]
+                # Plot
+                hist, bins = ToF_histogram(ce_filtered, number_bins, label, norm, range)
+                hists.append(hist)
+                bin_centers_vec.append(bins)
+            plt.plot(bin_centers_vec[0], hists[0]-hists[1], label='Difference', zorder=5)
             plt.title('ToF')
             plt.xlabel('ToF [$\mu$s]')
-            plt.ylabel('Counts (Normalized by duration)')
+            plt.ylabel('Counts (Normalized by beam monitor)')
             plt.legend()
             plt.grid(True, which='major', linestyle='--', zorder=0)
             plt.grid(True, which='minor', linestyle='--', zorder=0)
@@ -347,7 +458,7 @@ class MainWindow(QMainWindow):
                             int(self.gCh_origin.text()),
                             int(self.wCh_origin.text())]
             fig = plt.figure()
-            start = 1
+            start = 0
             stop = 10
             plot_energy = False
             energy_plot(ce_filtered, origin_voxel, number_bins, start, stop, plot_energy)
@@ -483,10 +594,6 @@ class MainWindow(QMainWindow):
                                   zorder=5, histtype='step')
 
 
-
-
-
-
     # ==== Animation ==== #
 
     def Animation_3D_action(self):
@@ -619,6 +726,57 @@ class MainWindow(QMainWindow):
         plt.legend()
         fig.show()
 
+    # =========================================================================
+    # Beam Monitors
+    # =========================================================================
+
+    def import_beam_monitor_data(self):
+        dir_name = os.path.dirname(__file__)
+        folder = os.path.join(dir_name, '../Tables/')
+        files = os.listdir(folder)
+        files = [file for file in files if file[-4:] == '.asc']
+        fig = plt.figure()
+        for file in files:
+            path = folder + file
+            data = np.transpose(np.loadtxt(path, delimiter="\t"))
+            x = data[0] * 1000
+            y = data[1]
+            norm = 1/max(y)
+            plt.errorbar(x, y*norm, np.sqrt(y)*norm, label=file, fmt='.', capsize=5, zorder=5)
+            plt.title('ToF - Beam Monitor')
+            plt.xlabel('ToF [µs]')
+            plt.ylabel('Counts (Normalized by maximum)')
+            plt.yscale('log')
+            plt.grid(True, which='major', linestyle='--', zorder=0)
+            plt.grid(True, which='minor', linestyle='--', zorder=0)
+            print('---')
+            print(file)
+            print(sum(y))
+            print('---')
+        fig.show()
+        plt.legend()
+
+    def initialize_bm_dict(self):
+        """
+        In order of appearance:
+
+        1. Coated Radial, beam
+        2. NonCoated Radial, beam
+        3. He-3, beam
+        4. Coated Radial, background
+        5. NonCoated Radial, background
+        6. He-3, background
+
+        """
+        bm_dict = {'mvmelst_165_191002_111641_Det2_overnight3.zip': 11411036,
+                   'mvmelst_135_190930_141618_Det1_overnight2_30x80_14x60.zip': 9020907,
+                   '2019_09_HZB_He3InBeam54304s_overnight.zip': 10723199,
+                   'mvmelst_169_191003_075039_Det2_He3InBeam_overnight4.zip': 14052542,
+                   'mvmelst_141_191001_120405_He3InBeam_overnight3.zip': 10723199,
+                   '2019_09_HZB_He_3_background_beam_blocked_by_boron_cadmium_9208s.zip': 1809302
+                   }
+        self.BM_counts_dict = bm_dict
+
 
 
     # ========================================================================
@@ -643,6 +801,7 @@ class MainWindow(QMainWindow):
         self.Coincidences_2D_button.clicked.connect(self.Coincidences_2D_action)
         self.Coincidences_3D_button.clicked.connect(self.Coincidences_3D_action)
         self.Coincidences_Projections_button.clicked.connect(self.Coincidences_Projections_action)
+        self.CE_2D_comparison_button.clicked.connect(self.CE_2D_comparison_action)
         # Analysis
         self.wavelength_button.clicked.connect(self.Wavelength_action)
         self.energy_button.clicked.connect(self.Energy_action)

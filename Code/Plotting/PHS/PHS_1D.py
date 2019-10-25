@@ -15,7 +15,7 @@ import os
 # ============================================================================
 
 
-def PHS_1D_plot(clusters, number_bins, label='', norm=1):
+def PHS_1D_plot(clusters, number_bins, label='', norm=1, ylabel='', intervals=None):
     """
     Histograms the ADC-values from wires and grids individually, and overlays
     the results from indiviual events and clustered events. For the clustered
@@ -30,23 +30,33 @@ def PHS_1D_plot(clusters, number_bins, label='', norm=1):
     Returns:
         fig (Figure): Figure containing 1D PHS plot
     """
+    # Declare parameters
     titles = ['Wires', 'Grids']
     limits = [[0, 79], [80, 119]]
     ADC_types = ['wADC', 'gADC']
     weights=norm*np.ones(clusters.shape[0])
+    bin_centers_vec = []
+    hists = []
     for i, (title, limit, ADC_type) in enumerate(zip(titles, limits, ADC_types)):
         plt.subplot(1, 2, i+1)
         # Set figure properties
         plt.title('PHS (1D) - %s' % title)
         plt.xlabel('Collected charge [ADC channels]')
-        plt.ylabel('Counts (Normalized by duration)')
+        plt.ylabel('Counts %s' % ylabel)
         plt.yscale('log')
         plt.grid(True, which='major', linestyle='--', zorder=0)
         plt.grid(True, which='minor', linestyle='--', zorder=0)
-        plt.hist(clusters[ADC_type],
-                 bins=number_bins,
-                 histtype='step',
-                 label='Clusters %s' % label,
-                 zorder=5, weights=weights)
+        if intervals is not None:
+            range = intervals[i]
+        else:
+            range = None
+        # Plot
+        hist, bins, *_ = plt.hist(clusters[ADC_type], bins=number_bins,
+                                  histtype='step', label='Clusters %s' % label,
+                                  zorder=5, weights=weights, range=range)
+        bin_centers = 0.5 * (bins[1:] + bins[:-1])
+        bin_centers_vec.append(bin_centers)
+        hists.append(hist)
         plt.legend()
     plt.tight_layout()
+    return bin_centers_vec, hists
