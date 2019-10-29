@@ -62,10 +62,12 @@ def coincidences_3D_plot(df, origin_voxel):
                     hist[2].append(coord['z'])
                     hist[3].append(H[wCh, gCh-80, bus])
                     loc += 1
+                    distance = np.sqrt(coord['x'] ** 2 + coord['y'] ** 2 + coord['z'] ** 2)
                     labels.append('Module: %d<br>' % bus
                                   + 'WireChannel: %d<br>' % wCh
                                   + 'GridChannel: %d<br>' % gCh
-                                  + 'Counts: %d' % H[wCh, gCh-80, bus])
+                                  + 'Counts: %d<br>' % H[wCh, gCh-80, bus]
+                                  + 'Distance: %.3f' % distance)
     # Produce 3D histogram plot
     MG_3D_trace = go.Scatter3d(x=hist[0],
                                y=hist[1],

@@ -290,7 +290,7 @@ class MainWindow(QMainWindow):
             bus_stop = self.module_max.value()
             # Get beam monitor data
             file_name = self.data_sets[5:-5]
-            norm = 1/self.BM_counts_dict[file_name]
+            norm = 1/self.measurement_time#self.BM_counts_dict[file_name]
             fig, histograms = coincidences_projections_plot(ce_filtered, bus_start, bus_stop, norm)
             # Export histograms to text
             dir_name = os.path.dirname(__file__)
@@ -573,7 +573,7 @@ class MainWindow(QMainWindow):
         He3_parameters = get_He3_filter_parameters(self)
         df_He3 = filter_He3(self.He3_df, He3_parameters)
         # Investigate ToF spread
-        #investigate_layers_FWHM(df_MG, df_He3, origin_voxel)
+        investigate_layers_FWHM(df_MG, df_He3, origin_voxel)
         investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel)
 
 
