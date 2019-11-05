@@ -170,6 +170,8 @@ class MainWindow(QMainWindow):
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             number_bins = int(self.phsBins.text())
             fig = plt.figure()
+            fig.set_figheight(5)
+            fig.set_figwidth(10)
             PHS_1D_plot(ce_filtered, number_bins)
             fig.show()
 
@@ -443,7 +445,7 @@ class MainWindow(QMainWindow):
                             int(self.gCh_origin.text()),
                             int(self.wCh_origin.text())]
             fig = plt.figure()
-            start = 7
+            start = 0.8
             stop = 10
             plot_energy = True
             energy_plot(ce_filtered, origin_voxel, number_bins, start, stop, plot_energy)
@@ -509,33 +511,43 @@ class MainWindow(QMainWindow):
             print('Count rate: %.1f [Hz]' % count_rate)
 
     def Efficiency_action(self):
-        if (self.data_sets != ''):
-            parameters_MG = get_filter_parameters(self)
-            parameters_He3 = get_He3_filter_parameters(self)
-            MG_red = filter_clusters(self.ce, parameters_MG)
-            He3_red = filter_He3(self.He3_df, parameters_He3)
-            number_bins = int(self.dE_bins.text())
-            origin_voxel = [int(self.bus_origin.text()),
-                            int(self.gCh_origin.text()),
-                            int(self.wCh_origin.text())]
-            MG_label, He3_label = self.data_sets, self.He3_data_sets
-            start, stop = 1, 10
-            useMaxNorm = True
-            fig = plt.figure()
-            fig.suptitle('Comparison He-3 and MG (normalized to max value)')
-            plt.subplot(1, 2, 1)
-            plot_energy = True
-            energy_plot(MG_red, origin_voxel, number_bins,
-                        start, stop, plot_energy, MG_label, useMaxNorm)
-            energy_plot_He3(He3_red, number_bins, plot_energy, He3_label, useMaxNorm)
-            plt.legend()
-            plt.subplot(1, 2, 2)
-            plot_energy = False
-            energy_plot(MG_red, origin_voxel, number_bins,
-                        start, stop, plot_energy, MG_label, useMaxNorm)
-            energy_plot_He3(He3_red, number_bins, plot_energy, He3_label, useMaxNorm)
-            plt.legend()
-            fig.show()
+        dirname = os.path.dirname(__file__)
+        He3_efficiency_path = os.path.join(dirname, '../Tables/He3_efficiency.txt')
+        MG_efficiency_path = os.path.join(dirname, '../Tables/MG_efficiency.txt')
+        He3_efficiency = np.loadtxt(He3_efficiency_path, delimiter=",", unpack=True)
+        MG_efficiency = np.loadtxt(MG_efficiency_path, delimiter=",", unpack=True)[[0, 2]]
+        fig = plt.figure()
+        start = 0.01
+        end = 12
+        fig.suptitle('Efficiency, Multi-Grid and He-3')
+        fig.set_figheight(5)
+        fig.set_figwidth(10)
+        plt.subplot(1, 2, 1)
+        plt.plot(He3_efficiency[0], He3_efficiency[1], color='red',
+                 label='He-3 (Average, Metal Container)', zorder=5)
+        #plt.plot(MG_efficiency[0], MG_efficiency[1], color='blue',
+        #         label='MG (90° incident angle)', zorder=5)
+        plt.title('Wavelength')
+        plt.xlabel('Wavelength (Å)')
+        plt.ylabel('Efficiency')
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        plt.xlim(start, end)
+        plt.legend()
+        plt.subplot(1, 2, 2)
+        plt.plot(A_to_meV(He3_efficiency[0]), He3_efficiency[1], color='red',
+                 label='He-3 (Average, Metal Container)', zorder=5)
+        #plt.plot(A_to_meV(MG_efficiency[0]), MG_efficiency[1], color='blue',
+        #         label='MG (90° incident angle)', zorder=5)
+        plt.title('Energy')
+        plt.xlabel('Energy (meV)')
+        plt.ylabel('Efficiency')
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        plt.xlim(A_to_meV(end), A_to_meV(start))
+        plt.xscale('log')
+        plt.legend()
+        fig.show()
 
 
     def Energy_Resolution_action(self):
@@ -719,7 +731,7 @@ class MainWindow(QMainWindow):
         number_bins = int(self.tofBins.text())
         MG_label, He3_label = self.data_sets, self.He3_data_sets
         useMaxNorm = True
-        # plot data
+        # Plot data
         fig = plt.figure()
         He3_ToF_plot(He3_red, number_bins, He3_label)
         ToF_histogram(MG_red, number_bins, MG_label)

@@ -1162,7 +1162,7 @@ Resolution</string>
      </rect>
     </property>
     <property name="text">
-     <string>2000</string>
+     <string>200</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="tofBins">

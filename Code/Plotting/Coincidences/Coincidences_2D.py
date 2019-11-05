@@ -56,8 +56,8 @@ def coincidences_2D_plot(ce, measurement_time, bus_start, bus_stop):
     # Plot data
     fig = plt.figure()
     number_detectors = ((bus_stop + 1) - bus_start)//3
-    fig.set_figheight(4*number_detectors)
-    fig.set_figwidth(14)
+    fig.set_figheight(5*number_detectors)
+    fig.set_figwidth(17)
     histograms = []
     for i, bus in enumerate(range(bus_start, bus_stop+1)):
         ce_bus = ce[ce.Bus == bus]

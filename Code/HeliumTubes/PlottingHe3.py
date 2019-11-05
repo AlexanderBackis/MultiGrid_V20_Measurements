@@ -86,7 +86,7 @@ def energy_plot_He3(df, number_bins, plot_energy=False, label=None, useMaxNorm=F
     # Calculate DeltaE
     energy = calculate_He3_energy(df)
     # Define lambda range
-    start = 1
+    start = 0.8
     end = 10
     # Select normalization
     if useMaxNorm is False:

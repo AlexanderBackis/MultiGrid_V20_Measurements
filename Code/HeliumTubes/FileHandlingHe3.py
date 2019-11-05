@@ -71,6 +71,7 @@ def import_He3_data(file_path):
     ChannelShift = 0
     TimeShift    = 4
     ADCShift     = 48
+    PileUpShift  = 2
     # Import data
     data = np.loadtxt(file_path, dtype='str', delimiter='\n')
     print('Data loaded')
@@ -79,7 +80,8 @@ def import_He3_data(file_path):
     # Declare dictionary to store data
     He3_dict = {'Ch':  np.empty([size], dtype=int),
                 'ToF': np.empty([size], dtype=int),
-                'ADC': np.empty([size], dtype=int)}
+                'ADC': np.empty([size], dtype=int),
+                'PileUp': np.empty([size], dtype=int)}
     count = 0
     # Extracts information from data
     for i, row in enumerate(data[start_idx+1:]):
@@ -91,6 +93,7 @@ def import_He3_data(file_path):
             He3_dict['Ch'][count] = (word & ChannelMask)
             He3_dict['ToF'][count] = (word & TimeMask) >> TimeShift
             He3_dict['ADC'][count] = (word & ADCMask) >> ADCShift
+            He3_dict['PileUp'][count] = (word & PileUpMask) >> PileUpShift
             count += 1
         # Print progress of clustering process
         if i % 1000 == 1:
