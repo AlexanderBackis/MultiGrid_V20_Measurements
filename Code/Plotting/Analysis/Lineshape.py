@@ -39,11 +39,11 @@ def analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parame
     MG_coated_background, MG_non_coated_background, He3_background = full_data[2], full_data[3], full_data[5]
 
     # Plot all individual peaks
-    Coated_values = plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'], 28.413)
+    #Coated_values = plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'], 28.413)
     NonCoated_values =  plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], 28.413+1.5e-3)
     He3_values= plot_all_peaks(He3_data, 'He3', colors['He3'], 28.239+3e-3)
     # Extract values
-    energies_Coated, FoM_Coated, FoM_err_Coated, peak_areas_Coated, peak_err_Coated = Coated_values
+    #energies_Coated, FoM_Coated, FoM_err_Coated, peak_areas_Coated, peak_err_Coated = Coated_values
     energies_NonCoated, FoM_NonCoated, FoM_err_NonCoated, peak_areas_NonCoated, peak_err_NonCoated = NonCoated_values
     energies_He3, FoM_He3, FoM_err_He3, peak_areas_He3, peak_err_He3 = He3_values
     # Plot Coated Radial blades compared to non-coated radial blades
@@ -56,10 +56,10 @@ def analyze_all_lineshapes(origin_voxel, MG_filter_parameters, He3_filter_parame
 
     # Plot important values
     #FWHMs = [FWHM_Coated, FWHM_NonCoated, FWHM_He3]
-    energies = [energies_Coated, energies_NonCoated, energies_He3]
-    labels = ['MG_Coated', 'MG_Non_Coated', 'He3']
-    FoMs = [FoM_Coated, FoM_NonCoated, FoM_He3]
-    errors = [FoM_err_Coated, FoM_err_NonCoated, FoM_err_He3]
+    #energies = [energies_Coated, energies_NonCoated, energies_He3]
+    #labels = ['MG_Coated', 'MG_Non_Coated', 'He3']
+    #FoMs = [FoM_Coated, FoM_NonCoated, FoM_He3]
+    #errors = [FoM_err_Coated, FoM_err_NonCoated, FoM_err_He3]
 
     # Plot FWHM
     #fig = plt.figure()
@@ -170,7 +170,7 @@ def plot_efficiency(He3_energies, MG_energies,
                  fmt='.-', capsize=5,  color='blue', label='Multi-Grid', zorder=5)
     plt.xlabel('Energy (meV)')
     plt.ylabel('Peak area (Counts normalized by beam monitor counts)')
-    plt.xlim(2, 70)
+    plt.xlim(2, 120)
     plt.grid(True, which='major', linestyle='--', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     plt.title('Comparison MG and He-3')
@@ -179,7 +179,7 @@ def plot_efficiency(He3_energies, MG_energies,
     plt.subplot(1, 3, 2)
     plt.xlabel('Energy (meV)')
     plt.ylabel('Efficiency')
-    plt.xlim(2, 70)
+    plt.xlim(2, 120)
     plt.plot(A_to_meV(MG_efficiency_calc[0]), MG_efficiency_calc[1], color='black',
              label='MG (90° incident angle)', zorder=5)
     plt.errorbar(MG_energies, MG_efficiency, full_errors, fmt='.-',
@@ -419,24 +419,41 @@ def plot_all_peaks(data, label, color, chopper_to_detector_distance):
     FoM_uncertainites = []
     peak_areas = []
     peak_area_uncertainties = []
+    # Declare peak locations and widths
+    peak_values = bins[peaks]
+    width_values = widths
+    # Add last two peaks
+    if label == 'He3':
+        peak_values = np.append(peak_values, [77, 104])
+        width_values = np.append(width_values, [widths[-1]/2, widths[-1]/2])
+    elif label == 'MG_Non_Coated':
+        peak_values = np.append(peak_values, [77.5, 105])
+        width_values = np.append(width_values, [widths[-1]/2, widths[-1]/2])
     # Iterate through all peaks
-    for width, peak in zip(widths, peaks):
+    for width, peak in zip(width_values, peak_values):
         # Extract fit guesses and peak borders
-        left, right = bins[peak]-width/20, bins[peak]+width/20
+        left, right = peak-width/20, peak+width/20
         hist_peak, bins_peak = get_hist(energies, number_bins, left, right)
         a_guess, x0_guess, sigma_guess = get_fit_parameters_guesses(hist_peak, bins_peak)
         # Prepare peak within +/- 7 of our estimated sigma
-        left_fit, right_fit = (x0_guess - (7 * sigma_guess)), (x0_guess + (7 * sigma_guess))
+        if peak < 70:
+            left_fit, right_fit = (x0_guess - (7 * sigma_guess)), (x0_guess + (7 * sigma_guess))
+        else:
+            left_fit, right_fit = (x0_guess - (4 * sigma_guess)), (x0_guess + (4 * sigma_guess))
         hist_fit, bins_fit = get_hist(energies, number_bins, left_fit, right_fit)
         fig = plt.figure()
         # Fit data
         a, x0, sigma, x_fit, y_fit, *_ = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
-        #plt.plot(x_fit, y_fit, label='Gaussian fit', color='black')
         # Plot data
-        left_plot, right_plot = (x0_guess - (31 * sigma_guess)), (x0_guess + (7 * sigma_guess))
+        if peak < 70:
+            left_plot, right_plot = (x0 - (31 * sigma)), (x0 + (7 * sigma))
+            plt.xlim(x0 - (31 * sigma), x0 + (7 * sigma))
+        else:
+            left_plot, right_plot = (x0 - (10 * sigma)), (x0 + (10 * sigma))
+            plt.xlim(x0 - (10 * sigma), x0 + (10 * sigma))
         hist_plot, bins_plot = get_hist(energies, number_bins, left_plot, right_plot)
-        plt.errorbar(bins_plot, hist_plot, np.sqrt(hist_plot), fmt='.-',
-                     capsize=5, zorder=5, label=label, color=color)
+        plt.errorbar(bins_plot, hist_plot, np.sqrt(hist_plot), fmt='.-', capsize=5, zorder=5, label=label, color=color)
+        plt.plot(x_fit, y_fit*(max(hist_plot)/max(y_fit)), label='Gaussian fit', color='black')
         # Plot where the shoulder should be
         reduced_energies, distances, linestyles = calculate_distance_borders(bins_plot, hist_plot, chopper_to_detector_distance)
         #for distance, linestyle in zip(distances[1:3], linestyles[1:3]):
@@ -450,7 +467,7 @@ def plot_all_peaks(data, label, color, chopper_to_detector_distance):
         # Extract area
         peak_area, peak_area_uncertainity = get_peak_area(energies, x0, sigma, bin_width)
         # Save all important values
-        peak_energies.append(bins[peak])
+        peak_energies.append(peak)
         FoMs.append(FoM)
         FoM_uncertainites.append(FoM_uncertainity)
         peak_areas.append(peak_area)
@@ -458,14 +475,13 @@ def plot_all_peaks(data, label, color, chopper_to_detector_distance):
         # Stylise plot
         plt.grid(True, which='major', linestyle='--', zorder=0)
         plt.grid(True, which='minor', linestyle='--', zorder=0)
-        plt.title('Peak at: %.2f meV (%.2f Å)' % (bins[peak], meV_to_A(bins[peak])))
+        plt.title('Peak at: %.2f meV (%.2f Å)' % (peak, meV_to_A(peak)))
         plt.xlabel('Energy [meV]')
         plt.ylabel('Counts')
         plt.yscale('log')
-        plt.xlim(x0 - (31 * sigma), x0 + (7 * sigma))
         plt.legend(loc=2)
         # Save plot
-        file_name = '%s_Peak_at_%.2f_meV_(%.2f_Å).pdf' % (label, bins[peak], meV_to_A(bins[peak]))
+        file_name = '%s_Peak_at_%.2f_meV_(%.2f_Å).pdf' % (label, peak, meV_to_A(peak))
         output_path = output_folder + file_name
         fig.savefig(output_path, bbox_inches='tight')
         plt.close()
@@ -561,13 +577,20 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
 # =============================================================================
 
 def get_peak_area(energies, x0, sigma, bin_width):
+    # Get background range
+    if x0 < 70:
+        back_start = -30
+        back_stop = -25
+    else:
+        back_start = -3
+        back_stop = -2
     # Extract number of counts from regions of interest
     peak_counts = energies[(energies >= (x0 - sigma)) & (energies <= (x0 + sigma))]
-    background_counts = energies[(energies >= (x0 - 30*sigma)) & (energies <= (x0 - 25*sigma))]
+    background_counts = energies[(energies >= (x0 + back_start*sigma)) & (energies <= (x0 + back_stop*sigma))]
     # Rename for easier calculation of uncertainties
     a = len(peak_counts)
     b = len(background_counts)
-    background_range_in_meV = 5*sigma
+    background_range_in_meV = sigma*abs((back_start-back_stop))
     # Define normalization constants
     norm = (1/background_range_in_meV) * 2*sigma
     # Calculate FoM
@@ -582,8 +605,8 @@ def get_peak_area(energies, x0, sigma, bin_width):
     plt.axhline(y=b*(1/background_range_in_meV)*bin_width,
                 color='black', linewidth=2, label=None)
     # Statistics for background
-    #plt.axvline(x=x0 - 30*sigma, color='black', linewidth=2, label='Background')
-    #plt.axvline(x=x0 - 25*sigma, color='black', linewidth=2, label=None)
+    plt.axvline(x=x0 + back_start*sigma, color='black', linewidth=2, label='Background')
+    plt.axvline(x=x0 + back_stop*sigma, color='black', linewidth=2, label=None)
     # Statistics for peak area
     plt.axvline(x=x0 - sigma, color='orange', linewidth=2, label='-σ')
     plt.axvline(x=x0 + sigma, color='orange', linewidth=2, label='σ')
@@ -649,10 +672,10 @@ def get_distance_FoM(beam, x0, sigma, start, end, bin_width):
     uncertainty = df * f * norm_range
     FoM = f * norm_range
     # Plot background to cross-check calculation
-    plt.axhline(y=b*(1/background_range_in_meV)*bin_width,
-                color='black', linewidth=2, label=None)
-    plt.axvline(x=x0 - 30*sigma, color='orange', linewidth=2, label='Background')
-    plt.axvline(x=x0 - 25*sigma, color='orange', linewidth=2, label=None)
+    #plt.axhline(y=b*(1/background_range_in_meV)*bin_width,
+    #            color='black', linewidth=2, label=None)
+    #plt.axvline(x=x0 - 30*sigma, color='orange', linewidth=2, label='Background')
+    #plt.axvline(x=x0 - 25*sigma, color='orange', linewidth=2, label=None)
     return FoM, uncertainty
 
 def get_peaks(hist, heights, number_bins):
