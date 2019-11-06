@@ -145,4 +145,5 @@ def load_He3_data(path):
     """
     df = pd.read_hdf(path, 'df')
     data_sets = pd.read_hdf(path, 'data_sets')['data_sets'].iloc[0]
+    print(df)
     return df, data_sets

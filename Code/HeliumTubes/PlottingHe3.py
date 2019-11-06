@@ -12,6 +12,7 @@ import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 from HeliumTubes.EnergyHe3 import calculate_He3_energy
 from scipy.signal import find_peaks
@@ -117,9 +118,9 @@ def energy_plot_He3(df, number_bins, plot_energy=False, label=None, useMaxNorm=F
         heights[(bin_centers >= 50.0) & (bin_centers <= 70.0)] = 2000
         heights[(bin_centers >= 70.0) & (bin_centers <= 100.0)] = 286
         # Get peaks
-        peaks, *_ = find_peaks(hist, height=heights)
-        plt.plot(bin_centers[peaks], hist[peaks], marker='x', linestyle='', color='red')
-        plt.plot(bin_centers, heights, color='black')
+        #peaks, *_ = find_peaks(hist, height=heights)
+        #plt.plot(bin_centers[peaks], hist[peaks], marker='x', linestyle='', color='red')
+        #plt.plot(bin_centers, heights, color='black')
     else:
         plt.xlabel('Wavelength [Å]')
         plt.title('Wavelength Distribution')
@@ -135,3 +136,39 @@ def energy_plot_He3(df, number_bins, plot_energy=False, label=None, useMaxNorm=F
     plt.ylabel('Counts')
     plt.yscale('log')
     return hist, bin_centers
+
+
+
+# =============================================================================
+#                             PILEUP - HELIUM-3
+# =============================================================================
+
+def he3_pileup_plot(df):
+    def plot_2D_hist(df, title):
+        # Declare parameters
+        time_offset = (0.6e-3) * 1e6
+        period_time = (1/14) * 1e6
+        plt.hist2d(df.ADC,
+                   (df.ToF * (8e-9) * 1e6 + time_offset) % period_time,
+                   range=[[0, 66000], [0, 71429]],
+                   bins=[50, 50],
+                   norm=LogNorm(),
+                   #vmin=vmin, vmax=vmax,
+                   cmap='jet')
+        plt.title(title)
+        plt.ylabel('ToF [µs]')
+        plt.xlabel('Charge [ADC channels]')
+        cbar = plt.colorbar()
+        cbar.set_label('Counts')
+
+
+    df_full = df
+    df_no_pileup = df[df.PileUp == 0]
+    df_pileup = df[df.PileUp == 1]
+    dfs = [df_no_pileup, df_pileup]
+    titles = ['No pile-up', 'Pile-up']
+    for i, (df, title) in enumerate(zip(dfs, titles)):
+        plt.subplot(2, 2, i+1)
+        plot_2D_hist(df, title)
+        plt.subplot(2, 2, i+3)
+        He3_PHS_plot(df, 2000)

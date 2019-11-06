@@ -24,7 +24,7 @@ from FileHandling.Cluster import cluster_data
 from FileHandling.Storage import save_data, load_data
 # He-3 tubes
 from HeliumTubes.FileHandlingHe3 import unzip_He3_data, import_He3_data, save_He3_data, load_He3_data
-from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot, energy_plot_He3
+from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot, energy_plot_He3, he3_pileup_plot
 from HeliumTubes.FilteringHe3 import get_He3_filter_parameters, filter_He3
 from HeliumTubes.EnergyHe3 import calculate_He3_energy
 # Helper functions
@@ -692,7 +692,9 @@ class MainWindow(QMainWindow):
         parameters = get_He3_filter_parameters(self)
         df_red = filter_He3(self.He3_df, parameters)
         fig = plt.figure()
-        He3_ToF_plot(df_red, number_bins)
+        He3_ToF_plot(df_red, number_bins, 'Full data')
+        He3_ToF_plot(df_red[df_red.PileUp == 1], number_bins, 'Pile Up Events')
+        plt.legend()
         fig.show()
 
     def He3_Ch_action(self):
@@ -708,7 +710,20 @@ class MainWindow(QMainWindow):
         number_bins = int(self.dE_bins.text())
         plot_energy = True
         fig = plt.figure()
-        energy_plot_He3(df_red, number_bins, plot_energy)
+        plt.subplot(1, 2, 1)
+        hist_full, bins_full = energy_plot_He3(df_red, number_bins, plot_energy, 'Full Data')
+        hist_pileup, bins_pileup = energy_plot_He3(df_red[df_red.PileUp == 1], number_bins, plot_energy, 'Pile Up Events')
+        plt.legend()
+        plt.subplot(1, 2, 2)
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        plt.xlabel('Energy (meV)')
+        plt.ylabel('Fraction of Counts (PileUp/Full)')
+        plt.title('Investigation of Pileup')
+        plt.plot(bins_full, hist_pileup/hist_full, color='black', zorder=5,
+                 label='PileUpEvents/AllEvents')
+        plt.xscale('log')
+        plt.legend()
         fig.show()
 
     def He3_Wavelength_action(self):
@@ -717,7 +732,17 @@ class MainWindow(QMainWindow):
         number_bins = int(self.dE_bins.text())
         plot_energy = False
         fig = plt.figure()
-        energy_plot_He3(df_red, number_bins, plot_energy)
+        plt.subplot(1, 2, 1)
+        hist_full, bins_full = energy_plot_He3(df_red, number_bins, plot_energy, 'Full Data')
+        hist_pileup, bins_pileup = energy_plot_He3(df_red[df_red.PileUp == 1], number_bins, plot_energy, 'Pile Up Events')
+        plt.legend()
+        plt.subplot(1, 2, 2)
+        plt.grid(True, which='major', linestyle='--', zorder=0)
+        plt.grid(True, which='minor', linestyle='--', zorder=0)
+        plt.xlabel('Energy (meV)')
+        plt.ylabel('Fraction of Counts (PileUp/Full)')
+        plt.title('Investigation of Pileup')
+        plt.plot(bins_full, hist_pileup/hist_full, color='black', zorder=5)
         fig.show()
 
     def ToF_MG_vs_ToF_He3_action(self):
@@ -736,6 +761,18 @@ class MainWindow(QMainWindow):
         He3_ToF_plot(He3_red, number_bins, He3_label)
         ToF_histogram(MG_red, number_bins, MG_label)
         plt.legend()
+        fig.show()
+
+    def He3_pileup_action(self):
+        # Filter data
+        parameters_He3 = get_He3_filter_parameters(self)
+        He3_red = filter_He3(self.He3_df, parameters_He3)
+        # Plot data
+        fig = plt.figure()
+        fig.set_figheight(15)
+        fig.set_figwidth(15)
+        he3_pileup_plot(He3_red)
+        plt.tight_layout()
         fig.show()
 
     # =========================================================================
@@ -838,6 +875,7 @@ class MainWindow(QMainWindow):
         self.he3_energy_button.clicked.connect(self.He3_Energy_action)
         self.he3_wavelength_button.clicked.connect(self.He3_Wavelength_action)
         self.ToF_MG_vs_ToF_He3_button.clicked.connect(self.ToF_MG_vs_ToF_He3_action)
+        self.PileUp_button.clicked.connect(self.He3_pileup_action)
 
     def refresh_window(self):
         self.app.processEvents()
