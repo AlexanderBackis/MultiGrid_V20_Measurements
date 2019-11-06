@@ -8,7 +8,7 @@ The program consists of a GUI Interface which allows the user to cluster Mesytec
 - Time-of-Flight
 - Energy and Wavelength
 
-In addition to this, the program has a 'filtering'-feature which allows the user to gate the data on different parameters, such as parameters mentioned above. It also contains the relevant analysis code, written for the three main purposes of the measurement:
+In addition to this, the program has a 'filtering'-feature which allows the user to gate the data on different parameters, such as the ones mentioned above. It also contains the relevant analysis code, written for the three main purposes of the measurement:
 
 1. Efficiency at cold neutrons energies
 2. Elastic line shape in energy spectra
