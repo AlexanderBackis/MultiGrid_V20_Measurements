@@ -7,6 +7,8 @@ PathsAndFolders.py: Helper functions for handling of paths and folders.
 import numpy as np
 from scipy.optimize import curve_fit
 
+from HelperFunctions.Misc import find_nearest
+
 # =============================================================================
 #                                 GAUSSIAN FIT
 # =============================================================================
@@ -47,18 +49,3 @@ def get_hist(energies, number_bins, start, stop):
     hist, bin_edges = np.histogram(energies, bins=number_bins, range=[start, stop])
     bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
     return hist, bin_centers
-
-def find_nearest(array, value):
-    """
-    Returns the index of the element in 'array' which is closest to 'value'.
-
-    Args:
-        array (numpy array): Numpy array with elements
-        value (float): Value which we want to find the closest element to in
-                       arrray
-
-    Returns:
-        idx (int): index of the element in 'array' which is closest to 'value'
-    """
-    idx = (np.abs(array - value)).argmin()
-    return idx

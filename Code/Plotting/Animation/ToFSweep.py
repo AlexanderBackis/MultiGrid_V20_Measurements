@@ -14,7 +14,7 @@ import shutil
 from Plotting.Coincidences.Coincidences_Projections import plot_front, plot_top, plot_side
 from Plotting.Misc.ToF import ToF_histogram
 
-from HelperFunctions.PathsAndFolders import mkdir_p
+from HelperFunctions.Misc import mkdir_p
 
 
 # =============================================================================

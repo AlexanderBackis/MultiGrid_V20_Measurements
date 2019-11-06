@@ -161,7 +161,6 @@ def he3_pileup_plot(df):
         cbar = plt.colorbar()
         cbar.set_label('Counts')
 
-
     df_full = df
     df_no_pileup = df[df.PileUp == 0]
     df_pileup = df[df.PileUp == 1]

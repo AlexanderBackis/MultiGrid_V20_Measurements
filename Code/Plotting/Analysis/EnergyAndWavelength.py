@@ -4,13 +4,14 @@
 DeltaE.py: Function which histograms energy transfer data
 """
 
-from HelperFunctions.EnergyTransfer import calculate_energy
+from HelperFunctions.EnergyCalculation import calculate_energy
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks
+from HelperFunctions.Misc import meV_to_A, A_to_meV
 
 # =============================================================================
-#                             ENERGY TRANSFER
+#                                  ENERGY
 # =============================================================================
 
 
@@ -30,12 +31,8 @@ def energy_plot(df, origin_voxel, number_bins, start=1, stop=10,
         dE_hist (numpy array): Numpy array containing the histogram data
         bin_centers (numpy array): Numpy array containing the bin centers
     """
-    def meV_to_A(energy):
-        return np.sqrt(81.81/energy)
 
-    def A_to_meV(wavelength):
-        return (81.81/(wavelength ** 2))
-    # Calculate DeltaE
+    # Calculate energy
     energy = calculate_energy(df, origin_voxel)
     # Select normalization
     if useMaxNorm is False:

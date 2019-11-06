@@ -22,6 +22,7 @@ from matplotlib.colors import LogNorm
 from FileHandling.Import import unzip_data, import_data
 from FileHandling.Cluster import cluster_data
 from FileHandling.Storage import save_data, load_data
+from FileHandling.DataPreparation import prepare_data, plot_all_peaks
 # He-3 tubes
 from HeliumTubes.FileHandlingHe3 import unzip_He3_data, import_He3_data, save_He3_data, load_He3_data
 from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot, energy_plot_He3, he3_pileup_plot
@@ -30,7 +31,8 @@ from HeliumTubes.EnergyHe3 import calculate_He3_energy
 # Helper functions
 from HelperFunctions.CreateMapping import create_mapping
 from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
-from HelperFunctions.EnergyTransfer import calculate_energy
+from HelperFunctions.EnergyCalculation import calculate_energy
+from HelperFunctions.Misc import append_folder_and_files, meV_to_A, A_to_meV, get_duration
 # PHS
 from Plotting.PHS.PHS_1D import PHS_1D_plot
 from Plotting.PHS.PHS_2D import PHS_2D_plot
@@ -44,18 +46,19 @@ from Plotting.Misc.Multiplicity import multiplicity_plot
 from Plotting.Misc.ToF import ToF_histogram
 from Plotting.Misc.Timestamp import timestamp_plot
 # Analysis
-from Plotting.Analysis.DeltaE import energy_plot
+from Plotting.Analysis.EnergyAndWavelength import energy_plot
 from Plotting.Analysis.CountRate import calculate_count_rate
-from Plotting.Analysis.Efficiency import calculate_efficiency
+from Plotting.Analysis.Efficiency import plot_efficiency
 from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
-from Plotting.Analysis.Lineshape import analyze_all_lineshapes
-from Plotting.Analysis.Layers import (investigate_layers_ToF, investigate_layers_FWHM,
+from Plotting.Analysis.Lineshape import plot_FoM
+from Plotting.Analysis.Layers import (investigate_layers_ToF,
+                                      investigate_layers_FWHM,
                                       investigate_layers_delta_ToF)
 # Animation
-from Plotting.Analysis.Animation3D import Animation_3D_plot
-from Plotting.Analysis.LambdaSweep import Lambda_Sweep_Animation
-from Plotting.Analysis.TimeSweep import Time_Sweep_Animation
-from Plotting.Analysis.ToFSweep import ToF_Sweep_Animation
+from Plotting.Animation.Animation3D import Animation_3D_plot
+from Plotting.Animation.LambdaSweep import Lambda_Sweep_Animation
+from Plotting.Animation.TimeSweep import Time_Sweep_Animation
+from Plotting.Animation.ToFSweep import ToF_Sweep_Animation
 
 
 
@@ -572,12 +575,6 @@ class MainWindow(QMainWindow):
         origin_voxel = [int(self.bus_origin.text()),
                         int(self.gCh_origin.text()),
                         int(self.wCh_origin.text())]
-        # Perform initial filter on data
-        #filter_parameters = get_filter_parameters(self)
-        #ce_filtered = filter_clusters(self.ce, filter_parameters)
-        #investigate_layers_ToF(ce_filtered)
-
-
         # Get MG data
         MG_parameters = get_filter_parameters(self)
         df_MG = filter_clusters(self.ce, MG_parameters)
@@ -588,22 +585,50 @@ class MainWindow(QMainWindow):
         investigate_layers_FWHM(df_MG, df_He3, origin_voxel)
         investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel)
 
-
-    def peak_finding_action(self):
-        filter_parameters = get_filter_parameters(self)
-        ce_filtered = filter_clusters(self.ce, filter_parameters)
-        number_bins = int(self.dE_bins.text())
+    def full_analysis_action(self):
+        # Prepare filter parameters
         origin_voxel = [int(self.bus_origin.text()),
                         int(self.gCh_origin.text()),
                         int(self.wCh_origin.text())]
-        energies = calculate_energy(ce_filtered, origin_voxel)
-        start_A = 1
-        stop_A = 10
-        start_meV = A_to_meV(stop_A)
-        stop_meV = A_to_meV(start_A)
-        hist, bins, *_ = plt.hist(energies, bins=number_bins,
-                                  range=[start_meV, stop_meV],
-                                  zorder=5, histtype='step')
+        MG_filter_parameters = get_filter_parameters(self)
+        He3_filter_parameters = get_He3_filter_parameters(self)
+        # Define colors and normalization
+        colors = {'MG_Coated': 'blue', 'MG_Non_Coated': 'green', 'He3': 'red'}
+        monitor_norm_coated = 1/11411036
+        monitor_norm_non_coated = 1/9020907
+        monitor_norm_He3 = 1/10723199
+        # Prepare data
+        full_data = prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters)
+        MG_coated_data, MG_non_coated_data, He3_data = full_data[0], full_data[1], full_data[4]
+        MG_coated_background, MG_non_coated_background, He3_background = full_data[2], full_data[3], full_data[5]
+        # Plot all peaks
+        Coated_values = plot_all_peaks(MG_coated_data, 'MG_Coated', colors['MG_Coated'], 28.413)
+        NonCoated_values =  plot_all_peaks(MG_non_coated_data, 'MG_Non_Coated', colors['MG_Non_Coated'], 28.413+1.5e-3)
+        He3_values = plot_all_peaks(He3_data, 'He3', colors['He3'], 28.239+3e-3)
+        # Extract key values
+        energies_Coated, FoM_Coated, FoM_err_Coated, peak_areas_Coated, peak_err_Coated = Coated_values
+        energies_NonCoated, FoM_NonCoated, FoM_err_NonCoated, peak_areas_NonCoated, peak_err_NonCoated = NonCoated_values
+        energies_He3, FoM_He3, FoM_err_He3, peak_areas_He3, peak_err_He3 = He3_values
+        # Store all values in vectors
+        energies = [energies_Coated, energies_NonCoated, energies_He3]
+        labels = ['MG_Coated', 'MG_Non_Coated', 'He3']
+        FoMs = [FoM_Coated, FoM_NonCoated, FoM_He3]
+        FoM_errors = [FoM_err_Coated, FoM_err_NonCoated, FoM_err_He3]
+        # Plot efficiency
+        fig = plt.figure()
+        fig.set_figheight(5)
+        fig.set_figwidth(15)
+        plot_efficiency(np.array(energies_He3), np.array(energies_NonCoated),
+                        np.array(peak_areas_He3), np.array(peak_areas_NonCoated),
+                        np.array(peak_err_He3), np.array(peak_err_NonCoated),
+                        monitor_norm_He3, monitor_norm_non_coated)
+        fig.show()
+        # Plot FoM
+        fig = plt.figure()
+        for energy, FoM, error, label in zip(energies, FoMs, FoM_errors, labels):
+            plot_FoM(energy, FoM, error, label, colors[label])
+        plt.legend()
+        fig.show()
 
 
     # ==== Animation ==== #
@@ -857,10 +882,9 @@ class MainWindow(QMainWindow):
         self.count_rate_button.clicked.connect(self.Count_Rate_action)
         self.efficiency_button.clicked.connect(self.Efficiency_action)
         self.ToF_Overlay_button.clicked.connect(self.ToF_Overlay_action)
-        self.lineshape_button.clicked.connect(self.Lineshape_action)
         self.Wavelength_Overlay_button.clicked.connect(self.Wavelength_overlay_action)
         self.layers_button.clicked.connect(self.Layers_action)
-        self.peak_finding_button.clicked.connect(self.peak_finding_action)
+        self.full_analysis_button.clicked.connect(self.full_analysis_action)
         # Animation
         self.time_sweep_button.clicked.connect(self.time_sweep_action)
         self.lambda_sweep_button.clicked.connect(self.lambda_sweep_action)
@@ -895,30 +919,6 @@ class MainWindow(QMainWindow):
         information_text = "<b>Counts:</b> %d [Counts]" % self.He3_counts
         information_text += '<br/><b>Data sets:</b> ' + self.He3_data_sets
         self.He3_information_window.setText(information_text)
-
-
-
-# =============================================================================
-# Helper Functions
-# =============================================================================
-
-def append_folder_and_files(folder, files):
-    folder_vec = np.array(len(files)*[folder])
-    return np.core.defchararray.add(folder_vec, files)
-
-def get_duration(df):
-    times = df.Time.values
-    diff = np.diff(times)
-    resets = np.where(diff < 0)
-    duration_in_TDC_channels = sum(times[resets]) + times[-1]
-    duration_in_seconds = duration_in_TDC_channels * 62.5e-9
-    return duration_in_seconds
-
-def meV_to_A(energy):
-    return np.sqrt(81.81/energy)
-
-def A_to_meV(wavelength):
-    return (81.81/(wavelength ** 2))
 
 
 # =============================================================================

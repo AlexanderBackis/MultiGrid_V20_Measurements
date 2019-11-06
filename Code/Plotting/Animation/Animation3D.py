@@ -14,7 +14,7 @@ import shutil
 
 from HelperFunctions.CreateMapping import create_mapping
 from HelperFunctions.Borderlines import initiate_detector_border_lines
-from HelperFunctions.PathsAndFolders import mkdir_p
+from HelperFunctions.Misc import mkdir_p
 
 # =============================================================================
 #                         3D Animation - Time sweep

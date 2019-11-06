@@ -12,9 +12,9 @@ import imageio
 import shutil
 
 from Plotting.Coincidences.Coincidences_Projections import plot_front, plot_top, plot_side
-from Plotting.Analysis.DeltaE import energy_plot
-from HelperFunctions.EnergyTransfer import calculate_energy
-from HelperFunctions.PathsAndFolders import mkdir_p
+from Plotting.Analysis.EnergyAndWavelength import energy_plot
+from HelperFunctions.EnergyCalculation import calculate_energy
+from HelperFunctions.Misc import mkdir_p
 
 
 # =============================================================================

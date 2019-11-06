@@ -9,7 +9,35 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 # =============================================================================
-#                                ENERGY RESOLUTION
+#                                PLOT FWHM
+# =============================================================================
+
+
+def plot_FWHM(energies, FWHMs, label, color):
+    # Plot V20 data
+    for energy, FWHM, label in zip(energies, FWHMs, labels):
+        plt.plot(energy, FWHM, label=label, marker='o',
+                 linestyle='-', zorder=5, color=color)
+    # Plot SEQUOIA data (only High Resolution part)
+    dirname = os.path.dirname(__file__)
+    overview_folder = os.path.join(dirname, '../../../Tables/')
+    MG_SEQ_FWHM = np.loadtxt(overview_folder + 'MG_SEQ_FWHM.txt', delimiter=",")
+    MG_SEQ_Ei = np.loadtxt(overview_folder + 'MG_SEQ_Ei.txt', delimiter=",")
+    plt.plot(MG_SEQ_Ei, MG_SEQ_FWHM, marker='o', linestyle='-', zorder=5,
+             label='Multi-Grid: SEQUOIA', color='black')
+    # Stylize plot
+    plt.title('FWHM')
+    plt.ylabel('FWHM [meV]')
+    plt.xlabel('Peak energy [meV]')
+    plt.grid(True, which='major', linestyle='--', zorder=0)
+    plt.grid(True, which='minor', linestyle='--', zorder=0)
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.legend()
+
+
+# =============================================================================
+#                            CALCULATE FWHM
 # =============================================================================
 
 def calculate_energy_resolution(dE_values, Ei):

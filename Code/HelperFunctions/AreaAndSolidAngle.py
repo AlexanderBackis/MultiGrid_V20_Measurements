@@ -55,12 +55,12 @@ def get_multi_grid_area_and_solid_angle(parameters):
     # Get amount of surface to include
     modules_to_include = get_modules(parameters)
     grids = get_grids(parameters)
+    wires = [0, 20, 40, 60]
     # Iterate through surface and calculate area and solid angle
     MG_area = 0
     MG_projected_area = 0
     MG_solid_angle = 0
     for module in modules_to_include:
-        wires = get_wires(module)
         for grid in grids:
             for wire in wires:
                 # Extract coordinates
@@ -68,7 +68,7 @@ def get_multi_grid_area_and_solid_angle(parameters):
                 x_vox = vox_coordinate['x']
                 y_vox = vox_coordinate['y']
                 z_vox = vox_coordinate['z']
-                # Do calculations
+                # Calculate solid angle
                 theta = np.arctan(abs(y_vox/z_vox))
                 d = np.sqrt(x_vox ** 2 + y_vox ** 2 + z_vox ** 2)
                 projected_area = VOXEL_AREA * np.cos(theta)
@@ -98,32 +98,6 @@ def get_modules(parameters):
     """
     buses = [0, 1, 2]
     return buses
-
-
-def get_wires(module):
-    """
-    Returns the wires which will be included in the area and solid angle
-    calculations. Checks if any wire columns are disconnected, and if so,
-    discards the area and solid angle contribution from these.
-
-    Args:
-        parameters (dict): Dictionary containing the parameters on how the data
-                           is reduced. Here we are only interested in the
-                           filters which affects the total surface area.
-
-    Returns:
-        wires (numpy array): Containing sequence of surface wires to be included
-                             in the area and solid angle calculation
-    """
-    if module == 2:
-        wires = [0, 20, 40]
-    elif module == 3:
-        wires = [0, 20, 60]
-    elif module == 8:
-        wires = [0, 40, 60]
-    else:
-        wires = [0, 20, 40, 60]
-    return wires
 
 
 def get_grids(parameters):

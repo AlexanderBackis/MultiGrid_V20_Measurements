@@ -8,7 +8,7 @@ import numpy as np
 from HelperFunctions.CreateMapping import create_mapping
 
 # =============================================================================
-#                        CALCULATE ENERGY TRANSFER
+#                                 CALCULATE ENERGY
 # =============================================================================
 
 def calculate_energy(df, origin_voxel, distance_offset=0):

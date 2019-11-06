@@ -13,15 +13,15 @@ import shutil
 from scipy.optimize import curve_fit
 
 from Plotting.Misc.Timestamp import timestamp_plot
-from HelperFunctions.PathsAndFolders import mkdir_p
+from HelperFunctions.Misc import mkdir_p
 
-from HelperFunctions.EnergyTransfer import calculate_energy, get_distances
+from HelperFunctions.EnergyCalculation import calculate_energy, get_distances
 from HeliumTubes.EnergyHe3 import calculate_He3_energy
 from HelperFunctions.Fitting import get_hist, get_fit_parameters_guesses, fit_data
 
 
 # =============================================================================
-#                      LAYERS INVESTIGATION - ToF
+#                      LAYERS INVESTIGATION - TOF
 # =============================================================================
 
 def investigate_layers_ToF(df):
