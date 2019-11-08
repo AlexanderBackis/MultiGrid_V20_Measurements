@@ -14,7 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
-from HeliumTubes.EnergyHe3 import calculate_He3_energy
+from helium_tube.energy_he3 import calculate_He3_energy
 from scipy.signal import find_peaks
 
 # =============================================================================

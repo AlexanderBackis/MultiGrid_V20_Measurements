@@ -7,7 +7,8 @@ Coincidences_2D.py: Histograms the hitposition, expressed in wire- and grid
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-from HelperFunctions.AreaAndSolidAngle import get_multi_grid_area_and_solid_angle
+
+from multi_grid.helper_functions.area_and_solid_angle import get_multi_grid_area_and_solid_angle
 
 # =============================================================================
 #                          Coincidence Histogram (2D)

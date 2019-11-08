@@ -9,17 +9,16 @@ import numpy as np
 from scipy.signal import peak_widths
 import matplotlib.pyplot as plt
 
-from HelperFunctions.Filtering import filter_clusters
-from HelperFunctions.EnergyCalculation import calculate_energy
-from HelperFunctions.Fitting import get_hist, get_fit_parameters_guesses, fit_data
-from HelperFunctions.Misc import get_duration, mkdir_p, meV_to_A
-from HelperFunctions.PeakFinding import get_peaks
+from multi_grid.helper_functions.filtering import filter_clusters
+from multi_grid.helper_functions.energy_calculation import calculate_energy
+from multi_grid.helper_functions.fitting import get_hist, get_fit_parameters_guesses, fit_data
+from multi_grid.helper_functions.misc import get_duration, mkdir_p, meV_to_A
+from multi_grid.helper_functions.peak_finding import get_peaks
+from multi_grid.plotting.analysis.lineshape import get_FoM, calculate_distance_borders
+from multi_grid.plotting.analysis.efficiency import get_peak_area
 
-from Plotting.Analysis.Lineshape import get_FoM, calculate_distance_borders
-from Plotting.Analysis.Efficiency import get_peak_area
-
-from HeliumTubes.FilteringHe3 import filter_He3
-from HeliumTubes.EnergyHe3 import calculate_He3_energy
+from helium_tube.filtering_he3 import filter_He3
+from helium_tube.energy_he3 import calculate_He3_energy
 
 
 # =============================================================================
@@ -74,7 +73,7 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
     # Store Multi-Grid data
     print('Multi-Grid...')
     for i, file_name in enumerate(MG_file_names):
-        path = os.path.join(dirname, '../../Data/Lineshape/%s' % file_name)
+        path = os.path.join(dirname, '../../../data/Lineshape/%s' % file_name)
         df = pd.read_hdf(path, 'ce')
         df_red = filter_clusters(df, MG_filter_parameters)
         duration = get_duration(df)
@@ -90,7 +89,7 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
     # Store He-3 data
     print('He-3...')
     for i, (file_name, duration) in enumerate(zip(He3_file_names, He3_durations)):
-        path = os.path.join(dirname, '../../Data/Lineshape/%s' % file_name)
+        path = os.path.join(dirname, '../../../data/Lineshape/%s' % file_name)
         df = pd.read_hdf(path, 'df')
         df_red = filter_He3(df, He3_filter_parameters)
         energies = calculate_He3_energy(df_red, He3_distance_offset)
@@ -112,7 +111,7 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
 def plot_all_peaks(data, label, color, chopper_to_detector_distance):
     # Prepare output paths
     dirname = os.path.dirname(__file__)
-    output_folder = os.path.join(dirname, '../../Output/%s/' % label)
+    output_folder = os.path.join(dirname, '../../../output/%s/' % label)
     mkdir_p(output_folder)
     # Extract parameters
     energies, hist, bins, peaks, widths = data[1], data[2], data[3], data[4], data[5]
@@ -202,7 +201,7 @@ def plot_all_peaks_from_three_data_sets(data_1, label_1, color_1,
                                         data_3, label_3, color_3):
     # Prepare output paths
     dirname = os.path.dirname(__file__)
-    output_folder = os.path.join(dirname, '../../Output/Comparison_%s_and_%s/' % (label_1, label_2))
+    output_folder = os.path.join(dirname, '../../../output/Comparison_%s_and_%s/' % (label_1, label_2))
     mkdir_p(output_folder)
     # Extract parameters
     energies, hist, bins, peaks, widths = data_1[1], data_1[2], data_1[3], data_1[4], data_1[5]

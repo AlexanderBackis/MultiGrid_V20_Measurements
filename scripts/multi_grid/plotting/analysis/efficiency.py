@@ -9,7 +9,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from HelperFunctions.Misc import find_nearest, A_to_meV, meV_to_A
+from multi_grid.helper_functions.misc import find_nearest, A_to_meV, meV_to_A
 
 
 # =============================================================================
@@ -43,8 +43,8 @@ def plot_efficiency(He3_energies, MG_energies,
 
     # Load calculated efficiencies, as a function of lambda
     dirname = os.path.dirname(__file__)
-    He3_efficiency_path = os.path.join(dirname, '../../../Tables/He3_efficiency.txt')
-    MG_efficiency_path = os.path.join(dirname, '../../../Tables/MG_efficiency.txt')
+    He3_efficiency_path = os.path.join(dirname, '../../../../tables/He3_efficiency.txt')
+    MG_efficiency_path = os.path.join(dirname, '../../../../tables/MG_efficiency.txt')
     He3_efficiency = np.loadtxt(He3_efficiency_path, delimiter=",", unpack=True)
     MG_efficiency_calc = np.loadtxt(MG_efficiency_path, delimiter=",", unpack=True)[[0, 2]]
     # Remove elements in MG data which are not recorded in He-3

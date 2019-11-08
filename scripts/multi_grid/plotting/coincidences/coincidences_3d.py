@@ -12,8 +12,8 @@ import plotly.graph_objs as go
 import plotly.io as pio
 import os
 
-from HelperFunctions.CreateMapping import create_mapping
-from HelperFunctions.Borderlines import initiate_detector_border_lines
+from multi_grid.helper_functions.mapping import create_mapping
+from multi_grid.helper_functions.border_lines import initiate_detector_border_lines
 
 # =============================================================================
 #                           Coincidence Histogram (3D)
@@ -109,5 +109,5 @@ def coincidences_3D_plot(df, origin_voxel):
     fig['layout'].update(title='Coincidences (3D)')
     fig['layout']['scene1'].update(scene)
     fig.layout.showlegend = False
-    py.offline.plot(fig, filename='../Output/Ce3Dhistogram.html', auto_open=True)
-    pio.write_image(fig, '../Output/Ce3Dhistogram.pdf')
+    py.offline.plot(fig, filename='../output/Ce3Dhistogram.html', auto_open=True)
+    pio.write_image(fig, '../output/Ce3Dhistogram.pdf')

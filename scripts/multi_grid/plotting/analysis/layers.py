@@ -12,12 +12,13 @@ import imageio
 import shutil
 from scipy.optimize import curve_fit
 
-from Plotting.Misc.Timestamp import timestamp_plot
-from HelperFunctions.Misc import mkdir_p
+from multi_grid.plotting.misc.timestamp import timestamp_plot
+from multi_grid.helper_functions.misc import mkdir_p
+from multi_grid.helper_functions.fitting import get_hist, get_fit_parameters_guesses, fit_data
+from multi_grid.helper_functions.energy_calculation import calculate_energy, get_distances
 
-from HelperFunctions.EnergyCalculation import calculate_energy, get_distances
-from HeliumTubes.EnergyHe3 import calculate_He3_energy
-from HelperFunctions.Fitting import get_hist, get_fit_parameters_guesses, fit_data
+from helium_tube.energy_he3 import calculate_He3_energy
+
 
 
 # =============================================================================
@@ -195,8 +196,8 @@ def investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel):
     errors = []
     # Prepare output paths
     dirname = os.path.dirname(__file__)
-    output_folder = os.path.join(dirname, '../../../Output/Layers/')
-    animation_path = os.path.join(dirname, '../../../Output/layers_animation.gif')
+    output_folder = os.path.join(dirname, '../../../../output/Layers/')
+    animation_path = os.path.join(dirname, '../../../../output/layers_animation.gif')
     mkdir_p(output_folder)
     # Iterate through all layers
     for layer in range(0, 20):

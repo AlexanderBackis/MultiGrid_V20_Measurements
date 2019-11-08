@@ -5,7 +5,7 @@ EnergyTransfer.py: Tools to calculate energy transfer.
 """
 
 import numpy as np
-from HelperFunctions.CreateMapping import create_mapping
+from multi_grid.helper_functions.mapping import create_mapping
 
 # =============================================================================
 #                                 CALCULATE ENERGY

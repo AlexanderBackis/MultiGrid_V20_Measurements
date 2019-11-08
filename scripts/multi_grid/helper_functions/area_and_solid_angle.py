@@ -7,7 +7,7 @@ AreaAndSolidAngle.py: Calculates the area and solid angle of the part of the
 """
 
 import numpy as np
-from HelperFunctions.CreateMapping import create_mapping
+from multi_grid.helper_functions.mapping import create_mapping
 
 # =============================================================================
 #                      AREA AND SOLID ANGLE CALCULATIONS

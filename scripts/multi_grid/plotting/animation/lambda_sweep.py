@@ -11,33 +11,36 @@ import os
 import imageio
 import shutil
 
-from Plotting.Coincidences.Coincidences_Projections import plot_front, plot_top, plot_side
-from Plotting.Misc.ToF import ToF_histogram
-
-from HelperFunctions.Misc import mkdir_p
+from multi_grid.plotting.coincidences.coincidences_projections import plot_front, plot_top, plot_side
+from multi_grid.plotting.analysis.energy_and_wavelength import energy_plot
+from multi_grid.helper_functions.energy_calculation import calculate_energy
+from multi_grid.helper_functions.misc import mkdir_p
 
 
 # =============================================================================
 #                                LAMBDA SWEEP
 # =============================================================================
 
-def ToF_Sweep_Animation(ce, number_bins, bus_start, bus_stop):
+def Lambda_Sweep_Animation(ce, number_bins, origin_voxel, bus_start, bus_stop):
+    def meV_to_A(energy):
+        return np.sqrt(81.81/energy)
+
+    def A_to_meV(wavelength):
+        return (81.81/(wavelength ** 2))
     # Filters
     ce = ce[(ce.wCh != -1) & (ce.gCh != -1)]
     # Storage
     dir_name = os.path.dirname(__file__)
     temp_folder = os.path.join(dir_name, '../temp_folder/')
-    output_path = os.path.join(dir_name, '../../../Output/ToF_sweep.gif')
+    output_path = os.path.join(dir_name, '../../../../output/lambda_sweep.gif')
     mkdir_p(temp_folder)
-    # Declare parameters
-    time_offset = (0.6e-3) * 1e6
-    period_time = (1/14) * 1e6
-    # Calculate ToF
-    ToF = (ce.ToF.values * 62.5e-9 * 1e6 + time_offset) % period_time
+    # Calculate energies
+    energy = calculate_energy(ce, origin_voxel)
+    landa = meV_to_A(energy)
     # Define intervals
-    iter_start = 15000
-    iter_stop = 20000
-    step = 50
+    iter_start = 4.3
+    iter_stop = 4.75
+    step = 0.001
     delimiters = np.arange(iter_start, iter_stop, step)
     # Iteration
     vmin = 1
@@ -45,7 +48,7 @@ def ToF_Sweep_Animation(ce, number_bins, bus_start, bus_stop):
     for i, delimiter in enumerate(delimiters):
         start = delimiter
         stop = delimiter + step
-        ce_temp = ce[(ToF >= start) & (ToF <= stop)]
+        ce_temp = ce[(landa >= start) & (landa <= stop)]
         wChs, gChs, Buses = ce_temp.wCh, ce_temp.gCh, ce_temp.Bus
         fig = plt.figure()
         fig.set_figheight(8)
@@ -57,7 +60,7 @@ def ToF_Sweep_Animation(ce, number_bins, bus_start, bus_stop):
         plt.subplot2grid((2, 3), (0, 2), colspan=1)
         plot_side(wChs, gChs, Buses, vmin, vmax)
         plt.subplot2grid((2, 3), (1, 0), colspan=3)
-        ToF_histogram(ce[(ToF >= iter_start) & (ToF <= iter_stop)], number_bins)
+        energy_plot(ce, origin_voxel, number_bins, iter_start, iter_stop)
         plt.axvline(x=(start+stop)/2, color='red', linewidth=2, alpha=0.8, zorder=5)
         plt.tight_layout()
         fig.savefig(temp_folder + '%d.png' % i)

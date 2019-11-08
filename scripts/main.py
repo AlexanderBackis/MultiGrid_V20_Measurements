@@ -19,46 +19,46 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 # File handling
-from FileHandling.Import import unzip_data, import_data
-from FileHandling.Cluster import cluster_data
-from FileHandling.Storage import save_data, load_data
-from FileHandling.DataPreparation import prepare_data, plot_all_peaks
-# He-3 tubes
-from HeliumTubes.FileHandlingHe3 import unzip_He3_data, import_He3_data, save_He3_data, load_He3_data
-from HeliumTubes.PlottingHe3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot, energy_plot_He3, he3_pileup_plot
-from HeliumTubes.FilteringHe3 import get_He3_filter_parameters, filter_He3
-from HeliumTubes.EnergyHe3 import calculate_He3_energy
+from multi_grid.file_handling.read import unzip_data, import_data
+from multi_grid.file_handling.cluster import cluster_data
+from multi_grid.file_handling.storage import save_data, load_data
+from multi_grid.file_handling.data_preparation import prepare_data, plot_all_peaks
+# He-3 tube
+from helium_tube.file_handling_he3 import unzip_He3_data, import_He3_data, save_He3_data, load_He3_data
+from helium_tube.plotting_he3 import He3_PHS_plot, He3_ToF_plot, He3_Ch_plot, energy_plot_He3, he3_pileup_plot
+from helium_tube.filtering_he3 import get_He3_filter_parameters, filter_He3
+from helium_tube.energy_he3 import calculate_He3_energy
 # Helper functions
-from HelperFunctions.CreateMapping import create_mapping
-from HelperFunctions.Filtering import filter_clusters, get_filter_parameters
-from HelperFunctions.EnergyCalculation import calculate_energy
-from HelperFunctions.Misc import append_folder_and_files, meV_to_A, A_to_meV, get_duration
+from multi_grid.helper_functions.mapping import create_mapping
+from multi_grid.helper_functions.filtering import filter_clusters, get_filter_parameters
+from multi_grid.helper_functions.energy_calculation import calculate_energy
+from multi_grid.helper_functions.misc import append_folder_and_files, meV_to_A, A_to_meV, get_duration
 # PHS
-from Plotting.PHS.PHS_1D import PHS_1D_plot
-from Plotting.PHS.PHS_2D import PHS_2D_plot
-from Plotting.PHS.PHS_Wires_Vs_Grids import PHS_wires_vs_grids_plot
+from multi_grid.plotting.phs.phs_1d import PHS_1D_plot
+from multi_grid.plotting.phs.phs_2d import PHS_2D_plot
+from multi_grid.plotting.phs.phs_wires_vs_grids import PHS_wires_vs_grids_plot
 # Coincidences
-from Plotting.Coincidences.Coincidences_2D import coincidences_2D_plot
-from Plotting.Coincidences.Coincidences_3D import coincidences_3D_plot
-from Plotting.Coincidences.Coincidences_Projections import coincidences_projections_plot
+from multi_grid.plotting.coincidences.coincidences_2d import coincidences_2D_plot
+from multi_grid.plotting.coincidences.coincidences_3d import coincidences_3D_plot
+from multi_grid.plotting.coincidences.coincidences_projections import coincidences_projections_plot
 # Misc
-from Plotting.Misc.Multiplicity import multiplicity_plot
-from Plotting.Misc.ToF import ToF_histogram
-from Plotting.Misc.Timestamp import timestamp_plot
+from multi_grid.plotting.misc.multiplicity import multiplicity_plot
+from multi_grid.plotting.misc.tof import ToF_histogram
+from multi_grid.plotting.misc.timestamp import timestamp_plot
 # Analysis
-from Plotting.Analysis.EnergyAndWavelength import energy_plot
-from Plotting.Analysis.CountRate import calculate_count_rate
-from Plotting.Analysis.Efficiency import plot_efficiency
-from Plotting.Analysis.EnergyResolution import calculate_energy_resolution
-from Plotting.Analysis.Lineshape import plot_FoM
-from Plotting.Analysis.Layers import (investigate_layers_ToF,
-                                      investigate_layers_FWHM,
-                                      investigate_layers_delta_ToF)
+from multi_grid.plotting.analysis.energy_and_wavelength import energy_plot
+from multi_grid.plotting.analysis.count_rate import calculate_count_rate
+from multi_grid.plotting.analysis.efficiency import plot_efficiency
+from multi_grid.plotting.analysis.energy_resolution import calculate_energy_resolution
+from multi_grid.plotting.analysis.lineshape import plot_FoM
+from multi_grid.plotting.analysis.layers import (investigate_layers_ToF,
+                                                 investigate_layers_FWHM,
+                                                 investigate_layers_delta_ToF)
 # Animation
-from Plotting.Animation.Animation3D import Animation_3D_plot
-from Plotting.Animation.LambdaSweep import Lambda_Sweep_Animation
-from Plotting.Animation.TimeSweep import Time_Sweep_Animation
-from Plotting.Animation.ToFSweep import ToF_Sweep_Animation
+from multi_grid.plotting.animation.animation_3d import Animation_3D_plot
+from multi_grid.plotting.animation.lambda_sweep import Lambda_Sweep_Animation
+from multi_grid.plotting.animation.time_sweep import Time_Sweep_Animation
+from multi_grid.plotting.animation.tof_sweep import ToF_Sweep_Animation
 
 
 
@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
     def __init__(self, app, parent=None):
         super(MainWindow, self).__init__(parent)
         dir_name = os.path.dirname(__file__)
-        title_screen_path = os.path.join(dir_name, '../Windows/mainwindow.ui')
+        title_screen_path = os.path.join(dir_name, '../windows/mainwindow.ui')
         self.ui = uic.loadUi(title_screen_path, self)
         self.app = app
         # Clustering attributes
@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
     # =========================================================================
 
     def cluster_action(self):
-        zip_paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        zip_paths = QFileDialog.getOpenFileNames(self, "", "../data")[0]
         if len(zip_paths) > 0:
             # Import
             data = ()
@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
             save_data(path, self.ce, self.e, self.data_sets)
 
     def load_action(self):
-        path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
+        path = QFileDialog.getOpenFileName(self, "", "../data")[0]
         if path != '':
             clusters, events, data_sets_temp = load_data(path)
             # Write or append
@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
             fig.show()
 
     def PHS_comparison_action(self):
-        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        paths = QFileDialog.getOpenFileNames(self, "", "../data")[0]
         if len(paths) > 0:
             # Declare parameters
             filter_parameters = get_filter_parameters(self)
@@ -270,7 +270,7 @@ class MainWindow(QMainWindow):
             fig, histograms = coincidences_2D_plot(ce_filtered, self.measurement_time, bus_start, bus_stop)
             # Export histograms to text
             dir_name = os.path.dirname(__file__)
-            output_path = os.path.join(dir_name, '../Output/')
+            output_path = os.path.join(dir_name, '../output/')
             for bus, histogram in enumerate(histograms):
                 path = output_path + '2D_Coincidences_Bus_%d.txt' % bus
                 np.savetxt(path, histogram, fmt="%d", delimiter=",")
@@ -299,7 +299,7 @@ class MainWindow(QMainWindow):
             fig, histograms = coincidences_projections_plot(ce_filtered, bus_start, bus_stop, norm)
             # Export histograms to text
             dir_name = os.path.dirname(__file__)
-            output_path = os.path.join(dir_name, '../Output/')
+            output_path = os.path.join(dir_name, '../output/')
             file_names = ['Front', 'Top', 'Side']
             for file_name, histogram in zip(file_names, histograms):
                 path = output_path + '2D_Coincidences_Projections_%s.txt' % file_name
@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
 
 
     def CE_2D_comparison_action(self):
-        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        paths = QFileDialog.getOpenFileNames(self, "", "../data")[0]
         if len(paths) > 0:
             # Declare parameters
             filter_parameters = get_filter_parameters(self)
@@ -389,7 +389,7 @@ class MainWindow(QMainWindow):
             hist, bins = ToF_histogram(ce_filtered, number_bins, range=[0, 71429])
             # Save histogram in ASCII-format
             dir_name = os.path.dirname(__file__)
-            output_path = os.path.join(dir_name, '../Output/ToF_%s.txt' % self.data_sets[5:-5])
+            output_path = os.path.join(dir_name, '../output/ToF_%s.txt' % self.data_sets[5:-5])
             np.savetxt(output_path,
                        np.transpose(np.array([bins, hist])),
                        delimiter=",",
@@ -397,7 +397,7 @@ class MainWindow(QMainWindow):
             fig.show()
 
     def ToF_Overlay_action(self):
-        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        paths = QFileDialog.getOpenFileNames(self, "", "../data")[0]
         if len(paths) > 0:
             # Declare parameters
             filter_parameters = get_filter_parameters(self)
@@ -479,7 +479,7 @@ class MainWindow(QMainWindow):
             fig.show()
 
     def Wavelength_overlay_action(self):
-        paths = QFileDialog.getOpenFileNames(self, "", "../Data")[0]
+        paths = QFileDialog.getOpenFileNames(self, "", "../data")[0]
         number_bins = int(self.dE_bins.text())
         origin_voxel = [int(self.bus_origin.text()),
                         int(self.gCh_origin.text()),
@@ -516,16 +516,24 @@ class MainWindow(QMainWindow):
 
     def Count_Rate_action(self):
         if (self.data_sets != ''):
+            # Declare parameters
+            number_bins = int(self.tofBins.text())
+            time_offset = (0.6e-3)
+            period_time = (1/14)
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
-            ToF_values = ce_filtered.ToF * 62.5e-9
-            count_rate = calculate_count_rate(ToF_values, self.measurement_time)
+            ToF_values = (ce_filtered.ToF * 62.5e-9 + time_offset) % period_time
+            fig = plt.figure()
+            count_rate = calculate_count_rate(ToF_values,
+                                              self.measurement_time,
+                                              number_bins)
+            fig.show()
             print('Count rate: %.1f [Hz]' % count_rate)
 
     def Efficiency_action(self):
         dirname = os.path.dirname(__file__)
-        He3_efficiency_path = os.path.join(dirname, '../Tables/He3_efficiency.txt')
-        MG_efficiency_path = os.path.join(dirname, '../Tables/MG_efficiency.txt')
+        He3_efficiency_path = os.path.join(dirname, '../tables/He3_efficiency.txt')
+        MG_efficiency_path = os.path.join(dirname, '../tables/MG_efficiency.txt')
         He3_efficiency = np.loadtxt(He3_efficiency_path, delimiter=",", unpack=True)
         MG_efficiency = np.loadtxt(MG_efficiency_path, delimiter=",", unpack=True)[[0, 2]]
         fig = plt.figure()
@@ -691,7 +699,7 @@ class MainWindow(QMainWindow):
     # =========================================================================
 
     def Import_He3_action(self):
-        file_path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
+        file_path = QFileDialog.getOpenFileName(self, "", "../data")[0]
         if file_path != '':
             self.He3_df = import_He3_data(file_path)
             self.He3_data_sets = '<br/>' + file_path.rsplit('/', 1)[-1]
@@ -706,7 +714,7 @@ class MainWindow(QMainWindow):
             save_He3_data(path, self.He3_df, self.He3_data_sets)
 
     def Load_He3_action(self):
-        path = QFileDialog.getOpenFileName(self, "", "../Data")[0]
+        path = QFileDialog.getOpenFileName(self, "", "../data")[0]
         if path != '':
              self.He3_df, self.He3_data_sets = load_He3_data(path)
         self.fill_He3_information_window()
@@ -729,7 +737,7 @@ class MainWindow(QMainWindow):
         hist, bins = He3_ToF_plot(df_red, number_bins, range=[0, 71429])
         # Save histogram in ASCII-format
         dir_name = os.path.dirname(__file__)
-        output_path = os.path.join(dir_name, '../Output/ToF_%s.txt' % self.He3_data_sets[5:-5])
+        output_path = os.path.join(dir_name, '../output/ToF_%s.txt' % self.He3_data_sets[5:-5])
         np.savetxt(output_path,
                    np.transpose(np.array([bins, hist])),
                    delimiter=",",
@@ -821,7 +829,7 @@ class MainWindow(QMainWindow):
 
     def import_beam_monitor_data(self):
         dir_name = os.path.dirname(__file__)
-        folder = os.path.join(dir_name, '../Tables/')
+        folder = os.path.join(dir_name, '../tables/')
         files = os.listdir(folder)
         files = [file for file in files if file[-4:] == '.asc']
         fig = plt.figure()

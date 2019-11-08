@@ -3,7 +3,7 @@ import os
 
 # Get paths
 dir_name = os.path.dirname(__file__)
-folder = os.path.join(dir_name, 'Data/')
+folder = os.path.join(dir_name, 'data/')
 files = os.listdir(folder)
 files = [file for file in files if file[-4:] == '.bn4']
 # Declare parameters

@@ -4,11 +4,12 @@
 DeltaE.py: Function which histograms energy transfer data
 """
 
-from HelperFunctions.EnergyCalculation import calculate_energy
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks
-from HelperFunctions.Misc import meV_to_A, A_to_meV
+
+from multi_grid.helper_functions.energy_calculation import calculate_energy
+from multi_grid.helper_functions.misc import meV_to_A, A_to_meV
 
 # =============================================================================
 #                                  ENERGY

@@ -62,7 +62,7 @@ def create_channel_to_coordinate_map(theta, offset):
     """
     # Import voxel coordinates
     dirname = os.path.dirname(__file__)
-    file_path = os.path.join(dirname, '../../Tables/Mapping_MG_SEQ_ESS.xlsx')
+    file_path = os.path.join(dirname, '../../../tables/Mapping_MG_SEQ_ESS.xlsx')
     matrix = pd.read_excel(file_path).values
     coordinates = matrix[2:802]
     # Create empty dictionary to store mapping

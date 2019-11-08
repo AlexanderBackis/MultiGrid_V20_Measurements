@@ -10,7 +10,7 @@ import shutil
 import zipfile
 import re
 
-from HelperFunctions.Misc import mkdir_p
+from multi_grid.helper_functions.misc import mkdir_p
 
 # =============================================================================
 #                                UNZIP DATA

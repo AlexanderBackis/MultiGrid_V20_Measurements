@@ -12,9 +12,9 @@ import os
 import imageio
 import shutil
 
-from HelperFunctions.CreateMapping import create_mapping
-from HelperFunctions.Borderlines import initiate_detector_border_lines
-from HelperFunctions.Misc import mkdir_p
+from multi_grid.helper_functions.mapping import create_mapping
+from multi_grid.helper_functions.border_lines import initiate_detector_border_lines
+from multi_grid.helper_functions.misc import mkdir_p
 
 # =============================================================================
 #                         3D Animation - Time sweep
