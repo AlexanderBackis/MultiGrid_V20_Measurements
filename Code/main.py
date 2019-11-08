@@ -380,11 +380,20 @@ class MainWindow(QMainWindow):
 
     def ToF_action(self):
         if self.data_sets != '':
+            # Filter data
             filter_parameters = get_filter_parameters(self)
             ce_filtered = filter_clusters(self.ce, filter_parameters)
             number_bins = int(self.tofBins.text())
+            # Plot data
             fig = plt.figure()
-            ToF_histogram(ce_filtered, number_bins)
+            hist, bins = ToF_histogram(ce_filtered, number_bins, range=[0, 71429])
+            # Save histogram in ASCII-format
+            dir_name = os.path.dirname(__file__)
+            output_path = os.path.join(dir_name, '../Output/ToF_%s.txt' % self.data_sets[5:-5])
+            np.savetxt(output_path,
+                       np.transpose(np.array([bins, hist])),
+                       delimiter=",",
+                       header='ToF (µs), Counts')
             fig.show()
 
     def ToF_Overlay_action(self):
@@ -717,8 +726,14 @@ class MainWindow(QMainWindow):
         parameters = get_He3_filter_parameters(self)
         df_red = filter_He3(self.He3_df, parameters)
         fig = plt.figure()
-        He3_ToF_plot(df_red, number_bins, 'Full data')
-        He3_ToF_plot(df_red[df_red.PileUp == 1], number_bins, 'Pile Up Events')
+        hist, bins = He3_ToF_plot(df_red, number_bins, range=[0, 71429])
+        # Save histogram in ASCII-format
+        dir_name = os.path.dirname(__file__)
+        output_path = os.path.join(dir_name, '../Output/ToF_%s.txt' % self.He3_data_sets[5:-5])
+        np.savetxt(output_path,
+                   np.transpose(np.array([bins, hist])),
+                   delimiter=",",
+                   header='ToF (µs), Counts')
         plt.legend()
         fig.show()
 

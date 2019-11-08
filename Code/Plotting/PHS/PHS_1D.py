@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-PHS_1D.py: Module which plots the PHS spectra for wires and grids separatly.
-           Plots PHS from indivdual events and summation from clusters overlaid.
+""" PHS_1D.py: Module which plots the PHS spectra for wires and grids separatly.
+               Plots PHS from indivdual events and summation from clusters
+               overlaid.
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 
 
 # ============================================================================
@@ -34,7 +33,7 @@ def PHS_1D_plot(clusters, number_bins, label='', norm=1, ylabel='', intervals=No
     titles = ['Wires', 'Grids']
     limits = [[0, 79], [80, 119]]
     ADC_types = ['wADC', 'gADC']
-    weights=norm*np.ones(clusters.shape[0])
+    weights = norm*np.ones(clusters.shape[0])
     bin_centers_vec = []
     hists = []
     for i, (title, limit, ADC_type) in enumerate(zip(titles, limits, ADC_types)):

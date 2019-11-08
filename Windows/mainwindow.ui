@@ -53,7 +53,7 @@
      <item row="3" column="4">
       <widget class="QLineEdit" name="wADC_min">
        <property name="text">
-        <string>500</string>
+        <string>600</string>
        </property>
       </widget>
      </item>
@@ -91,7 +91,7 @@
      <item row="3" column="5">
       <widget class="QLineEdit" name="gADC_min">
        <property name="text">
-        <string>400</string>
+        <string>600</string>
        </property>
       </widget>
      </item>
