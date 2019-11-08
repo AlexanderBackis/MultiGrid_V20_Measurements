@@ -31,7 +31,7 @@ git clone https://github.com/AlexanderBackis/MultiGrid_V20_Measurements.git
 ```
 
 ## Execution
-Navigate to MultiGrid_V20_Measurements->Code and enter:
+Navigate to MultiGrid_V20_Measurements->scripts and enter:
 ```
 python main.py
 ```
