@@ -45,7 +45,8 @@ def get_fit_parameters_guesses(hist, bins):
 #                               HELPER FUNCTIONS
 # =============================================================================
 
-def get_hist(energies, number_bins, start, stop):
-    hist, bin_edges = np.histogram(energies, bins=number_bins, range=[start, stop])
+def get_hist(energies, number_bins, start, stop, weights=None):
+    hist, bin_edges = np.histogram(energies, bins=number_bins,
+                                   range=[start, stop], weights=weights)
     bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
     return hist, bin_centers

@@ -53,7 +53,8 @@ from multi_grid.plotting.analysis.energy_resolution import calculate_energy_reso
 from multi_grid.plotting.analysis.lineshape import plot_FoM
 from multi_grid.plotting.analysis.layers import (investigate_layers_ToF,
                                                  investigate_layers_FWHM,
-                                                 investigate_layers_delta_ToF)
+                                                 investigate_layers_delta_ToF,
+                                                 investigate_layers_counts)
 # Animation
 from multi_grid.plotting.animation.animation_3d import Animation_3D_plot
 from multi_grid.plotting.animation.lambda_sweep import Lambda_Sweep_Animation
@@ -295,7 +296,7 @@ class MainWindow(QMainWindow):
             bus_stop = self.module_max.value()
             # Get beam monitor data
             file_name = self.data_sets[5:-5]
-            norm = 1/self.measurement_time#self.BM_counts_dict[file_name]
+            norm = 1/get_duration(ce_filtered)#self.BM_counts_dict[file_name]
             fig, histograms = coincidences_projections_plot(ce_filtered, bus_start, bus_stop, norm)
             # Export histograms to text
             dir_name = os.path.dirname(__file__)
@@ -596,11 +597,13 @@ class MainWindow(QMainWindow):
         MG_parameters = get_filter_parameters(self)
         df_MG = filter_clusters(self.ce, MG_parameters)
         # Get He3 data
-        He3_parameters = get_He3_filter_parameters(self)
-        df_He3 = filter_He3(self.He3_df, He3_parameters)
+        #He3_parameters = get_He3_filter_parameters(self)
+        #df_He3 = filter_He3(self.He3_df, He3_parameters)
         # Investigate ToF spread
-        investigate_layers_FWHM(df_MG, df_He3, origin_voxel)
-        investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel)
+        #investigate_layers_FWHM(df_MG, df_He3, origin_voxel)
+        #investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel)
+        duration = get_duration(df_MG)
+        investigate_layers_counts(df_MG, duration)
 
     def full_analysis_action(self):
         # Prepare filter parameters

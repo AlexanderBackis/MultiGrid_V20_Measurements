@@ -44,6 +44,7 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
     4. Bin centers
    (5. Peaks)
    (6. Widths)
+   (7. PileUp) <- Only for He-3
 
     """
     # Declare parameters, such as distance offset and He3 duration
@@ -96,10 +97,10 @@ def prepare_data(origin_voxel, MG_filter_parameters, He3_filter_parameters):
         hist, bins = get_hist(energies, number_bins, start, end)
         data = [duration, energies, hist, bins]
         if i < 1:
-            # If it is a beam measurement, extract peaks
+            # If it is a beam measurement, extract peaks and pile up info
             peaks = get_peaks(hist, heights_He3, number_bins)
             widths, *_ = peak_widths(hist, peaks)
-            data.extend([peaks, widths])
+            data.extend([peaks, widths, df_red.PileUp])
         full_data.append(data)
     return full_data
 
@@ -122,6 +123,11 @@ def plot_all_peaks(data, label, color, chopper_to_detector_distance):
     FoM_uncertainites = []
     peak_areas = []
     peak_area_uncertainties = []
+    # Declare histogram weights, for He-3 we use PileUp + 1 as a weight, else None
+    if label == 'He3':
+        weights = data[6] + 1
+    else:
+        weights = None
     # Declare peak locations and widths
     peak_values = bins[peaks]
     width_values = widths
@@ -136,14 +142,14 @@ def plot_all_peaks(data, label, color, chopper_to_detector_distance):
     for width, peak in zip(width_values, peak_values):
         # Extract fit guesses and peak borders
         left, right = peak-width/20, peak+width/20
-        hist_peak, bins_peak = get_hist(energies, number_bins, left, right)
+        hist_peak, bins_peak = get_hist(energies, number_bins, left, right, weights)
         a_guess, x0_guess, sigma_guess = get_fit_parameters_guesses(hist_peak, bins_peak)
         # Prepare peak within +/- 7 of our estimated sigma
         if peak < 70:
             left_fit, right_fit = (x0_guess - (7 * sigma_guess)), (x0_guess + (7 * sigma_guess))
         else:
             left_fit, right_fit = (x0_guess - (4 * sigma_guess)), (x0_guess + (4 * sigma_guess))
-        hist_fit, bins_fit = get_hist(energies, number_bins, left_fit, right_fit)
+        hist_fit, bins_fit = get_hist(energies, number_bins, left_fit, right_fit, weights)
         fig = plt.figure()
         # Fit data
         a, x0, sigma, x_fit, y_fit, *_ = fit_data(hist_fit, bins_fit, a_guess, x0_guess, sigma_guess)
@@ -154,7 +160,7 @@ def plot_all_peaks(data, label, color, chopper_to_detector_distance):
         else:
             left_plot, right_plot = (x0 - (10 * sigma)), (x0 + (10 * sigma))
             plt.xlim(x0 - (10 * sigma), x0 + (10 * sigma))
-        hist_plot, bins_plot = get_hist(energies, number_bins, left_plot, right_plot)
+        hist_plot, bins_plot = get_hist(energies, number_bins, left_plot, right_plot, weights)
         plt.errorbar(bins_plot, hist_plot, np.sqrt(hist_plot), fmt='.-', capsize=5, zorder=5, label=label, color=color)
         plt.plot(x_fit, y_fit*(max(hist_plot)/max(y_fit)), label='Gaussian fit', color='black')
         # Plot where the shoulder should be
@@ -168,7 +174,7 @@ def plot_all_peaks(data, label, color, chopper_to_detector_distance):
         bin_width = bins_plot[1] - bins_plot[0]
         FoM, FoM_uncertainity = get_FoM(energies, x0, sigma, start, end, bin_width)
         # Extract area
-        peak_area, peak_area_uncertainity = get_peak_area(energies, x0, sigma, bin_width)
+        peak_area, peak_area_uncertainity = get_peak_area(energies, x0, sigma, bin_width, weights)
         # Save all important values
         peak_energies.append(peak)
         FoMs.append(FoM)

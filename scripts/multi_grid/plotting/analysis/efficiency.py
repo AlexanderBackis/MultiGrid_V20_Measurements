@@ -99,10 +99,10 @@ def plot_efficiency(He3_energies, MG_energies,
     plt.xlabel('Energy (meV)')
     plt.ylabel('Efficiency')
     plt.xlim(2, 120)
-    plt.plot(A_to_meV(MG_efficiency_calc[0]), MG_efficiency_calc[1], color='black',
-             label='MG (90° incident angle)', zorder=5)
     plt.errorbar(MG_energies, MG_efficiency, full_errors, fmt='.-',
                 capsize=5, color='blue', label='Measured MG efficiency', zorder=5)
+    plt.plot(A_to_meV(MG_efficiency_calc[0]), MG_efficiency_calc[1], color='black',
+             label='MG (90° incident angle)', zorder=5)
     #plt.plot(He3_energies, He3_efficiency_datapoints, color='red',
     #         marker='o', linestyle='', label='He-3, Calculated', zorder=5)
     plt.grid(True, which='major', linestyle='--', zorder=0)
@@ -113,8 +113,6 @@ def plot_efficiency(He3_energies, MG_energies,
     plt.subplot(1, 3, 3)
     plt.xlabel('Wavelength (Å)')
     plt.ylabel('Efficiency')
-    MG_efficiency = (MG_areas*monitor_norm_MG)/(He3_areas*(1/He3_efficiency_datapoints)*monitor_norm_He3)
-    MG_efficiency_unc = np.sqrt((MG_err/MG_areas) ** 2 + (He3_err/He3_areas) ** 2) * MG_efficiency
     plt.errorbar(meV_to_A(MG_energies), MG_efficiency, full_errors, fmt='.-',
                  capsize=5, color='blue', label='Measured MG efficiency', zorder=5)
     plt.grid(True, which='major', linestyle='--', zorder=0)
@@ -133,7 +131,7 @@ def plot_efficiency(He3_energies, MG_energies,
 #                            CALCULATE PEAK AREA
 # =============================================================================
 
-def get_peak_area(energies, x0, sigma, bin_width):
+def get_peak_area(energies, x0, sigma, bin_width, weights=None):
     """
     Calculates the elastic peak area. Does this in five steps:
 
@@ -158,8 +156,10 @@ def get_peak_area(energies, x0, sigma, bin_width):
         back_start = -3
         back_stop = -2
     # Extract number of counts from regions of interest
-    peak_counts = energies[(energies >= (x0 - sigma)) & (energies <= (x0 + sigma))]
-    background_counts = energies[(energies >= (x0 + back_start*sigma)) & (energies <= (x0 + back_stop*sigma))]
+    peak_indexes = (energies >= (x0 - sigma)) & (energies <= (x0 + sigma))
+    background_indexes = (energies >= (x0 + back_start*sigma)) & (energies <= (x0 + back_stop*sigma))
+    peak_counts = energies[peak_indexes]
+    background_counts = energies[background_indexes]
     # Rename for easier calculation of uncertainties
     a = len(peak_counts)
     b = len(background_counts)
@@ -167,15 +167,22 @@ def get_peak_area(energies, x0, sigma, bin_width):
     # Define normalization constants
     norm = (1/background_range_in_meV) * 2*sigma
     # Calculate area
-    c = a - b * norm
+    if weights is not None:
+        norm_a = sum(weights[peak_indexes])/a
+        norm_b = sum(weights[background_indexes])/b
+    else:
+        norm_a = 1
+        norm_b = 1
+    c = (a * norm_a) - (b * norm * norm_b)
     # Calculate uncertainites
     da = np.sqrt(a)
     db = np.sqrt(b)
-    dc = np.sqrt(da ** 2 + (db*norm) ** 2)
+    dc = np.sqrt((da*norm_b) ** 2 + (db*norm*norm_b) ** 2)
     uncertainty = dc
     area = c
     # Plot background to cross-check calculation
-    plt.axhline(y=b*(1/background_range_in_meV)*bin_width, color='black', linewidth=2, label=None)
+    plt.axhline(y=b*norm_b*(1/background_range_in_meV)*bin_width, color='black',
+                linewidth=2, label=None)
     # Statistics for background
     plt.axvline(x=x0 + back_start*sigma, color='black', linewidth=2, label='Background')
     plt.axvline(x=x0 + back_stop*sigma, color='black', linewidth=2, label=None)

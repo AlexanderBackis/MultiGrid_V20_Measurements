@@ -322,6 +322,48 @@ def investigate_layers_delta_ToF(df_MG, df_He3, origin_voxel):
 
 
 # =============================================================================
+#                      LAYERS INVESTIGATION - COUNTS
+# =============================================================================
+
+def investigate_layers_counts(df, duration):
+    # Get count as a function of layer
+    layers = np.arange(0, 20, 1)
+    counts = [df[(df.wCh % 20) == layer].shape[0] for layer in layers]
+    # Plot data
+    fig = plt.figure()
+    plt.grid(True, which='major', linestyle='--', zorder=0)
+    plt.grid(True, which='minor', linestyle='--', zorder=0)
+    plt.xlabel('Layer')
+    plt.ylabel('Counts (Normalized by duration)')
+    plt.title('Counts vs layer')
+    plt.errorbar(layers, counts/duration, np.sqrt(counts)*(1/duration),
+                 fmt='.-', capsize=5, zorder=5, color='black')
+    fig.show()
+
+
+# =============================================================================
+#                      LAYERS INVESTIGATION - PHS
+# =============================================================================
+
+def investigate_layers_phs(df, duration):
+    # Get count as a function of layer
+    layers = np.arange(0, 20, 1)
+    counts = [df[(df.wCh % 20) == layer].shape[0] for layer in layers]
+    # Plot data
+    fig = plt.figure()
+    plt.grid(True, which='major', linestyle='--', zorder=0)
+    plt.grid(True, which='minor', linestyle='--', zorder=0)
+    plt.xlabel('Layer')
+    plt.ylabel('Counts (Normalized by duration)')
+    plt.title('Counts vs layer')
+    plt.errorbar(layers, counts/duration, np.sqrt(counts)*(1/duration),
+                 fmt='.-', capsize=5, zorder=5, color='black')
+    fig.show()
+
+
+
+
+# =============================================================================
 #                               HELPER FUNCTIONS
 # =============================================================================
 

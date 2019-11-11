@@ -30,9 +30,13 @@ def timestamp_plot(Time, number_bins, unit, label):
 
     # Prepare figure
     plt.title('Timestamp Histogram')
-    plt.xlabel('Time [%s]' % unit)
-    plt.ylabel('Counts [events/bin]')
+    plt.xlabel('Time (%s)' % unit)
+    plt.ylabel('Rate (events/s)')
     plt.grid(True, which='major', zorder=0)
     plt.grid(True, which='minor', linestyle='--', zorder=0)
     # Plot
-    plt.hist(Time, histtype='step', bins=number_bins, label=label, zorder=5)
+    #plt.hist(Time, histtype='step', bins=number_bins, label=label, zorder=5)
+    hist, bin_edges = np.histogram(Time, bins=number_bins)
+    bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+    delta_t = (60 ** 2) * (bin_centers[1] - bin_centers[0])
+    plt.plot(bin_centers, hist/delta_t, label=label, zorder=5)
